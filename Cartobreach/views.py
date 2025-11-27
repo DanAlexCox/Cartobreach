@@ -1,9 +1,8 @@
 from django.shortcuts import render
+from django import template
 
-#renders static content
-def simple_view(request):
-    data = {"content": "Gfg is the best"}
-    return render(request, "geeks.html", data)
+#register library for templates
+register = template.Library()
 
 #handles form input and applies conditional rendering.
 def check_age(request):
@@ -23,15 +22,24 @@ def loop(request):
     }
     return render(request, "loop.html", context)
 
+#returns variable type
+@register.filter(name='get_type')
+def get_type(value):
+    return type(value).__name__
+
 #testing map.html view
 def map(request):
-    test_variable = "Hello World!"
-    #context dictionary variable name : context data
-    context ={
-        "test_variable": test_variable,
-        "another_test" : "My name is daniel",
-        "number_test" : 42,
-        "number_list" : [1,2,3,4,5],
-        
+    mapload = None
+    #post check post method
+    if request.method == 'POST':
+        #returns mapload if submit button 'maploader' is clicked
+        mapload = request.POST.get('mapload', None)
+    
+    #content dictionary
+    context = {
+        'index' : "",
+        'map' : "map.html",
+        'mapload' : mapload,
     }
+
     return render(request, "index.html", context)

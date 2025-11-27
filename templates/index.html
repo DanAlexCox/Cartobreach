@@ -1,4 +1,34 @@
-<!-- Button to load map -->
-<button class="maploader">Load map</button>
+<!DOCTYPE html>
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Cartobreach</title> 
+</head> 
+<body> 
+    <h1>Welcome to Cartobreach</h1>
+    <!-- Button to load map and hide map-->
+    <form method="post" action ="{{index}}" mapshow">
+        {% csrf_token %}
+        <input type="hidden" name="mapload" value="map.html">
+        <button type="submit">Load map</button>
+    </form>
+    <form method="post" action="{{index}}" id="maphide">
+        {% csrf_token %}
+        <input type="hidden" name="maphide">
+        <button type="submit">Hide map</button>
+    </form>
+    
+    <!-- load map (map.html) after clicking maploader button -->
 
-<!-- load map after clicking maploader button -->
+    {% if mapload is not str %}
+        {% include mapload %}
+    {% else %}
+        {{mapload}}
+    {% endif %}
+    
+</body> 
+</html>
+
+
+

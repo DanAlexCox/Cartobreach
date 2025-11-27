@@ -1,11 +1,17 @@
-{{ test_variable }}
-</br>
-{{ another_test }}
-</br>
-{{ number_test }}
-</br>
-{{ number_list}}
-</br>
+<!-- map styler -->
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/map.css' %}">
+<!-- map img -->
 {% load static %}
 <img src="{% static 'images/continents_map.svg' %}" alt="Continents_map">
 <br>
+
+<!-- Button to load analytics section (visually on the right of map)-->
+<button class="analyticsloader">Open analytics</button>
+
+<!-- load dataset analytics (analysis.html) after clicking analyticsloader button -->
+<section class="mapanalytics">
+    <!-- when single continent clicked load analysis of continent data-->
+</section>
+
+

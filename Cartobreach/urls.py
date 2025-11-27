@@ -22,7 +22,6 @@ from Cartobreach import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('simple', views.simple_view),
     path('condition', views.check_age),
     path('loop', views.loop),
     path('', views.map),
