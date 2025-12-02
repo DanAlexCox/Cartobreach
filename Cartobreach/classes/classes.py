@@ -34,10 +34,10 @@ class Map:
         
 # Class for continents
 class Continent:
-    def __init__(self, name, name_map, color):
+    def __init__(self, name, alpha_code, name_map):
         self._name = name # name of continent
+        self._alpha_code = alpha_code # alpha code of continent
         self._name_map = name_map # name on world map
-        self._color = color # color of continent
     
     def getName(self): # name getter
         return self._name 
@@ -45,17 +45,18 @@ class Continent:
     def setName(self, value): # name setter
         self._name = value
         
+    def getAlphaCode(self): # continent alpha code getter
+        return self._alpha_code 
+    
+    def setAlphaCode(self, value): # continent setter
+        self._alpha_code = value
+        
     def getNameMap(self): # name on map getter
         return self._name_map 
     
     def setNameMap(self, value): # name on map setter
         self._name_map = value
     
-    def getColor(self): # color getter
-        return self._color
-    
-    def setColor(self, value): # color setter
-        self._color = value
     
 # Class for countries
 class Country:

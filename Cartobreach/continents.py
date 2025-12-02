@@ -2,16 +2,14 @@ from classes.classes import Continent
 from django.http import HttpResponse
 import pygal #install pygal_maps_world via pip
 
-
 #Constructing continent objects
-AF = Continent("Africa", "africa", "yellow")
-AN = Continent("Antarctica", "antartica", "white")
-AS = Continent("Asia", "asia", "red")
-EU = Continent("Europe", "europe", "blue")
-NA = Continent("North America", "north_america", "green")
-OC = Continent("Oceania", "oceania", "purple")
-SA = Continent("South America", "south_america", "orange")
-
+AF = Continent("Africa", "AF", "africa")
+AN = Continent("Antarctica", "AN", "antartica")
+AS = Continent("Asia", "AS", "asia")
+EU = Continent("Europe", "EU", "europe")
+NA = Continent("North America", "NA", "north_america")
+OC = Continent("Oceania", "OC", "oceania")
+SA = Continent("South America", "SA", "south_america")
 
 #Create world map
 
