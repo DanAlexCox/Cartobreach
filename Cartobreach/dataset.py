@@ -4,7 +4,7 @@ from datetime import datetime
 from continents import AF,AN,AS,EU,NA,OC,SA #importing continent objects
 
 #get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory"], nrows=5)
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory"], nrows=20)
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
@@ -35,22 +35,42 @@ def convertCountryCodeToContinentCode(cellList):
     return continents
 
 # function that counts how many times a data "search" is in an unclean column thats also have another data "alsosearch" from column "alsocolumn"
-def countUncleanColumnValuesInContinent(column, search, alsocolumn, alsosearch):
-    #clean columns
-    cleanedColumn = cleanColumn(column)
-    cleanedAlsoColumn = cleanColumn(alsocolumn)
+def countUncleanDoubleColumnValues(column, search, alsocolumn, alsosearch):
+    count = 0
+    for i in df[column]:
+        for j in df[alsocolumn]:
+            if search in i and alsosearch in j:
+                count =count+1
+    return count
 
-    return cleanedColumn.apply(lambda x: (
-         isinstance(x, list)
-         and search in x
-         and isinstance(cleanedAlsoColumn, list)
-         and alsosearch in cleanedAlsoColumn
-        ), axis=1).sum()
+# function that filters out date type columns to exclude any non date times
+def filterDateTime(series):
+    # convert to DateTime
+    series = series.apply(convertDateTime)
+    return series[series.apply(lambda x: isinstance(x, datetime))]
 
-# convert start and end dates
-df["start_date"] = df["start_date"].apply(convertDateTime)
-df["end_date"] = df["end_date"].apply(convertDateTime)
+# function that filters every row that doesnt have only value in each row
+def filterSingleColumn(cellList):
+    #clean column
+    cellList = cleanColumn(cellList)
+    return df[cellList.apply(lambda x: isinstance(x, list) and len(x) == 1)]
 
+# function that filters every row that doesnt have only value in each row
+def filterMultipleColumns(column):
+    #clean column
+    column = cleanColumn(column)
+    return df[column.apply(lambda x: isinstance(x, list) and len(x) > 1)]
+
+# function that filters a specific value from series
+def filterSpecificColumn(column, value):
+    #clean column
+    column = cleanColumn(column)
+    return df[column.apply(lambda x: isinstance(x, list) and (value in x))]
+
+#function that calculates total intensity of a region (continent/country)
+def totalAreaIntensity(area):
+    return area[helo]
+    
 #sort by start date
 groupStartDate = df.sort_values(by=["start_date"], ascending=True)
 
@@ -60,11 +80,32 @@ df["receiver_continent_code"] = df["receiver_country_alpha_2_code"].apply(conver
 df["receiver_continent_code"] = df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
     
 # count how many attacks were towards corporate industry
-print(countUncleanColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)"))
+countUncleanColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)")
 
 # count how many attacks were towards military
-print(countUncleanColumnValues("receiver_subcategory","Military"))
+countUncleanColumnValues("receiver_subcategory","Military")
 
 # count how many attacks occured relating political groups/governments in a continent
-print(countUncleanColumnValuesInContinent("receiver_category","State institutions / political system","receiver_continent_code",NA.getAlphaCode()))
+countUncleanDoubleColumnValues("receiver_category","State institutions / political system","receiver_continent_code",NA.getAlphaCode())
 
+# count how many attacks occured relating to social groups in a continent
+countUncleanDoubleColumnValues("receiver_category","Social groups","receiver_continent_code",NA.getAlphaCode())
+
+# count how many attacks occured relating to critical infrastrastructure in a continent
+countUncleanDoubleColumnValues("receiver_category","Critical infrastructure","receiver_continent_code",NA.getAlphaCode())
+
+# filter list so it includes only known start and end dates
+filterDateTime(df["start_date"])
+filterDateTime(df["end_date"])
+
+# make df series only with one singular type of incident
+filterSingleColumn("incident_type")
+
+# make df series only with more than one type of incident
+filterMultipleColumns("incident_type")
+
+# filter df series for one type of incident
+filterSpecificColumn("incident_type","Disruption")
+
+# total intensity weight for an area (date_theft, disruption, hijacking, physical_effects_spatial, physical_effects_temporal, unweighted_intensity)
+totalAreaIntensity(AS.getAlphaCode)
