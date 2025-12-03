@@ -4,7 +4,7 @@ from datetime import datetime
 from continents import AF,AN,AS,EU,NA,OC,SA # importing continent objects
 
 # get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "data_theft", "weighted_intensity"], nrows=20)
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=20)
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
@@ -102,7 +102,6 @@ df["receiver_continent_code"] = df["receiver_continent_code"].apply(lambda x: li
     
 # count how many attacks were towards corporate industry
 countUncleanColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)")
-
 # count how many attacks were towards military
 countUncleanColumnValues("receiver_subcategory","Military")
 
@@ -140,12 +139,16 @@ totalMultipleIntensity("incident_type", "Data theft", "receiver_continent_code",
 # intensity of an area alpha code broken down into data_theft, "disruption", "hijacking", "physical_effects_spatial", "physical_effects_temporal"
 specificIntensity("data_theft", "receiver_continent_code", NA.getAlphaCode())
 
-# total political intensity weight
+# count how many instances of known functional disruption are there in a region
+countUncleanDoubleColumnValues("functional_impact", "Days (< 7 days)", "receiver_continent_code", NA.getAlphaCode())
 
-# Disruption duration
-
-# Intelligence disruption
+# count how many instances of known intelligence disruption are there in a region
+countUncleanDoubleColumnValues("intelligence_impact", "Minor data breach/exfiltration (no critical/sensitive information), data corruption (deletion/altering) and/or leaking of data  ", "receiver_continent_code", EU.getAlphaCode())
 
 # Attacker types
 
-# Line graph to show number of incidents every year/month
+# bar chart for instances in each continent
+
+# line graph to show number of incidents every year
+
+# line graph to show number of incidents every month
