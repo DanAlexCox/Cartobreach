@@ -1,10 +1,10 @@
-import pandas as pd #pip install pandas
-import pycountry_convert as pcc #pip install pycountry-convert
+import pandas as pd # pip install pandas
+import pycountry_convert as pcc # pip install pycountry-convert
 from datetime import datetime
-from continents import AF,AN,AS,EU,NA,OC,SA #importing continent objects
+from continents import AF,AN,AS,EU,NA,OC,SA # importing continent objects
 
-#get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory"], nrows=20)
+# get data from csv
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "data_theft", "weighted_intensity"], nrows=20)
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
@@ -12,14 +12,14 @@ def convertDateTime(column):
 
 # function that cleans and returns column
 def cleanColumn(column):
-    #turn into uncleaned column lists
-    countList = df[column].str.split(";")
-    #clean column lists to make unique values only
-    return countList.apply(lambda x: x if isinstance(x, (list, tuple, str)) else x).apply(lambda x: list(dict.fromkeys(x)))
+    # turn into uncleaned column lists
+    countList = df[column].apply(lambda v: v.split(";") if isinstance(v, str) else v)
+    # clean column lists to make unique values only
+    return countList.apply(lambda x: list(dict.fromkeys(x)))
 
 # function for counting how many instances are in an uncleaned column
 def countUncleanColumnValues(column, search):
-    #clean column and turn into list
+    # clean column and turn into list
     cleanedColumn = cleanColumn(column)
     return cleanedColumn.apply(lambda x: isinstance(x, list) and search in x).sum()
 
@@ -51,27 +51,48 @@ def filterDateTime(series):
 
 # function that filters every row that doesnt have only value in each row
 def filterSingleColumn(cellList):
-    #clean column
+    # clean column
     cellList = cleanColumn(cellList)
     return df[cellList.apply(lambda x: isinstance(x, list) and len(x) == 1)]
 
 # function that filters every row that doesnt have only value in each row
 def filterMultipleColumns(column):
-    #clean column
+    # clean column
     column = cleanColumn(column)
     return df[column.apply(lambda x: isinstance(x, list) and len(x) > 1)]
 
 # function that filters a specific value from series
 def filterSpecificColumn(column, value):
-    #clean column
-    column = cleanColumn(column)
-    return df[column.apply(lambda x: isinstance(x, list) and (value in x))]
+    # clean column
+    cleanedColumn = cleanColumn(column)
+    return df[cleanedColumn.apply(lambda x: value in x)]
 
-#function that calculates total intensity of a region (continent/country)
-def totalAreaIntensity(area):
-    return area[helo]
+# function that filters two different AND values from series
+def filterTwoColumns(column, value, alsocolumn, alsovalue):
+    # clean column and alsocolumn
+    cleanedColumn = cleanColumn(column)
+    cleanedAlsoColumn = cleanColumn(alsocolumn)
+    # return df that is filtered when value and alsovalue exist
+    return df[cleanedColumn.apply(lambda x: value in x) & cleanedAlsoColumn.apply(lambda x: alsovalue in x)]
+
+# function that calculates total intensity of a region (continent/country) using weighted_intensity
+def totalAreaIntensity(area, alpha):
+    # filter to a region area
+    filteredDataframe = filterSpecificColumn(area, alpha)
+    # sum up weighted_intensity
+    return filteredDataframe["weighted_intensity"].sum()
     
-#sort by start date
+# function that calculates total intensity using 2 conditions
+def totalMultipleIntensity(column, value, alsocolumn, alsovalue):
+    # filter df and then sum up weighted_intensity
+    return filterTwoColumns(column, value, alsocolumn, alsovalue)["weighted_intensity"].sum()
+
+# function that calculates unweighted intensity of a region using a specified scoring column
+def specificIntensity(scorecolumn, regioncolumn, region):
+    # filter to region and replace score strings to integer scores then sum all points up
+    return filterSpecificColumn(regioncolumn, region)[scorecolumn].apply(lambda x: 2 if "2 points" in x else (1 if "1 point" in x else 0)).sum()
+
+# sort by start date
 groupStartDate = df.sort_values(by=["start_date"], ascending=True)
 
 # make new column receiver_continent with unique values only
@@ -107,5 +128,24 @@ filterMultipleColumns("incident_type")
 # filter df series for one type of incident
 filterSpecificColumn("incident_type","Disruption")
 
-# total intensity weight for an area (date_theft, disruption, hijacking, physical_effects_spatial, physical_effects_temporal, unweighted_intensity)
-totalAreaIntensity(AS.getAlphaCode)
+# filter df series using two column conditions
+filterTwoColumns("incident_type", "Disruption", "receiver_continent_code", NA.getAlphaCode())
+
+# total intensity weight for an area alpha code (data_theft, disruption, hijacking, physical_effects_spatial, physical_effects_temporal, unweighted_intensity)
+totalAreaIntensity("receiver_continent_code", AS.getAlphaCode())
+
+# intensity of an area filtering to a column value
+totalMultipleIntensity("incident_type", "Data theft", "receiver_continent_code", EU.getAlphaCode())
+
+# intensity of an area alpha code broken down into data_theft, "disruption", "hijacking", "physical_effects_spatial", "physical_effects_temporal"
+specificIntensity("data_theft", "receiver_continent_code", NA.getAlphaCode())
+
+# total political intensity weight
+
+# Disruption duration
+
+# Intelligence disruption
+
+# Attacker types
+
+# Line graph to show number of incidents every year/month
