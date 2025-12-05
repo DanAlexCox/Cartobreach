@@ -1,7 +1,9 @@
-import pandas as pd # pip install pandas
-import pycountry_convert as pcc # pip install pycountry-convert
-from datetime import datetime
-from continents import AF,AN,AS,EU,NA,OC,SA # importing continent objects
+# pip install ...
+import matplotlib.pyplot as ppl # import pyplot matlablib
+import pandas as pd # import pandas
+import pycountry_convert as pcc # import pycountry-convert
+from datetime import datetime # import datetime function
+from continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
 
 # get data from csv
 df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=20)
@@ -84,6 +86,15 @@ def totalMultipleIntensity(column, value, alsocolumn, alsovalue):
     # filter df and then sum up weighted_intensity
     return filterTwoColumns(column, value, alsocolumn, alsovalue)["weighted_intensity"].sum()
 
+# function that cuts data series into cut dates between minimum date and maximum
+def filterDateRange(dateColumnSeries, min, max):
+    filteredSeries = filterDateTime(dateColumnSeries) # filter date series
+    min = datetime.strptime(min, '%d.%m.%Y') #convert date string to datetime
+    max = datetime.strptime(max, '%d.%m.%Y') #convert date string to datetime
+    # union comparison of min and max ranges
+    return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x <= max)]
+
+
 # function that calculates unweighted intensity of a region using a specified scoring column
 def specificIntensity(scorecolumn, regioncolumn, region):
     # filter to region and replace score strings to integer scores then sum all points up
@@ -112,8 +123,8 @@ countUncleanDoubleColumnValues("receiver_category","Social groups","receiver_con
 countUncleanDoubleColumnValues("receiver_category","Critical infrastructure","receiver_continent_code",AS.getAlphaCode())
 
 # filter list so it includes only known start and end dates
-filterDateTime(df["start_date"])
-filterDateTime(df["end_date"])
+df["start_date"] = filterDateTime(df["start_date"])
+df["end_date"] = filterDateTime(df["end_date"])
 
 # make df series only with one singular type of incident
 filterSingleColumn("incident_type")
@@ -153,9 +164,33 @@ countUncleanColumnValues("initiator_continent_code", AS.getAlphaCode())
 # count initiators from region that attacked corporate targets
 countUncleanDoubleColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)", "initiator_continent_code", NA.getAlphaCode())
 
-# bar chart for instances in each continent
+# set continent values
+AF.setValue(countUncleanColumnValues("receiver_continent_code", AF.getAlphaCode())),
+AS.setValue(countUncleanColumnValues("receiver_continent_code", AS.getAlphaCode()))
+AN.setValue(countUncleanColumnValues("receiver_continent_code", AN.getAlphaCode()))
+EU.setValue(countUncleanColumnValues("receiver_continent_code", EU.getAlphaCode()))
+NA.setValue(countUncleanColumnValues("receiver_continent_code", NA.getAlphaCode()))
+OC.setValue(countUncleanColumnValues("receiver_continent_code", OC.getAlphaCode()))
+SA.setValue(countUncleanColumnValues("receiver_continent_code", SA.getAlphaCode()))
 
+# bar plot for instances in each continent
+barValues = [countUncleanColumnValues("receiver_continent_code", AF.getAlphaCode()),
+             countUncleanColumnValues("receiver_continent_code", AS.getAlphaCode()),
+             countUncleanColumnValues("receiver_continent_code", AN.getAlphaCode()),
+             countUncleanColumnValues("receiver_continent_code", EU.getAlphaCode()),
+             countUncleanColumnValues("receiver_continent_code", NA.getAlphaCode()),
+             countUncleanColumnValues("receiver_continent_code", OC.getAlphaCode()),
+             countUncleanColumnValues("receiver_continent_code", SA.getAlphaCode())]
+barNames = [AF.getName(), AS.getName(), AN.getName(), EU.getName(), NA.getName(), OC.getName(), SA.getName()]
 
-# line graph to show number of incidents every year
+ppl.bar(barNames, barValues, color="blue")
+ppl.xlabel("Continents")
+ppl.ylabel("No. of Incidents")
+ppl.savefig("Cartobreach/static/images/continent_incidents.png")
+# line graph to show number of incidents every year i.e. known start date range 1/1/YYYY - 31/12/YYYY
+# filter dates and format
+filterDateRange(df["start_date"], '01.01.2003', '31.12.2003')
+
+# range of filtered dates
 
 # line graph to show number of incidents every month
