@@ -10,7 +10,7 @@ df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["inc
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
-    return pd.to_datetime(column, format="%d.%m.%Y", errors ='coerce')
+    return pd.to_datetime(column, format="%d.%m.%Y", errors ='coerce').date()
 
 # function that cleans and returns column
 def cleanColumn(column):
@@ -86,19 +86,40 @@ def totalMultipleIntensity(column, value, alsocolumn, alsovalue):
     # filter df and then sum up weighted_intensity
     return filterTwoColumns(column, value, alsocolumn, alsovalue)["weighted_intensity"].sum()
 
-# function that cuts data series into cut dates between minimum date and maximum
-def filterDateRange(dateColumnSeries, min, max):
-    filteredSeries = filterDateTime(dateColumnSeries) # filter date series
-    min = datetime.strptime(min, '%d.%m.%Y') #convert date string to datetime
-    max = datetime.strptime(max, '%d.%m.%Y') #convert date string to datetime
-    # union comparison of min and max ranges
-    return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x <= max)]
-
-
 # function that calculates unweighted intensity of a region using a specified scoring column
 def specificIntensity(scorecolumn, regioncolumn, region):
     # filter to region and replace score strings to integer scores then sum all points up
     return filterSpecificColumn(regioncolumn, region)[scorecolumn].apply(lambda x: 2 if "2 points" in x else (1 if "1 point" in x else 0)).sum()
+
+# function that cuts data series into cut dates between minimum date and maximum
+def filterDateRange(dateColumnSeries, min, max):
+    filteredSeries = filterDateTime(dateColumnSeries) # filter date series
+    min = datetime.strptime(min, '%d.%m.%Y').date() #convert date string to datetime
+    max = datetime.strptime(max, '%d.%m.%Y').date() #convert date string to datetime
+    # union comparison of min and max ranges
+    return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+
+# function that adds rows in a date range
+def countInDateRange(dateColumnSeries, min, max):
+    return filterDateRange(dateColumnSeries, min, max).count()
+
+# function that constructs line plot for yearly incident counts between dataset minimum and maximum date
+def yearlyIncidentBarPlot(dateColumnSeries, dataMin, dataMax):
+    # yearly date range list
+    yearRange = pd.date_range(start=dataMin, end=dataMax, freq='YS').to_pydatetime()
+    # date range counts of each year (count up to end of year, end of year)
+    plotArray = [[]]
+    for i in range(0, len(yearRange)):
+        plotArray.append([countInDateRange(dateColumnSeries, str(yearRange[i]), str(yearRange[i+1])), yearRange[i]])
+    #next roadblock: yearRange[i] is str but not formatted to filterDateRange format
+ 
+ 
+ 
+ 
+ 
+    
+    # plot line plot (x: year, y: number of incidents)
+    
 
 # sort by start date
 groupStartDate = df.sort_values(by=["start_date"], ascending=True)
@@ -187,10 +208,9 @@ ppl.bar(barNames, barValues, color="blue")
 ppl.xlabel("Continents")
 ppl.ylabel("No. of Incidents")
 ppl.savefig("Cartobreach/static/images/continent_incidents.png")
-# line graph to show number of incidents every year i.e. known start date range 1/1/YYYY - 31/12/YYYY
-# filter dates and format
-filterDateRange(df["start_date"], '01.01.2003', '31.12.2003')
+# line graph to show number of incidents every year i.e. known start date range 1/1/2000 <= x < 1/1/2025
+# filter dates by year
+yearlyIncidentBarPlot(df["start_date"], '01.01.2000', '01.01.2025')
 
-# range of filtered dates
 
-# line graph to show number of incidents every month
+# line graph to show all continents' total incidents each month each with different colours
