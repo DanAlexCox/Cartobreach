@@ -38,7 +38,7 @@ class Continent:
         self._name = name # name of continent
         self._alpha_code = alpha_code # alpha code of continent
         self._name_map = name_map # name on world map
-        self._val = val # value of continent
+        self._val = val # active value of continent
     
     def getName(self): # name getter
         return self._name 
@@ -58,10 +58,10 @@ class Continent:
     def setNameMap(self, value): # name on map setter
         self._name_map = value
     
-    def getValue(self): # value of continent getter
+    def getValue(self): # active value of continent getter
         return self._val
     
-    def setValue(self, value): # value of continent setter
+    def setValue(self, value): # active value of continent setter
         self._val = value
     
 # Class for countries
