@@ -4,7 +4,7 @@ from datetime import datetime
 from continents import AF,AN,AS,EU,NA,OC,SA # importing continent objects
 
 # get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=20)
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=20)
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
@@ -36,12 +36,9 @@ def convertCountryCodeToContinentCode(cellList):
 
 # function that counts how many times a data "search" is in an unclean column thats also have another data "alsosearch" from column "alsocolumn"
 def countUncleanDoubleColumnValues(column, search, alsocolumn, alsosearch):
-    count = 0
-    for i in df[column]:
-        for j in df[alsocolumn]:
-            if search in i and alsosearch in j:
-                count =count+1
-    return count
+    # clean columns then count the rows that both search and also search exist
+    
+    return (cleanColumn(column).apply(lambda x: search in x) & cleanColumn(alsocolumn).apply(lambda x: alsosearch in x)).sum()
 
 # function that filters out date type columns to exclude any non date times
 def filterDateTime(series):
@@ -112,7 +109,7 @@ countUncleanDoubleColumnValues("receiver_category","State institutions / politic
 countUncleanDoubleColumnValues("receiver_category","Social groups","receiver_continent_code",NA.getAlphaCode())
 
 # count how many attacks occured relating to critical infrastrastructure in a continent
-countUncleanDoubleColumnValues("receiver_category","Critical infrastructure","receiver_continent_code",NA.getAlphaCode())
+countUncleanDoubleColumnValues("receiver_category","Critical infrastructure","receiver_continent_code",AS.getAlphaCode())
 
 # filter list so it includes only known start and end dates
 filterDateTime(df["start_date"])
@@ -125,7 +122,7 @@ filterSingleColumn("incident_type")
 filterMultipleColumns("incident_type")
 
 # filter df series for one type of incident
-filterSpecificColumn("incident_type","Disruption")
+filterSpecificColumn("incident_type","Data_theft")
 
 # filter df series using two column conditions
 filterTwoColumns("incident_type", "Disruption", "receiver_continent_code", NA.getAlphaCode())
@@ -140,14 +137,24 @@ totalMultipleIntensity("incident_type", "Data theft", "receiver_continent_code",
 specificIntensity("data_theft", "receiver_continent_code", NA.getAlphaCode())
 
 # count how many instances of known functional disruption are there in a region
-countUncleanDoubleColumnValues("functional_impact", "Days (< 7 days)", "receiver_continent_code", NA.getAlphaCode())
+countUncleanDoubleColumnValues("functional_impact", "Days (< 7 days)", "receiver_continent_code", SA.getAlphaCode())
 
 # count how many instances of known intelligence disruption are there in a region
-countUncleanDoubleColumnValues("intelligence_impact", "Minor data breach/exfiltration (no critical/sensitive information), data corruption (deletion/altering) and/or leaking of data  ", "receiver_continent_code", EU.getAlphaCode())
+countUncleanDoubleColumnValues("intelligence_impact", "Minor data breach/exfiltration (no critical/sensitive information), data corruption (deletion/altering) and/or leaking of data  ", "receiver_continent_code", AS.getAlphaCode())
 
-# Attacker types
+# convert initiator country code to continent code
+df["initiator_continent_code"] = cleanColumn("initiator_alpha_2")
+df["initiator_continent_code"] = df["initiator_continent_code"].apply(convertCountryCodeToContinentCode)
+df["initiator_continent_code"] = df["initiator_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+
+# count initiators from region
+countUncleanColumnValues("initiator_continent_code", AS.getAlphaCode())
+
+# count initiators from region that attacked corporate targets
+countUncleanDoubleColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)", "initiator_continent_code", NA.getAlphaCode())
 
 # bar chart for instances in each continent
+
 
 # line graph to show number of incidents every year
 
