@@ -10,7 +10,7 @@ df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["inc
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
-    return pd.to_datetime(column, format="%d.%m.%Y", errors ='coerce').date()
+    return pd.to_datetime(column, format="%d.%m.%Y", errors ='coerce')
 
 # function that cleans and returns column
 def cleanColumn(column):
@@ -94,8 +94,9 @@ def specificIntensity(scorecolumn, regioncolumn, region):
 # function that cuts data series into cut dates between minimum date and maximum
 def filterDateRange(dateColumnSeries, min, max):
     filteredSeries = filterDateTime(dateColumnSeries) # filter date series
-    min = datetime.strptime(min, '%d.%m.%Y').date() #convert date string to datetime
-    max = datetime.strptime(max, '%d.%m.%Y').date() #convert date string to datetime
+    if isinstance(min, str) and isinstance(max, str): # if min and max dates are string
+        min = datetime.strptime(min, '%d.%m.%Y') #convert date string to datetime
+        max = datetime.strptime(max, '%d.%m.%Y') #convert date string to datetime
     # union comparison of min and max ranges
     return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
 
@@ -108,18 +109,24 @@ def yearlyIncidentBarPlot(dateColumnSeries, dataMin, dataMax):
     # yearly date range list
     yearRange = pd.date_range(start=dataMin, end=dataMax, freq='YS').to_pydatetime()
     # date range counts of each year (count up to end of year, end of year)
-    plotArray = [[]]
-    for i in range(0, len(yearRange)):
-        plotArray.append([countInDateRange(dateColumnSeries, str(yearRange[i]), str(yearRange[i+1])), yearRange[i]])
-    #next roadblock: yearRange[i] is str but not formatted to filterDateRange format
- 
- 
- 
- 
- 
-    
+    x_values = []
+    xtick_replace = []
+    xtick_values = []
+    y_values = []
+    for i in range(0, len(yearRange)-1):
+        x_values.append(str(yearRange[i]))
+        if yearRange[i].year % 2 == 0: # determine x axis scale i.e. xticks
+            xtick_replace.append(str(yearRange[i]))
+            xtick_values.append(str(yearRange[i].year))
+        y_values.append(countInDateRange(dateColumnSeries, yearRange[i], yearRange[i+1]))
     # plot line plot (x: year, y: number of incidents)
-    
+    print(len(xtick_values))
+    ppl.figure()
+    ppl.plot(x_values, y_values)
+    ppl.xlabel("Year")
+    ppl.xticks(xtick_replace, xtick_values)
+    ppl.ylabel("No. of Incidents")
+    ppl.savefig("Cartobreach/static/images/continent_incidents_per_year.png")
 
 # sort by start date
 groupStartDate = df.sort_values(by=["start_date"], ascending=True)
@@ -144,8 +151,8 @@ countUncleanDoubleColumnValues("receiver_category","Social groups","receiver_con
 countUncleanDoubleColumnValues("receiver_category","Critical infrastructure","receiver_continent_code",AS.getAlphaCode())
 
 # filter list so it includes only known start and end dates
-df["start_date"] = filterDateTime(df["start_date"])
-df["end_date"] = filterDateTime(df["end_date"])
+filterDateTime(df["start_date"])
+filterDateTime(df["end_date"])
 
 # make df series only with one singular type of incident
 filterSingleColumn("incident_type")
@@ -204,10 +211,12 @@ barValues = [countUncleanColumnValues("receiver_continent_code", AF.getAlphaCode
              countUncleanColumnValues("receiver_continent_code", SA.getAlphaCode())]
 barNames = [AF.getName(), AS.getName(), AN.getName(), EU.getName(), NA.getName(), OC.getName(), SA.getName()]
 
+ppl.figure()
 ppl.bar(barNames, barValues, color="blue")
 ppl.xlabel("Continents")
 ppl.ylabel("No. of Incidents")
 ppl.savefig("Cartobreach/static/images/continent_incidents.png")
+
 # line graph to show number of incidents every year i.e. known start date range 1/1/2000 <= x < 1/1/2025
 # filter dates by year
 yearlyIncidentBarPlot(df["start_date"], '01.01.2000', '01.01.2025')
