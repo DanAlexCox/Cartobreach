@@ -98,14 +98,16 @@ def filterDateRange(dateColumnSeries, min, max):
         min = datetime.strptime(min, '%d.%m.%Y') #convert date string to datetime
         max = datetime.strptime(max, '%d.%m.%Y') #convert date string to datetime
     # union comparison of min and max ranges
-    return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+    ###### make function work for yearlyIncidentLinePlot(...)
+    return (filteredSeries >= min) & (filteredSeries < max)
+    # return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
 
 # function that adds rows in a date range
 def countInDateRange(dateColumnSeries, min, max):
     return filterDateRange(dateColumnSeries, min, max).count()
 
 # function that constructs line plot for yearly incident counts between dataset minimum and maximum date
-def yearlyIncidentBarPlot(dateColumnSeries, dataMin, dataMax):
+def yearlyIncidentLinePlot(dateColumnSeries, dataMin, dataMax):
     # yearly date range list
     yearRange = pd.date_range(start=dataMin, end=dataMax, freq='YS').to_pydatetime()
     # date range counts of each year (count up to end of year, end of year)
@@ -120,16 +122,54 @@ def yearlyIncidentBarPlot(dateColumnSeries, dataMin, dataMax):
             xtick_values.append(str(yearRange[i].year))
         y_values.append(countInDateRange(dateColumnSeries, yearRange[i], yearRange[i+1]))
     # plot line plot (x: year, y: number of incidents)
-    print(len(xtick_values))
+    print(y_values)
     ppl.figure()
     ppl.plot(x_values, y_values)
     ppl.xlabel("Year")
     ppl.xticks(xtick_replace, xtick_values)
     ppl.ylabel("No. of Incidents")
-    ppl.savefig("Cartobreach/static/images/continent_incidents_per_year.png")
+    # ppl.savefig("Cartobreach/static/images/incidents_per_year.png")
 
+# function that cuts data into specified range with one condition
+def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
+    filteredDateSeries = filterDateRange(dateColumnSeries, min, max) # filter date range between min and max function
+    # union of filtered dates and data column value
+    return dataColumn[dataColumn.apply(lambda x: value in x) & filteredDateSeries]
+    
+# function that adds rows in data range
+def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
+    return filterDataRange(dateColumnSeries, dataColumn, value, min, max).count()
+
+# function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
+def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
+    uniqueArea = cleanedArea.explode().unique() # get list of only unique values in dataColumn
+    # dataset lifetime monthly range list for all areas 
+    monthRange = pd.date_range(start='01.01.2000', end = '01.01.2025', freq='MS').to_pydatetime()
+    xtick_replace= [] # replace select months
+    xtick_values = [] # xtick new scale values
+    area_allocation = [] #allocates x,y values to area
+    ppl.figure() # get all area data
+    for area in range(0, len(uniqueArea)):
+        x_values = [] # new area needs new x values
+        y_values = [] # new area needs new y values
+        for i in range(0, len(monthRange)-1): # find count for each area
+            x_values.append(str(monthRange[i]))
+            if monthRange[i].month % 12 == 0 and monthRange[i].year % 2 == 0: # scale for years
+                xtick_replace.append(str(monthRange[i]))
+                xtick_values.append(str(monthRange[i].year))
+            # count incidents for an area and within month range make function
+            y_values.append(countInDataRange(dateColumnSeries, cleanedArea, uniqueArea[area], monthRange[i], monthRange[i+1]))
+        area_allocation.append([uniqueArea[area],[x_values, y_values]])
+        # plot line graph figures
+        ppl.plot(area_allocation[area][1][0], area_allocation[area][1][1])
+    ppl.xlabel("Timeline")
+    ppl.ylabel("Incidents per month")
+    ppl.xticks(xtick_replace, xtick_values)
+    ppl.savefig("Cartobreach/static/images/continent_incidents_per_month.png")
+        
+    
 # sort by start date
-groupStartDate = df.sort_values(by=["start_date"], ascending=True)
+df.sort_values(by=["start_date"], ascending=True)
 
 # make new column receiver_continent with unique values only
 df["receiver_country_alpha_2_code"] = cleanColumn("receiver_country_alpha_2_code")
@@ -214,12 +254,12 @@ barNames = [AF.getName(), AS.getName(), AN.getName(), EU.getName(), NA.getName()
 ppl.figure()
 ppl.bar(barNames, barValues, color="blue")
 ppl.xlabel("Continents")
+ppl.xticks(fontsize=8)
 ppl.ylabel("No. of Incidents")
 ppl.savefig("Cartobreach/static/images/continent_incidents.png")
 
 # line graph to show number of incidents every year i.e. known start date range 1/1/2000 <= x < 1/1/2025
-# filter dates by year
-yearlyIncidentBarPlot(df["start_date"], '01.01.2000', '01.01.2025')
-
+yearlyIncidentLinePlot(df["start_date"], '01.01.2000', '01.01.2025')
 
 # line graph to show all continents' total incidents each month each with different colours
+# monthlyAllAreasIncidentLinePlot(df["start_date"], df["receiver_continent_code"])
