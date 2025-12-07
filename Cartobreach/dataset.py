@@ -95,12 +95,10 @@ def specificIntensity(scorecolumn, regioncolumn, region):
 def filterDateRange(dateColumnSeries, min, max):
     filteredSeries = filterDateTime(dateColumnSeries) # filter date series
     if isinstance(min, str) and isinstance(max, str): # if min and max dates are string
-        min = datetime.strptime(min, '%d.%m.%Y') #convert date string to datetime
-        max = datetime.strptime(max, '%d.%m.%Y') #convert date string to datetime
+        min = pd.Timestamp(datetime.strptime(min, '%d.%m.%Y')) #convert date string to datetime
+        max = pd.Timestamp(datetime.strptime(max, '%d.%m.%Y')) #convert date string to datetime
     # union comparison of min and max ranges
-    ###### make function work for yearlyIncidentLinePlot(...)
-    return (filteredSeries >= min) & (filteredSeries < max)
-    # return filteredSeries[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+    return df[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
 
 # function that adds rows in a date range
 def countInDateRange(dateColumnSeries, min, max):
@@ -122,20 +120,22 @@ def yearlyIncidentLinePlot(dateColumnSeries, dataMin, dataMax):
             xtick_values.append(str(yearRange[i].year))
         y_values.append(countInDateRange(dateColumnSeries, yearRange[i], yearRange[i+1]))
     # plot line plot (x: year, y: number of incidents)
-    print(y_values)
     ppl.figure()
     ppl.plot(x_values, y_values)
     ppl.xlabel("Year")
     ppl.xticks(xtick_replace, xtick_values)
     ppl.ylabel("No. of Incidents")
-    # ppl.savefig("Cartobreach/static/images/incidents_per_year.png")
+    ppl.savefig("Cartobreach/static/images/incidents_per_year.png")
 
 # function that cuts data into specified range with one condition
 def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
-    filteredDateSeries = filterDateRange(dateColumnSeries, min, max) # filter date range between min and max function
+    filteredSeries = filterDateTime(dateColumnSeries) # filter date series
+    if isinstance(min, str) and isinstance(max, str): # if min and max dates are string
+        min = pd.Timestamp(datetime.strptime(min, '%d.%m.%Y')) #convert date string to datetime
+        max = pd.Timestamp(datetime.strptime(max, '%d.%m.%Y')) #convert date string to datetime
     # union of filtered dates and data column value
-    return dataColumn[dataColumn.apply(lambda x: value in x) & filteredDateSeries]
-    
+    return dataColumn[dataColumn.apply(lambda x: value in x) & filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+
 # function that adds rows in data range
 def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
     return filterDataRange(dateColumnSeries, dataColumn, value, min, max).count()
@@ -154,7 +154,7 @@ def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
         y_values = [] # new area needs new y values
         for i in range(0, len(monthRange)-1): # find count for each area
             x_values.append(str(monthRange[i]))
-            if monthRange[i].month % 12 == 0 and monthRange[i].year % 2 == 0: # scale for years
+            if (monthRange[i].month % 12 == 0) and (monthRange[i].year % 2 == 0): # scale for years
                 xtick_replace.append(str(monthRange[i]))
                 xtick_values.append(str(monthRange[i].year))
             # count incidents for an area and within month range make function
@@ -166,7 +166,6 @@ def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
     ppl.ylabel("Incidents per month")
     ppl.xticks(xtick_replace, xtick_values)
     ppl.savefig("Cartobreach/static/images/continent_incidents_per_month.png")
-        
     
 # sort by start date
 df.sort_values(by=["start_date"], ascending=True)
@@ -175,7 +174,7 @@ df.sort_values(by=["start_date"], ascending=True)
 df["receiver_country_alpha_2_code"] = cleanColumn("receiver_country_alpha_2_code")
 df["receiver_continent_code"] = df["receiver_country_alpha_2_code"].apply(convertCountryCodeToContinentCode)
 df["receiver_continent_code"] = df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
-    
+
 # count how many attacks were towards corporate industry
 countUncleanColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)")
 # count how many attacks were towards military
@@ -256,10 +255,9 @@ ppl.bar(barNames, barValues, color="blue")
 ppl.xlabel("Continents")
 ppl.xticks(fontsize=8)
 ppl.ylabel("No. of Incidents")
-ppl.savefig("Cartobreach/static/images/continent_incidents.png")
+# ppl.savefig("Cartobreach/static/images/continent_incidents.png")
 
 # line graph to show number of incidents every year i.e. known start date range 1/1/2000 <= x < 1/1/2025
 yearlyIncidentLinePlot(df["start_date"], '01.01.2000', '01.01.2025')
-
 # line graph to show all continents' total incidents each month each with different colours
-# monthlyAllAreasIncidentLinePlot(df["start_date"], df["receiver_continent_code"])
+monthlyAllAreasIncidentLinePlot(df["start_date"], df["receiver_continent_code"])
