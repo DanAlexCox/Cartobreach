@@ -1,23 +1,32 @@
 from . import dataset
 ds = dataset.df
 
-
 # total incidents
 totalIncidents = len(ds.index)
 
 # count how many attacks were towards corporate industry
 corporateAttacks = dataset.countUncleanColumnValues("receiver_category", "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)")
-
+corporateAttacksPercent = round((float(corporateAttacks) / float(totalIncidents)) * 100, 2)
 # count how many attacks were towards military
 militaryAttacks = dataset.countUncleanColumnValues("receiver_subcategory","Military")
+militaryAttacksPercent = round((float(militaryAttacks) / float(totalIncidents)) * 100, 2)
+
+# line graph to show number of incidents every year i.e. known start date range 1/1/2000 <= x < 1/1/2025
+annualLinePlot = dataset.yearlyIncidentLinePlot(ds["start_date"], '01.01.2000', '01.01.2025')
+annualLinePlot
+
+# make new column receiver_continent with unique values only
+ds["receiver_country_alpha_2_code"] = dataset.cleanColumn("receiver_country_alpha_2_code")
+ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
+ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+# line graph to show all continents' total incidents each month each with different colours
+monthlyAllIncidentsLinePlot = dataset.monthlyAllAreasIncidentLinePlot(ds["start_date"], ds["receiver_continent_code"])
+monthlyAllIncidentsLinePlot
 
 # # sort by start date
 # df.sort_values(by=["start_date"], ascending=True)
 
-# # make new column receiver_continent with unique values only
-# df["receiver_country_alpha_2_code"] = cleanColumn("receiver_country_alpha_2_code")
-# df["receiver_continent_code"] = df["receiver_country_alpha_2_code"].apply(convertCountryCodeToContinentCode)
-# df["receiver_continent_code"] = df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+
 
 # # count how many attacks occured relating political groups/governments in a continent
 # countUncleanDoubleColumnValues("receiver_category","State institutions / political system","receiver_continent_code",NA.getAlphaCode())
@@ -96,7 +105,5 @@ militaryAttacks = dataset.countUncleanColumnValues("receiver_subcategory","Milit
 # ppl.ylabel("No. of Incidents")
 # # ppl.savefig("Cartobreach/static/images/continent_incidents.png")
 
-# # line graph to show number of incidents every year i.e. known start date range 1/1/2000 <= x < 1/1/2025
-# yearlyIncidentLinePlot(df["start_date"], '01.01.2000', '01.01.2025')
-# # line graph to show all continents' total incidents each month each with different colours
-# monthlyAllAreasIncidentLinePlot(df["start_date"], df["receiver_continent_code"])
+
+
