@@ -1,4 +1,4 @@
-from classes.classes import Continent
+from .classes.classes import Continent
 from django.http import HttpResponse
 import pygal #install pygal_maps_world via pip
 
@@ -11,9 +11,20 @@ NA = Continent("North America", "NA", "north_america")
 OC = Continent("Oceania", "OC", "oceania")
 SA = Continent("South America", "SA", "south_america")
 
+# make continent list for getting individual supranationalworld svgs
+continentList = [AF, AN, AS, EU, NA, OC, SA]
+
+# render svg images of all continents separately using loop
+
+for i in range(0, len(continentList)):
+    singleContinent = pygal.maps.world.SupranationalWorld()
+    singleContinent.add(continentList[i].getName(), [continentList[i].getNameMap()])
+    # singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
+
 #Create world map
 
 worldmap = pygal.maps.world.SupranationalWorld()
+
 
 #Set title
 worldmap.title = 'Continents'
@@ -29,4 +40,4 @@ worldmap.add(OC.getName(), [(OC.getNameMap())])
 
 #render the map in a SVG file
 
-worldfile = worldmap.render_to_file('Cartobreach/static/images/continents_map.svg')
+# worldmap.render_to_file('Cartobreach/static/images/continents_map.svg')
