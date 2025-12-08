@@ -47,7 +47,9 @@ def map(request):
         'mapanalytics' : mapanalytics,
         'totalincidents' : tasks.totalIncidents,
         'corporateattacks' : tasks.corporateAttacks,
+        'corporateattackspercent' : tasks.corporateAttacksPercent,
         'militaryattacks' : tasks.militaryAttacks,
+        'militaryattackspercent' : tasks.militaryAttacksPercent,
     }
 
     return render(request, "index.html", context)
