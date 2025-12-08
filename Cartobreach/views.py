@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django import template
+from . import tasks
 
 #register library for templates
 register = template.Library()
@@ -33,13 +34,20 @@ def map(request):
     #post check post method
     if request.method == 'POST':
         #returns mapload if submit button 'maploader' is clicked
-        mapload = request.POST.get('mapload', None)
+        mapload = request.POST.get('mapload')
+        mapanalytics = request.POST.get('mapanalytics')
+    
     
     #content dictionary
     context = {
         'index' : "",
         'map' : "map.html",
         'mapload' : mapload,
+        'analysis' : "analysis.html",
+        'mapanalytics' : mapanalytics,
+        'totalincidents' : tasks.totalIncidents,
+        'corporateattacks' : tasks.corporateAttacks,
+        'militaryattacks' : tasks.militaryAttacks,
     }
 
     return render(request, "index.html", context)
