@@ -6,7 +6,7 @@ from datetime import datetime # import datetime function
 from .continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
 
 # get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=3000)
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=3400)
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
@@ -15,7 +15,7 @@ def convertDateTime(column):
 # function that cleans and returns column
 def cleanColumn(column):
     # turn into uncleaned column lists
-    countList = df[column].apply(lambda v: v.split(";") if isinstance(v, str) else (v if isinstance(v, list) else v))
+    countList = df[column].apply(lambda v: v.split(";") if isinstance(v, str) else (v if isinstance(v, list) else ([] if pd.isna(v) else [v])))
     # clean column lists to make unique values only
     return countList.apply(lambda x: list(dict.fromkeys(x)))
 
@@ -140,7 +140,7 @@ def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
 def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
     return filterDataRange(dateColumnSeries, dataColumn, value, min, max).count()
 
-# function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
+# function that constructs a scatter plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
 def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
     uniqueArea = cleanedArea.explode().unique() # get list of only unique values in dataColumn
     # dataset lifetime monthly range list for all areas 
