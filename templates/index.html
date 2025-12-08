@@ -8,24 +8,27 @@
 <body> 
     <h1>Welcome to Cartobreach</h1>
     <!-- Button to load map and hide map-->
-    <form method="post" action ="{{index}}" mapshow">
+    <form method="post" action ="{{index}}" id="mapshow">
         {% csrf_token %}
         <input type="hidden" name="mapload" value="map.html">
         <button type="submit">Load map</button>
     </form>
-    <form method="post" action="{{index}}" id="maphide">
-        {% csrf_token %}
-        <input type="hidden" name="maphide">
-        <button type="submit">Hide map</button>
-    </form>
     
     <!-- load map (map.html) after clicking maploader button -->
 
-    {% if mapload is not str %}
+    {% if mapload %}
         {% include mapload %}
-    {% else %}
-        {{mapload}}
     {% endif %}
+
+    <!-- Button to load analytics section (visually on the right of map)-->
+<form method="post" action ="{{index}}" id="analysisshow">
+    {% csrf_token %}
+    <input type="hidden" name="mapanalytics" value="analysis.html">
+    <button type="submit">Load analytics</button>
+</form>
+{% if mapanalytics %}
+    {% include mapanalytics %}
+{% endif %}
     
 </body> 
 </html>
