@@ -6,7 +6,7 @@ from datetime import datetime # import datetime function
 from .continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
 
 # get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"], nrows=3400)
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"])
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
@@ -92,20 +92,20 @@ def specificIntensity(scorecolumn, regioncolumn, region):
     return filterSpecificColumn(regioncolumn, region)[scorecolumn].apply(lambda x: 2 if "2 points" in x else (1 if "1 point" in x else 0)).sum()
 
 # function that cuts data series into cut dates between minimum date and maximum
-def filterDateRange(dateColumnSeries, min, max):
+def filterDateRange(dataset, dateColumnSeries, min, max):
     filteredSeries = filterDateTime(dateColumnSeries) # filter date series
     if isinstance(min, str) and isinstance(max, str): # if min and max dates are string
         min = pd.Timestamp(datetime.strptime(min, '%d.%m.%Y')) #convert date string to datetime
         max = pd.Timestamp(datetime.strptime(max, '%d.%m.%Y')) #convert date string to datetime
     # union comparison of min and max ranges
-    return df[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+    return dataset[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
 
 # function that adds rows in a date range
-def countInDateRange(dateColumnSeries, min, max):
-    return filterDateRange(dateColumnSeries, min, max).count()
+def countInDateRange(dataset, dateColumnSeries, min, max):
+    return filterDateRange(dataset, dateColumnSeries, min, max).count()
 
 # function that constructs line plot for yearly incident counts between dataset minimum and maximum date
-def yearlyIncidentLinePlot(dateColumnSeries, dataMin, dataMax):
+def yearlyIncidentLinePlot(dataset, dateColumnSeries, dataMin, dataMax):
     # yearly date range list
     yearRange = pd.date_range(start=dataMin, end=dataMax, freq='YS').to_pydatetime()
     # date range counts of each year (count up to end of year, end of year)
@@ -118,7 +118,7 @@ def yearlyIncidentLinePlot(dateColumnSeries, dataMin, dataMax):
         if yearRange[i].year % 2 == 0: # determine x axis scale i.e. xticks
             xtick_replace.append(str(yearRange[i]))
             xtick_values.append(str(yearRange[i].year))
-        y_values.append(countInDateRange(dateColumnSeries, yearRange[i], yearRange[i+1]))
+        y_values.append(countInDateRange(dataset, dateColumnSeries, yearRange[i], yearRange[i+1]))
     # plot line plot (x: year, y: number of incidents)
     ppl.figure()
     ppl.plot(x_values, y_values)
@@ -166,3 +166,4 @@ def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
     ppl.ylabel("Incidents per month")
     ppl.xticks(xtick_replace, xtick_values)
     ppl.savefig("Cartobreach/static/images/continent_incidents_per_month.png")
+
