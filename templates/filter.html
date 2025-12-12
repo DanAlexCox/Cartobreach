@@ -7,7 +7,5 @@
         {% csrf_token %}
         <label for="enddate">End</label>
         <input type="date" name="enddate" value="{{enddate}}">
-        {% csrf_token %}
-        <input type="hidden" name="filter">
         <button type="submit">filter</button>
     </form>
