@@ -12,10 +12,10 @@ df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["inc
 def convertDateTime(column):
     return pd.to_datetime(column, format="%d.%m.%Y", errors ='coerce')
 
-# function that cleans and returns column
+# function that cleans and returns column series
 def cleanColumn(column):
     # turn into uncleaned column lists
-    countList = df[column].apply(lambda v: v.split(";") if isinstance(v, str) else (v if isinstance(v, list) else ([] if pd.isna(v) else [v])))
+    countList = column.apply(lambda v: v.split(";") if isinstance(v, str) else (v if isinstance(v, list) else ([] if pd.isna(v) else [v])))
     # clean column lists to make unique values only
     return countList.apply(lambda x: list(dict.fromkeys(x)))
 
