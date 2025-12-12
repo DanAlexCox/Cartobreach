@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('condition', views.check_age),
     path('loop', views.loop),
-    path('', views.map),
+    path('', views.index),
+    path('', views.filter)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
