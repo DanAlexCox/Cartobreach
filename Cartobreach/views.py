@@ -28,22 +28,27 @@ def loop(request):
 def get_type(value):
     return type(value).__name__
 
-#testing map.html view
-def map(request):
-    mapload = None
-    #post check post method
-    if request.method == 'POST':
-        #returns mapload if submit button 'maploader' is clicked
-        mapload = request.POST.get('mapload')
-        mapanalytics = request.POST.get('mapanalytics')
+valid_includes = ["map.html", "analysis.html", "filter.html"]
+default_dates = ["01.01.2000", "01.01.2025"]
+
+# index page dictionary function
+def index(request):
+    #default incident date range
+    startStartDate = request.GET.get('startdate', '2000-01-01')
+    endStartDate = request.GET.get('enddate', '2025-01-01')
     
-    
+    mapload = request.POST.get('mapload')
+    if mapload not in valid_includes:
+        mapload = None
+    mapanalytics = request.POST.get('mapanalytics')
+    if mapanalytics not in valid_includes:
+        mapanalytics = None
     #content dictionary
     context = {
         'index' : "",
-        'map' : "map.html",
+        'startdate' : startStartDate,
+        'enddate' : endStartDate,
         'mapload' : mapload,
-        'analysis' : "analysis.html",
         'mapanalytics' : mapanalytics,
         'totalincidents' : tasks.totalIncidents,
         'corporateattacks' : tasks.corporateAttacks,
@@ -51,5 +56,11 @@ def map(request):
         'militaryattacks' : tasks.militaryAttacks,
         'militaryattackspercent' : tasks.militaryAttacksPercent,
     }
-
     return render(request, "index.html", context)
+
+# function for filter form
+def filter(request):
+    # check if html made a post
+    startStartDate = request.get('startdate', '2000-01-01')
+    endStartDate = request.get('enddate', '2025-01-01')
+    return 
