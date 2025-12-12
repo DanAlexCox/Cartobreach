@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django import template
+from datetime import datetime
 from . import tasks
+from . import dataset
 
 #register library for templates
 register = template.Library()
@@ -36,10 +38,23 @@ def index(request):
     #default incident date range
     startStartDate = request.GET.get('startdate', '2000-01-01')
     endStartDate = request.GET.get('enddate', '2025-01-01')
+    minDate = datetime.strptime(request.GET.get('startdate', '2000-01-01'), '%Y-%m-%d')
+    maxDate = datetime.strptime(request.GET.get('enddate', '2025-01-01'), '%Y-%m-%d')
+    # filter dataset
+    ds = tasks.filterDatasetByDate(minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
+    # filter variables from tasks.py
+    totalIncidents = len(ds.index) # total incidents in date range
+    print(totalIncidents)
+    corporateAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in date range
+    corporateAttacksPercent = round((float(corporateAttacks) / float(totalIncidents)) * 100, 2) # corporate attacks percentage in date range
+    militaryAttacks = dataset.countUncleanColumnValues(ds["receiver_subcategory"],"Military") # military attacks in date range
+    militaryAttacksPercent = round((float(militaryAttacks) / float(totalIncidents)) * 100, 2) # military attacks percentage in range
     
+    # check map button has been clicked
     mapload = request.POST.get('mapload')
     if mapload not in valid_includes:
         mapload = None
+    # check analytics button has been clicked
     mapanalytics = request.POST.get('mapanalytics')
     if mapanalytics not in valid_includes:
         mapanalytics = None
@@ -50,17 +65,10 @@ def index(request):
         'enddate' : endStartDate,
         'mapload' : mapload,
         'mapanalytics' : mapanalytics,
-        'totalincidents' : tasks.totalIncidents,
-        'corporateattacks' : tasks.corporateAttacks,
-        'corporateattackspercent' : tasks.corporateAttacksPercent,
-        'militaryattacks' : tasks.militaryAttacks,
-        'militaryattackspercent' : tasks.militaryAttacksPercent,
+        'totalincidents' : totalIncidents,
+        'corporateattacks' : corporateAttacks,
+        'corporateattackspercent' : corporateAttacksPercent,
+        'militaryattacks' : militaryAttacks,
+        'militaryattackspercent' : militaryAttacksPercent,
     }
     return render(request, "index.html", context)
-
-# function for filter form
-def filter(request):
-    # check if html made a post
-    startStartDate = request.get('startdate', '2000-01-01')
-    endStartDate = request.get('enddate', '2025-01-01')
-    return 
