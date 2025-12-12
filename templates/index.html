@@ -2,33 +2,35 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="icon" type="image/x-icon" href="{% static 'images/Cartobreach_Logo_No_Name.png' %}">
     <title>Cartobreach</title> 
 </head> 
-<body> 
+<body>
     <h1>Welcome to Cartobreach</h1>
     <!-- Button to load map and hide map-->
-    <form method="post" action ="{{index}}" id="mapshow">
+    <form method="post" action ="" id="mapshow">
         {% csrf_token %}
         <input type="hidden" name="mapload" value="map.html">
         <button type="submit">Load map</button>
     </form>
-    
-    <!-- load map (map.html) after clicking maploader button -->
 
+    <!-- Button to load analytics section (visually on the right of map)-->
+    <form method="post" action ="" id="analysisshow">
+        {% csrf_token %}
+        <input type="hidden" name="mapanalytics" value="analysis.html">
+        <button type="submit">Load analytics</button>
+    </form>
+    {% include "filter.html" %}
+    <!-- load map (map.html) after clicking maploader button -->
     {% if mapload %}
         {% include mapload %}
     {% endif %}
 
-    <!-- Button to load analytics section (visually on the right of map)-->
-<form method="post" action ="{{index}}" id="analysisshow">
-    {% csrf_token %}
-    <input type="hidden" name="mapanalytics" value="analysis.html">
-    <button type="submit">Load analytics</button>
-</form>
-{% if mapanalytics %}
-    {% include mapanalytics %}
-{% endif %}
+    {% if mapanalytics %}
+        {% include mapanalytics %}
+    {% endif %}
     
 </body> 
 </html>
