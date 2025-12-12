@@ -1,0 +1,13 @@
+<!-- filter post form -->
+    <form method="get" action="" id="filterform">
+        <h2>Data range</h2>
+        {% csrf_token %}
+        <label for="startdate">Start</label>
+        <input type="date" name="startdate" value="{{startdate}}">
+        {% csrf_token %}
+        <label for="enddate">End</label>
+        <input type="date" name="enddate" value="{{enddate}}">
+        {% csrf_token %}
+        <input type="hidden" name="filter">
+        <button type="submit">filter</button>
+    </form>
