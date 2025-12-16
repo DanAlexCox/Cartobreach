@@ -25,4 +25,5 @@ urlpatterns = [
     path('condition', views.check_age),
     path('loop', views.loop),
     path('', views.index),
+    path('map', views.continent)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
