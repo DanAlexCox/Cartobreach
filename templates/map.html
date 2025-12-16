@@ -2,7 +2,10 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/map.css' %}">
 <!-- map img -->
-{% load static %}
-<img src="{% static 'images/continents_map.svg' %}" alt="Continents_map" style="max-width: 50%;">
+
+<div id="map-container">
+    <!-- Render svg with clickable feature to open continents.html-->
+    <embed type="image/svg+xml" src= {{ continents|safe }} />
+</div>
 <br>
 
