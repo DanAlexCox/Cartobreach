@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from django import template
 from datetime import datetime
+from django.conf import settings
+from django.utils.safestring import mark_safe
+import os
 from . import tasks
 from . import dataset
+from . import continents
 
 #register library for templates
 register = template.Library()
@@ -44,12 +48,10 @@ def index(request):
     ds = tasks.filterDatasetByDate(minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
     # filter variables from tasks.py
     totalIncidents = len(ds.index) # total incidents in date range
-    print(totalIncidents)
     corporateAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in date range
     corporateAttacksPercent = round((float(corporateAttacks) / float(totalIncidents)) * 100, 2) # corporate attacks percentage in date range
     militaryAttacks = dataset.countUncleanColumnValues(ds["receiver_subcategory"],"Military") # military attacks in date range
     militaryAttacksPercent = round((float(militaryAttacks) / float(totalIncidents)) * 100, 2) # military attacks percentage in range
-    
     # check map button has been clicked
     mapload = request.POST.get('mapload')
     if mapload not in valid_includes:
@@ -58,6 +60,7 @@ def index(request):
     mapanalytics = request.POST.get('mapanalytics')
     if mapanalytics not in valid_includes:
         mapanalytics = None
+    
     #content dictionary
     context = {
         'index' : "",
@@ -72,3 +75,7 @@ def index(request):
         'militaryattackspercent' : militaryAttacksPercent,
     }
     return render(request, "index.html", context)
+
+# function for continent clicking (add later countries)
+def continent(request):
+    return render(request, "map.html", continents = continents.worldmap.render_data_uri())
