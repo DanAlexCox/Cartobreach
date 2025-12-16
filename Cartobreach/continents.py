@@ -16,15 +16,14 @@ continentList = [AF, AN, AS, EU, NA, OC, SA]
 
 # render svg images of all continents separately using loop
 
-for i in range(0, len(continentList)):
-    singleContinent = pygal.maps.world.SupranationalWorld()
-    singleContinent.add(continentList[i].getName(), [continentList[i].getNameMap()])
-    # singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
+# for i in range(0, len(continentList)):
+#     singleContinent = pygal.maps.world.SupranationalWorld(show_legend=False)
+#     singleContinent.force_uri_protocol = 'http'
+#     singleContinent.add(continentList[i].getName(), [continentList[i].getNameMap()])
+#     singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
 
 #Create world map
-
 worldmap = pygal.maps.world.SupranationalWorld()
-
 
 #Set title
 worldmap.title = 'Continents'
@@ -39,5 +38,4 @@ worldmap.add(SA.getName(), [(SA.getNameMap())])
 worldmap.add(OC.getName(), [(OC.getNameMap())])
 
 #render the map in a SVG file
-
 # worldmap.render_to_file('Cartobreach/static/images/continents_map.svg')
