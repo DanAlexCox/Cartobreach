@@ -29,13 +29,13 @@ worldmap = pygal.maps.world.SupranationalWorld()
 worldmap.title = 'Continents'
 
 # adding the continents
-worldmap.add(AF.getName(), [(AF.getNameMap())])
-worldmap.add(AN.getName(), [(AN.getNameMap())])
-worldmap.add(AS.getName(), [(AS.getNameMap())])
-worldmap.add(EU.getName(), [(EU.getNameMap())])
-worldmap.add(NA.getName(), [(NA.getNameMap())])
-worldmap.add(SA.getName(), [(SA.getNameMap())])
-worldmap.add(OC.getName(), [(OC.getNameMap())])
+worldmap.add(AF.getName(), [{'value':AF.getNameMap(), 'label':AF.getName(), 'xlink': '/'+AF.getAlphaCode()+'/'}])
+worldmap.add(AN.getName(), [{'value':AN.getNameMap(), 'label':AN.getName(), 'xlink': '/'+AN.getAlphaCode()+'/'}])
+worldmap.add(AS.getName(), [{'value':AS.getNameMap(), 'label':AS.getName(), 'xlink': '/'+AS.getAlphaCode()+'/'}])
+worldmap.add(EU.getName(), [{'value':EU.getNameMap(), 'label':EU.getName(), 'xlink': '/'+EU.getAlphaCode()+'/'}])
+worldmap.add(NA.getName(), [{'value':NA.getNameMap(), 'label':NA.getName(), 'xlink': '/'+NA.getAlphaCode()+'/'}])
+worldmap.add(SA.getName(), [{'value':SA.getNameMap(), 'label':SA.getName(), 'xlink': '/'+SA.getAlphaCode()+'/'}])
+worldmap.add(OC.getName(), [{'value':OC.getNameMap(), 'label':OC.getName(), 'xlink': '/'+OC.getAlphaCode()+'/'}])
 
 #render the map in a SVG file
 # worldmap.render_to_file('Cartobreach/static/images/continents_map.svg')

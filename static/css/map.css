@@ -1,8 +1,12 @@
 #map-container{
     width: 50%;
     height: 20%;
-    svg a:hover path {
+    /* svg a:hover path {
         fill: #ff9800 !important;
         cursor: pointer;
-    }
+    } */
+}
+#map-container object{
+    width:100%;
+    height:50%;
 }

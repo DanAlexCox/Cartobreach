@@ -1,11 +1,9 @@
-<!-- map styler -->
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/map.css' %}">
 <!-- map img -->
-
 <div id="map-container">
     <!-- Render svg with clickable feature to open continents.html-->
-    <embed type="image/svg+xml" src= {{ continents|safe }} />
+    <object type="image/svg+xml" data="{{ continents|safe }}" >
+        Your browser does not support SVG
+    </object>
 </div>
 <br>
 
