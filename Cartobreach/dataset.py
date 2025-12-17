@@ -49,30 +49,30 @@ def filterDateTime(series):
     return series[series.apply(lambda x: isinstance(x, datetime))]
 
 # function that filters every row that doesnt have only value in each row
-def filterSingleColumn(cellList):
+def filterSingleColumn(dataset, cellList):
     # clean column
     cellList = cleanColumn(cellList)
-    return df[cellList.apply(lambda x: isinstance(x, list) and len(x) == 1)]
+    return dataset[cellList.apply(lambda x: isinstance(x, list) and len(x) == 1)]
 
 # function that filters every row that doesnt have only value in each row
-def filterMultipleColumns(column):
+def filterMultipleColumns(dataset, column):
     # clean column
     column = cleanColumn(column)
-    return df[column.apply(lambda x: isinstance(x, list) and len(x) > 1)]
+    return dataset[column.apply(lambda x: isinstance(x, list) and len(x) > 1)]
 
 # function that filters a specific value from series
-def filterSpecificColumn(column, value):
+def filterSpecificColumn(dataset, column, value):
     # clean column
     cleanedColumn = cleanColumn(column)
-    return df[cleanedColumn.apply(lambda x: value in x)]
+    return dataset[cleanedColumn.apply(lambda x: value in x)]
 
 # function that filters two different AND values from series
-def filterTwoColumns(column, value, alsocolumn, alsovalue):
+def filterTwoColumns(dataset, column, value, alsocolumn, alsovalue):
     # clean column and alsocolumn
     cleanedColumn = cleanColumn(column)
     cleanedAlsoColumn = cleanColumn(alsocolumn)
     # return df that is filtered when value and alsovalue exist
-    return df[cleanedColumn.apply(lambda x: value in x) & cleanedAlsoColumn.apply(lambda x: alsovalue in x)]
+    return dataset[cleanedColumn.apply(lambda x: value in x) & cleanedAlsoColumn.apply(lambda x: alsovalue in x)]
 
 # function that calculates total intensity of a region (continent/country) using weighted_intensity
 def totalAreaIntensity(area, alpha):
