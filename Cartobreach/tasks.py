@@ -22,10 +22,7 @@ def filterDatasetByDate(startStartDate, endStartDate):
 # annualLinePlot = dataset.yearlyIncidentLinePlot(ds, ds["start_date"], '01.01.2000', '01.01.2025')
 # annualLinePlot
 
-# # make new column receiver_continent with unique values only
-# ds["receiver_country_alpha_2_code"] = dataset.cleanColumn("receiver_country_alpha_2_code")
-# ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
-# ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+
 # # line graph to show all continents' total incidents each month each with different colours
 # monthlyAllIncidentsLinePlot = dataset.monthlyAllAreasIncidentLinePlot(ds["start_date"], ds["receiver_continent_code"])
 
