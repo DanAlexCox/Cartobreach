@@ -1,10 +1,10 @@
 from .classes.classes import Continent
 from django.http import HttpResponse
-import pygal #install pygal_maps_world via pip
+from pygal_maps_world.maps import SupranationalWorld #install pygal pygal_maps_world via pip
 
 #Constructing continent objects
 AF = Continent("Africa", "AF", "africa")
-AN = Continent("Antarctica", "AN", "antartica")
+AN = Continent("Antartica", "AN", "antartica")
 AS = Continent("Asia", "AS", "asia")
 EU = Continent("Europe", "EU", "europe")
 NA = Continent("North America", "NA", "north_america")
@@ -23,19 +23,14 @@ continentList = [AF, AN, AS, EU, NA, OC, SA]
 #     singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
 
 #Create world map
-worldmap = pygal.maps.world.SupranationalWorld()
+worldmap = SupranationalWorld(show_legend = False)
 
 #Set title
 worldmap.title = 'Continents'
 
 # adding the continents
-worldmap.add(AF.getName(), [{'value':AF.getNameMap(), 'label':AF.getName(), 'xlink': '/'+AF.getAlphaCode()+'/'}])
-worldmap.add(AN.getName(), [{'value':AN.getNameMap(), 'label':AN.getName(), 'xlink': '/'+AN.getAlphaCode()+'/'}])
-worldmap.add(AS.getName(), [{'value':AS.getNameMap(), 'label':AS.getName(), 'xlink': '/'+AS.getAlphaCode()+'/'}])
-worldmap.add(EU.getName(), [{'value':EU.getNameMap(), 'label':EU.getName(), 'xlink': '/'+EU.getAlphaCode()+'/'}])
-worldmap.add(NA.getName(), [{'value':NA.getNameMap(), 'label':NA.getName(), 'xlink': '/'+NA.getAlphaCode()+'/'}])
-worldmap.add(SA.getName(), [{'value':SA.getNameMap(), 'label':SA.getName(), 'xlink': '/'+SA.getAlphaCode()+'/'}])
-worldmap.add(OC.getName(), [{'value':OC.getNameMap(), 'label':OC.getName(), 'xlink': '/'+OC.getAlphaCode()+'/'}])
+for continents in continentList:
+    worldmap.add(continents.getName(), [(continents.getNameMap())])
 
 #render the map in a SVG file
-# worldmap.render_to_file('Cartobreach/static/images/continents_map.svg')
+rendermap = worldmap.render_to_file('static/images/continents_map.svg')

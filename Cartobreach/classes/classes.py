@@ -34,7 +34,7 @@ class Map:
         
 # Class for continents
 class Continent:
-    def __init__(self, name, alpha_code, name_map, val=0):
+    def __init__(self, name, alpha_code, name_map, val=1):
         self._name = name # name of continent
         self._alpha_code = alpha_code # alpha code of continent
         self._name_map = name_map # name on world map

@@ -60,6 +60,8 @@ def index(request):
     mapanalytics = request.POST.get('mapanalytics')
     if mapanalytics not in valid_includes:
         mapanalytics = None
+    # load continents map
+    continents.rendermap
     
     #content dictionary
     context = {
@@ -73,6 +75,5 @@ def index(request):
         'corporateattackspercent' : corporateAttacksPercent,
         'militaryattacks' : militaryAttacks,
         'militaryattackspercent' : militaryAttacksPercent,
-        "continents": continents.worldmap.render(),
     }
     return render(request, "index.html", context)
