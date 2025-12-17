@@ -3,5 +3,62 @@
     <!-- Render svg with clickable feature to open continents.html-->
      {% load static %}
     <embed type="image/svg+xml" src="{% static 'images/continents_map.svg' %}"/>
+    <script>
+        // group continents alpha codes into country alpha codes
+        // All countries assigned to continents thanks to https://www.html-code-generator.com/javascript/array/country-names
+const country_list = [
+    { cont: "AS", count: "AF" },{ cont: "EU", count: "AX" },{ cont: "EU", count: "AL" },{ cont: "AF", count: "DZ" },{ cont: "OC", count: "AS" },
+    { cont: "EU", count: "AD" },{ cont: "AF", count: "AO" },{ cont: "NA", count: "AI" },{ cont: "AN", count: "AQ" },{ cont: "NA", count: "AG" },
+    { cont: "SA", count: "AR" },{ cont: "AS", count: "AM" },{ cont: "NA", count: "AW" },{ cont: "OC", count: "AU" },{ cont: "EU", count: "AT" },
+    { cont: "AS", count: "AZ" },{ cont: "NA", count: "BS" },{ cont: "AS", count: "BH" },{ cont: "AS", count: "BD" },{ cont: "NA", count: "BB" },
+    { cont: "EU", count: "BY" },{ cont: "EU", count: "BE" },{ cont: "NA", count: "BZ" },{ cont: "AF", count: "BJ" },{ cont: "NA", count: "BM" },
+    { cont: "AS", count: "BT" },{ cont: "SA", count: "BO" },{ cont: "EU", count: "BA" },{ cont: "AF", count: "BW" },{ cont: "AN", count: "BV" },
+    { cont: "SA", count: "BR" },{ cont: "AS", count: "IO" },{ cont: "AS", count: "BN" },{ cont: "EU", count: "BG" },{ cont: "AF", count: "BF" },
+    { cont: "AF", count: "BI" },{ cont: "AF", count: "CV" },{ cont: "AS", count: "KH" },{ cont: "AF", count: "CM" },{ cont: "NA", count: "CA" },
+    { cont: "NA", count: "BQ" },{ cont: "NA", count: "KY" },{ cont: "AF", count: "CF" },{ cont: "AF", count: "TD" },{ cont: "SA", count: "CL" },
+    { cont: "AS", count: "CN" },{ cont: "AS", count: "CX" },{ cont: "AS", count: "CC" },{ cont: "SA", count: "CO" },{ cont: "AF", count: "KM" },
+    { cont: "AF", count: "CG" },{ cont: "AF", count: "CD" },{ cont: "OC", count: "CK" },{ cont: "NA", count: "CR" },{ cont: "EU", count: "HR" },
+    { cont: "NA", count: "CU" },{ cont: "NA", count: "CW" },{ cont: "AS", count: "CY" },{ cont: "EU", count: "CZ" },{ cont: "AF", count: "CI" },
+    { cont: "EU", count: "DK" },{ cont: "AF", count: "DJ" },{ cont: "NA", count: "DM" },{ cont: "NA", count: "DO" },{ cont: "SA", count: "EC" },
+    { cont: "AF", count: "EG" },{ cont: "NA", count: "SV" },{ cont: "AF", count: "GQ" },{ cont: "AF", count: "ER" },{ cont: "EU", count: "EE" },
+    { cont: "AF", count: "SZ" },{ cont: "AF", count: "ET" },{ cont: "SA", count: "FK" },{ cont: "EU", count: "FO" },{ cont: "OC", count: "FJ" },
+    { cont: "EU", count: "FI" },{ cont: "EU", count: "FR" },{ cont: "SA", count: "GF" },{ cont: "OC", count: "PF" },{ cont: "AN", count: "TF" },
+    { cont: "AF", count: "GA" },{ cont: "AF", count: "GM" },{ cont: "AS", count: "GE" },{ cont: "EU", count: "DE" },{ cont: "AF", count: "GH" },
+    { cont: "EU", count: "GI" },{ cont: "EU", count: "GR" },{ cont: "NA", count: "GL" },{ cont: "NA", count: "GD" },{ cont: "NA", count: "GP" },
+    { cont: "OC", count: "GU" },{ cont: "NA", count: "GT" },{ cont: "EU", count: "GG" },{ cont: "AF", count: "GN" },{ cont: "AF", count: "GW" },
+    { cont: "SA", count: "GY" },{ cont: "NA", count: "HT" },{ cont: "AN", count: "HM" },{ cont: "NA", count: "HN" },{ cont: "AS", count: "HK" },
+    { cont: "EU", count: "HU" },{ cont: "EU", count: "IS" },{ cont: "AS", count: "IN" },{ cont: "AS", count: "ID" },{ cont: "AS", count: "IR" },
+    { cont: "AS", count: "IQ" },{ cont: "EU", count: "IE" },{ cont: "EU", count: "IM" },{ cont: "AS", count: "IL" },{ cont: "EU", count: "IT" },
+    { cont: "NA", count: "JM" },{ cont: "AS", count: "JP" },{ cont: "EU", count: "JE" },{ cont: "AS", count: "JO" },{ cont: "AS", count: "KZ" },
+    { cont: "AF", count: "KE" },{ cont: "OC", count: "KI" },{ cont: "AS", count: "KP" },{ cont: "AS", count: "KR" },{ cont: "EU", count: "XK" },
+    { cont: "AS", count: "KW" },{ cont: "AS", count: "KG" },{ cont: "AS", count: "LA" },{ cont: "EU", count: "LV" },{ cont: "AS", count: "LB" },
+    { cont: "AF", count: "LS" },{ cont: "AF", count: "LR" },{ cont: "AF", count: "LY" },{ cont: "EU", count: "LI" },{ cont: "EU", count: "LT" },
+    { cont: "EU", count: "LU" },{ cont: "AS", count: "MO" },{ cont: "EU", count: "MK" },{ cont: "AF", count: "MG" },{ cont: "AF", count: "MW" },
+    { cont: "AS", count: "MY" },{ cont: "AS", count: "MV" },{ cont: "AF", count: "ML" },{ cont: "EU", count: "MT" },{ cont: "OC", count: "MH" },
+    { cont: "NA", count: "MQ" },{ cont: "AF", count: "MR" },{ cont: "AF", count: "MU" },{ cont: "AF", count: "YT" },{ cont: "NA", count: "MX" },
+    { cont: "OC", count: "FM" },{ cont: "EU", count: "MD" },{ cont: "EU", count: "MC" },{ cont: "AS", count: "MN" },{ cont: "EU", count: "ME" },
+    { cont: "NA", count: "MS" },{ cont: "AF", count: "MA" },{ cont: "AF", count: "MZ" },{ cont: "AS", count: "MM" },{ cont: "AF", count: "NA" },
+    { cont: "OC", count: "NR" },{ cont: "AS", count: "NP" },{ cont: "EU", count: "NL" },{ cont: "OC", count: "NC" },{ cont: "OC", count: "NZ" },
+    { cont: "NA", count: "NI" },{ cont: "AF", count: "NE" },{ cont: "AF", count: "NG" },{ cont: "OC", count: "NU" },{ cont: "OC", count: "NF" },
+    { cont: "OC", count: "MP" },{ cont: "EU", count: "NO" },{ cont: "AS", count: "OM" },{ cont: "AS", count: "PK" },{ cont: "OC", count: "PW" },
+    { cont: "AS", count: "PS" },{ cont: "NA", count: "PA" },{ cont: "OC", count: "PG" },{ cont: "SA", count: "PY" },{ cont: "SA", count: "PE" },
+    { cont: "AS", count: "PH" },{ cont: "OC", count: "PN" },{ cont: "EU", count: "PL" },{ cont: "EU", count: "PT" },{ cont: "NA", count: "PR" },
+    { cont: "AS", count: "QA" },{ cont: "AF", count: "RE" },{ cont: "EU", count: "RO" },{ cont: "AS", count: "RU" },{ cont: "AF", count: "RW" },
+    { cont: "NA", count: "BL" },{ cont: "AF", count: "SH" },{ cont: "NA", count: "KN" },{ cont: "NA", count: "LC" },{ cont: "NA", count: "MF" },
+    { cont: "NA", count: "PM" },{ cont: "NA", count: "VC" },{ cont: "OC", count: "WS" },{ cont: "EU", count: "SM" },{ cont: "AF", count: "ST" },
+    { cont: "AS", count: "SA" },{ cont: "AF", count: "SN" },{ cont: "EU", count: "RS" },{ cont: "AF", count: "SC" },{ cont: "AF", count: "SL" },
+    { cont: "AS", count: "SG" },{ cont: "NA", count: "SX" },{ cont: "EU", count: "SK" },{ cont: "EU", count: "SI" },{ cont: "OC", count: "SB" },
+    { cont: "AF", count: "SO" },{ cont: "AF", count: "ZA" },{ cont: "AN", count: "GS" },{ cont: "AF", count: "SS" },{ cont: "EU", count: "ES" },
+    { cont: "AS", count: "LK" },{ cont: "AF", count: "SD" },{ cont: "SA", count: "SR" },{ cont: "EU", count: "SJ" },{ cont: "EU", count: "SE" },
+    { cont: "EU", count: "CH" },{ cont: "AS", count: "SY" },{ cont: "AS", count: "TW" },{ cont: "AS", count: "TJ" },{ cont: "AF", count: "TZ" },
+    { cont: "AS", count: "TH" },{ cont: "AS", count: "TL" },{ cont: "AF", count: "TG" },{ cont: "OC", count: "TK" },{ cont: "OC", count: "TO" },
+    { cont: "NA", count: "TT" },{ cont: "AF", count: "TN" },{ cont: "AS", count: "TR" },{ cont: "AS", count: "TM" },{ cont: "NA", count: "TC" },
+    { cont: "OC", count: "TV" },{ cont: "NA", count: "UM" },{ cont: "AF", count: "UG" },{ cont: "EU", count: "UA" },{ cont: "AS", count: "AE" },
+    { cont: "EU", count: "GB" },{ cont: "NA", count: "US" },{ cont: "SA", count: "UY" },{ cont: "AS", count: "UZ" },{ cont: "OC", count: "VU" },
+    { cont: "EU", count: "VA" },{ cont: "SA", count: "VE" },{ cont: "AS", count: "VN" },{ cont: "NA", count: "VG" },{ cont: "NA", count: "VI" },
+    { cont: "OC", count: "WF" },{ cont: "AF", count: "EH" },{ cont: "AS", count: "YE" },{ cont: "AF", count: "ZM" },{ cont: "AF", count: "ZW" }
+];
+        // if country code class clicked, href continent alpha code
+    </script>
 </div>
 
