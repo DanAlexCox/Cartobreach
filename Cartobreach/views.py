@@ -1,9 +1,6 @@
 from django.shortcuts import render
 from django import template
 from datetime import datetime
-from django.conf import settings
-from django.utils.safestring import mark_safe
-import os
 from . import tasks
 from . import dataset
 from . import continents
@@ -11,31 +8,12 @@ from . import continents
 #register library for templates
 register = template.Library()
 
-#handles form input and applies conditional rendering.
-def check_age(request):
-    age = None
-    if request.method == 'POST':
-        # request.POST.get returns a string, default to "0"
-        age = int(request.POST.get('age', 0))
-    return render(request, 'check_age.html', {'age': age})
-
-#passes a list and string to demonstrate looping and filters.
-def loop(request):
-    data = "Gfg is the best"
-    number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    context = {
-        "data": data,
-        "list": number_list
-    }
-    return render(request, "loop.html", context)
-
 #returns variable type
 @register.filter(name='get_type')
 def get_type(value):
     return type(value).__name__
 
 valid_includes = ["map.html", "analysis.html", "filter.html"]
-default_dates = ["01.01.2000", "01.01.2025"]
 
 # index page dictionary function
 def index(request):
@@ -60,8 +38,16 @@ def index(request):
     mapanalytics = request.POST.get('mapanalytics')
     if mapanalytics not in valid_includes:
         mapanalytics = None
+    # make new column receiver_continent with unique values only
+    ds["receiver_country_alpha_2_code"] = dataset.cleanColumn(ds["receiver_country_alpha_2_code"])
+    ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
+    ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+    # set total incident values for continents
+    for continent in continents.continentList:
+        continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continent.getAlphaCode()) # filter date filted range for each continent
+        continent.setValue(len(continentSet.index)) # total incidents in continent
     # load continents map
-    continents.rendermap
+    continents.renderContinentMap(request)
     
     #content dictionary
     context = {
