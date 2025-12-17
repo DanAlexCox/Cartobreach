@@ -73,9 +73,6 @@ def index(request):
         'corporateattackspercent' : corporateAttacksPercent,
         'militaryattacks' : militaryAttacks,
         'militaryattackspercent' : militaryAttacksPercent,
+        "continents": continents.worldmap.render(),
     }
     return render(request, "index.html", context)
-
-# function for continent clicking (add later countries)
-def continent(request):
-    return render(request, "map.html", continents = continents.worldmap.render_data_uri())
