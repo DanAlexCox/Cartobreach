@@ -1,9 +1,11 @@
 from django.shortcuts import render
+from django.utils.safestring import mark_safe
 from django import template
 from datetime import datetime
 from . import tasks
 from . import dataset
 from . import continents
+from . import countries
 
 #register library for templates
 register = template.Library()
@@ -47,7 +49,12 @@ def index(request):
         continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continent.getAlphaCode()) # filter date filted range for each continent
         continent.setValue(len(continentSet.index)) # total incidents in continent
     # load continents map
-    continents.renderContinentMap(request)
+    svg = continents.renderContinentMap()
+    # replace function not working????????????????????
+    svg = svg.replace("xlink:href", "")
+    mapSvg = mark_safe(svg)
+    # inject continent links
+    # continents.injectLinks("static/images/continents_map.svg",request.build_absolute_uri("/")[:-1], continents.continentList)
     
     #content dictionary
     context = {
@@ -61,5 +68,6 @@ def index(request):
         'corporateattackspercent' : corporateAttacksPercent,
         'militaryattacks' : militaryAttacks,
         'militaryattackspercent' : militaryAttacksPercent,
+        'map': mapSvg,
     }
     return render(request, "index.html", context)
