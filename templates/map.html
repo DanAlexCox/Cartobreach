@@ -1,8 +1,9 @@
 <!-- map img -->
 <div id="map-container">
     <!-- Render svg with clickable feature to open continents.html-->
-     {% load static %}
-    <embed type="image/svg+xml" src="{% static 'images/continents_map.svg' %}"/>
+     <!-- {% load static %}
+    <embed type="image/svg+xml" src="{% static 'images/continents_map.svg' %}"/> -->
+    {{ map }}
     
 </div>
 <!-- map info pop up-->
@@ -16,111 +17,7 @@
     </div>
 </section>
 
-<script>
-// group continents alpha codes into country alpha codes
-// All countries assigned to continents thanks to https://www.html-code-generator.com/javascript/array/country-names
-const country_list = [
-    { cont: "AS", count: "AF", svgcount: "af" }, { cont: "EU", count: "AX", svgcount: "ax" }, { cont: "EU", count: "AL", svgcount: "al" }, { cont: "AF", count: "DZ", svgcount: "dz" }, { cont: "OC", count: "AS", svgcount: "as" },
-    { cont: "EU", count: "AD", svgcount: "ad" }, { cont: "AF", count: "AO", svgcount: "ao" }, { cont: "NA", count: "AI", svgcount: "ai" }, { cont: "AN", count: "AQ", svgcount: "aq" }, { cont: "NA", count: "AG", svgcount: "ag" },
-    { cont: "SA", count: "AR", svgcount: "ar" }, { cont: "AS", count: "AM", svgcount: "am" }, { cont: "NA", count: "AW", svgcount: "aw" }, { cont: "OC", count: "AU", svgcount: "au" }, { cont: "EU", count: "AT", svgcount: "at" },
-    { cont: "AS", count: "AZ", svgcount: "az" }, { cont: "NA", count: "BS", svgcount: "bs" }, { cont: "AS", count: "BH", svgcount: "bh" }, { cont: "AS", count: "BD", svgcount: "bd" }, { cont: "NA", count: "BB", svgcount: "bb" },
-    { cont: "EU", count: "BY", svgcount: "by" }, { cont: "EU", count: "BE", svgcount: "be" }, { cont: "NA", count: "BZ", svgcount: "bz" }, { cont: "AF", count: "BJ", svgcount: "bj" }, { cont: "NA", count: "BM", svgcount: "bm" },
-
-    { cont: "AS", count: "BT", svgcount: "bt" }, { cont: "SA", count: "BO", svgcount: "bo" }, { cont: "EU", count: "BA", svgcount: "ba" }, { cont: "AF", count: "BW", svgcount: "bw" }, { cont: "AN", count: "BV", svgcount: "bv" },
-    { cont: "SA", count: "BR", svgcount: "br" }, { cont: "AS", count: "IO", svgcount: "io" }, { cont: "AS", count: "BN", svgcount: "bn" }, { cont: "EU", count: "BG", svgcount: "bg" }, { cont: "AF", count: "BF", svgcount: "bf" },
-    { cont: "AF", count: "BI", svgcount: "bi" }, { cont: "AF", count: "CV", svgcount: "cv" }, { cont: "AS", count: "KH", svgcount: "kh" }, { cont: "AF", count: "CM", svgcount: "cm" }, { cont: "NA", count: "CA", svgcount: "ca" },
-    { cont: "NA", count: "BQ", svgcount: "bq" }, { cont: "NA", count: "KY", svgcount: "ky" }, { cont: "AF", count: "CF", svgcount: "cf" }, { cont: "AF", count: "TD", svgcount: "td" }, { cont: "SA", count: "CL", svgcount: "cl" },
-    { cont: "AS", count: "CN", svgcount: "cn" }, { cont: "AS", count: "CX", svgcount: "cx" }, { cont: "AS", count: "CC", svgcount: "cc" }, { cont: "SA", count: "CO", svgcount: "co" }, { cont: "AF", count: "KM", svgcount: "km" },
-
-    { cont: "AF", count: "CG", svgcount: "cg" }, { cont: "AF", count: "CD", svgcount: "cd" }, { cont: "OC", count: "CK", svgcount: "ck" }, { cont: "NA", count: "CR", svgcount: "cr" }, { cont: "EU", count: "HR", svgcount: "hr" },
-    { cont: "NA", count: "CU", svgcount: "cu" }, { cont: "NA", count: "CW", svgcount: "cw" }, { cont: "AS", count: "CY", svgcount: "cy" }, { cont: "EU", count: "CZ", svgcount: "cz" }, { cont: "AF", count: "CI", svgcount: "ci" },
-    { cont: "EU", count: "DK", svgcount: "dk" }, { cont: "AF", count: "DJ", svgcount: "dj" }, { cont: "NA", count: "DM", svgcount: "dm" }, { cont: "NA", count: "DO", svgcount: "do" }, { cont: "SA", count: "EC", svgcount: "ec" },
-    { cont: "AF", count: "EG", svgcount: "eg" }, { cont: "NA", count: "SV", svgcount: "sv" }, { cont: "AF", count: "GQ", svgcount: "gq" }, { cont: "AF", count: "ER", svgcount: "er" }, { cont: "EU", count: "EE", svgcount: "ee" },
-    { cont: "AF", count: "SZ", svgcount: "sz" }, { cont: "AF", count: "ET", svgcount: "et" }, { cont: "SA", count: "FK", svgcount: "fk" }, { cont: "EU", count: "FO", svgcount: "fo" }, { cont: "OC", count: "FJ", svgcount: "fj" },
-
-    { cont: "EU", count: "FI", svgcount: "fi" }, { cont: "EU", count: "FR", svgcount: "fr" }, { cont: "SA", count: "GF", svgcount: "gf" }, { cont: "OC", count: "PF", svgcount: "pf" }, { cont: "AN", count: "TF", svgcount: "tf" },
-    { cont: "AF", count: "GA", svgcount: "ga" }, { cont: "AF", count: "GM", svgcount: "gm" }, { cont: "AS", count: "GE", svgcount: "ge" }, { cont: "EU", count: "DE", svgcount: "de" }, { cont: "AF", count: "GH", svgcount: "gh" },
-    { cont: "EU", count: "GI", svgcount: "gi" }, { cont: "EU", count: "GR", svgcount: "gr" }, { cont: "NA", count: "GL", svgcount: "gl" }, { cont: "NA", count: "GD", svgcount: "gd" }, { cont: "NA", count: "GP", svgcount: "gp" },
-    { cont: "OC", count: "GU", svgcount: "gu" }, { cont: "NA", count: "GT", svgcount: "gt" }, { cont: "EU", count: "GG", svgcount: "gg" }, { cont: "AF", count: "GN", svgcount: "gn" }, { cont: "AF", count: "GW", svgcount: "gw" },
-    { cont: "SA", count: "GY", svgcount: "gy" }, { cont: "NA", count: "HT", svgcount: "ht" }, { cont: "AN", count: "HM", svgcount: "hm" }, { cont: "NA", count: "HN", svgcount: "hn" }, { cont: "AS", count: "HK", svgcount: "hk" },
-
-    { cont: "EU", count: "HU", svgcount: "hu" }, { cont: "EU", count: "IS", svgcount: "is" }, { cont: "AS", count: "IN", svgcount: "in" }, { cont: "AS", count: "ID", svgcount: "id" }, { cont: "AS", count: "IR", svgcount: "ir" },
-    { cont: "AS", count: "IQ", svgcount: "iq" }, { cont: "EU", count: "IE", svgcount: "ie" }, { cont: "EU", count: "IM", svgcount: "im" }, { cont: "AS", count: "IL", svgcount: "il" }, { cont: "EU", count: "IT", svgcount: "it" },
-    { cont: "NA", count: "JM", svgcount: "jm" }, { cont: "AS", count: "JP", svgcount: "jp" }, { cont: "EU", count: "JE", svgcount: "je" }, { cont: "AS", count: "JO", svgcount: "jo" }, { cont: "AS", count: "KZ", svgcount: "kz" },
-    { cont: "AF", count: "KE", svgcount: "ke" }, { cont: "OC", count: "KI", svgcount: "ki" }, { cont: "AS", count: "KP", svgcount: "kp" }, { cont: "AS", count: "KR", svgcount: "kr" }, { cont: "EU", count: "XK", svgcount: "xk" },
-
-    { cont: "AS", count: "KW", svgcount: "kw" }, { cont: "AS", count: "KG", svgcount: "kg" }, { cont: "AS", count: "LA", svgcount: "la" }, { cont: "EU", count: "LV", svgcount: "lv" }, { cont: "AS", count: "LB", svgcount: "lb" },
-    { cont: "AF", count: "LS", svgcount: "ls" }, { cont: "AF", count: "LR", svgcount: "lr" }, { cont: "AF", count: "LY", svgcount: "ly" }, { cont: "EU", count: "LI", svgcount: "li" }, { cont: "EU", count: "LT", svgcount: "lt" },
-    { cont: "EU", count: "LU", svgcount: "lu" }, { cont: "AS", count: "MO", svgcount: "mo" }, { cont: "EU", count: "MK", svgcount: "mk" }, { cont: "AF", count: "MG", svgcount: "mg" }, { cont: "AF", count: "MW", svgcount: "mw" },
-    { cont: "AS", count: "MY", svgcount: "my" }, { cont: "AS", count: "MV", svgcount: "mv" }, { cont: "AF", count: "ML", svgcount: "ml" }, { cont: "EU", count: "MT", svgcount: "mt" }, { cont: "OC", count: "MH", svgcount: "mh" },
-    { cont: "NA", count: "MQ", svgcount: "mq" }, { cont: "AF", count: "MR", svgcount: "mr" }, { cont: "AF", count: "MU", svgcount: "mu" }, { cont: "AF", count: "YT", svgcount: "yt" }, { cont: "NA", count: "MX", svgcount: "mx" },
-
-    { cont: "OC", count: "FM", svgcount: "fm" }, { cont: "EU", count: "MD", svgcount: "md" }, { cont: "EU", count: "MC", svgcount: "mc" }, { cont: "AS", count: "MN", svgcount: "mn" }, { cont: "EU", count: "ME", svgcount: "me" },
-    { cont: "NA", count: "MS", svgcount: "ms" }, { cont: "AF", count: "MA", svgcount: "ma" }, { cont: "AF", count: "MZ", svgcount: "mz" }, { cont: "AS", count: "MM", svgcount: "mm" }, { cont: "AF", count: "NA", svgcount: "na" },
-    { cont: "OC", count: "NR", svgcount: "nr" }, { cont: "AS", count: "NP", svgcount: "np" }, { cont: "EU", count: "NL", svgcount: "nl" }, { cont: "OC", count: "NC", svgcount: "nc" }, { cont: "OC", count: "NZ", svgcount: "nz" },
-    { cont: "NA", count: "NI", svgcount: "ni" }, { cont: "AF", count: "NE", svgcount: "ne" }, { cont: "AF", count: "NG", svgcount: "ng" }, { cont: "OC", count: "NU", svgcount: "nu" }, { cont: "OC", count: "NF", svgcount: "nf" },
-    { cont: "OC", count: "MP", svgcount: "mp" }, { cont: "EU", count: "NO", svgcount: "no" }, { cont: "AS", count: "OM", svgcount: "om" }, { cont: "AS", count: "PK", svgcount: "pk" }, { cont: "OC", count: "PW", svgcount: "pw" },
-
-    { cont: "AS", count: "PS", svgcount: "ps" }, { cont: "NA", count: "PA", svgcount: "pa" }, { cont: "OC", count: "PG", svgcount: "pg" }, { cont: "SA", count: "PY", svgcount: "py" }, { cont: "SA", count: "PE", svgcount: "pe" },
-    { cont: "AS", count: "PH", svgcount: "ph" }, { cont: "OC", count: "PN", svgcount: "pn" }, { cont: "EU", count: "PL", svgcount: "pl" }, { cont: "EU", count: "PT", svgcount: "pt" }, { cont: "NA", count: "PR", svgcount: "pr" },
-    { cont: "AS", count: "QA", svgcount: "qa" }, { cont: "AF", count: "RE", svgcount: "re" }, { cont: "EU", count: "RO", svgcount: "ro" }, { cont: "AS", count: "RU", svgcount: "ru" }, { cont: "AF", count: "RW", svgcount: "rw" },
-    { cont: "NA", count: "BL", svgcount: "bl" }, { cont: "AF", count: "SH", svgcount: "sh" }, { cont: "NA", count: "KN", svgcount: "kn" }, { cont: "NA", count: "LC", svgcount: "lc" }, { cont: "NA", count: "MF", svgcount: "mf" },
-    { cont: "NA", count: "PM", svgcount: "pm" }, { cont: "NA", count: "VC", svgcount: "vc" }, { cont: "OC", count: "WS", svgcount: "ws" }, { cont: "EU", count: "SM", svgcount: "sm" }, { cont: "AF", count: "ST", svgcount: "st" },
-
-    { cont: "AS", count: "SA", svgcount: "sa" }, { cont: "AF", count: "SN", svgcount: "sn" }, { cont: "EU", count: "RS", svgcount: "rs" }, { cont: "AF", count: "SC", svgcount: "sc" }, { cont: "AF", count: "SL", svgcount: "sl" },
-    { cont: "AS", count: "SG", svgcount: "sg" }, { cont: "NA", count: "SX", svgcount: "sx" }, { cont: "EU", count: "SK", svgcount: "sk" }, { cont: "EU", count: "SI", svgcount: "si" }, { cont: "OC", count: "SB", svgcount: "sb" },
-    { cont: "AF", count: "SO", svgcount: "so" }, { cont: "AF", count: "ZA", svgcount: "za" }, { cont: "AN", count: "GS", svgcount: "gs" }, { cont: "AF", count: "SS", svgcount: "ss" }, { cont: "EU", count: "ES", svgcount: "es" },
-    { cont: "AS", count: "LK", svgcount: "lk" }, { cont: "AF", count: "SD", svgcount: "sd" }, { cont: "SA", count: "SR", svgcount: "sr" }, { cont: "EU", count: "SJ", svgcount: "sj" }, { cont: "EU", count: "SE", svgcount: "se" },
-    { cont: "EU", count: "CH", svgcount: "ch" }, { cont: "AS", count: "SY", svgcount: "sy" }, { cont: "AS", count: "TW", svgcount: "tw" }, { cont: "AS", count: "TJ", svgcount: "tj" }, { cont: "AF", count: "TZ", svgcount: "tz" },
-
-    { cont: "AS", count: "TH", svgcount: "th" }, { cont: "AS", count: "TL", svgcount: "tl" }, { cont: "AF", count: "TG", svgcount: "tg" }, { cont: "OC", count: "TK", svgcount: "tk" }, { cont: "OC", count: "TO", svgcount: "to" },
-    { cont: "NA", count: "TT", svgcount: "tt" }, { cont: "AF", count: "TN", svgcount: "tn" }, { cont: "AS", count: "TR", svgcount: "tr" }, { cont: "AS", count: "TM", svgcount: "tm" }, { cont: "NA", count: "TC", svgcount: "tc" },
-    { cont: "OC", count: "TV", svgcount: "tv" }, { cont: "NA", count: "UM", svgcount: "um" }, { cont: "AF", count: "UG", svgcount: "ug" }, { cont: "EU", count: "UA", svgcount: "ua" }, { cont: "AS", count: "AE", svgcount: "ae" },
-    { cont: "EU", count: "GB", svgcount: "gb" }, { cont: "NA", count: "US", svgcount: "us" }, { cont: "SA", count: "UY", svgcount: "uy" }, { cont: "AS", count: "UZ", svgcount: "uz" }, { cont: "OC", count: "VU", svgcount: "vu" },
-    { cont: "EU", count: "VA", svgcount: "va" }, { cont: "SA", count: "VE", svgcount: "ve" }, { cont: "AS", count: "VN", svgcount: "vn" }, { cont: "NA", count: "VG", svgcount: "vg" }, { cont: "NA", count: "VI", svgcount: "vi" },
-    { cont: "OC", count: "WF", svgcount: "wf" }, { cont: "AF", count: "EH", svgcount: "eh" }, { cont: "AS", count: "YE", svgcount: "ye" }, { cont: "AF", count: "ZM", svgcount: "zm" }, { cont: "AF", count: "ZW", svgcount: "zw" }
-];
-// if country code class clicked, href continent alpha code
-    // convert array into object once for O(1) lookups eg. countryBySvg["fr"].cont => "EU"
-    const countryBySvg = Object.fromEntries(
-        country_list.map(c => [c.svgcount, c])
-    );
-    // set url parameter type should either be ct:continent or cy:country and the area code
-    function setUrlParam(type, code) {
-        
-        const url = new URL(window.location + "/?" + type+"=");
-        url.searchParams.set(type, code);
-        history.pushState({}, "", url);
-    }
-    // get url parameter along with its code
-    function getUrlParam() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.has("ct")) {
-            return { type: "ct", code: params.get("ct") };
-        }
-        if (params.has("cy")) {
-            return { type: "cy", code: params.get("cy") };
-        }
-        return null;
-    }
-    //get lowercase country code from svg class
-    document.addEventListener("click", function(e){
-        const el = e.target.closest(".country");
-        // !!!!!!!!!!!!!!cant get class name from svg
-        if(!el) return;
-        // find svg count
-        const svgcount = [...el.classList].find(
-            cls => cls !== "country"
-        );
-        if(!svgcount) return;
-        const countryData = countryBySvg[svgcount];
-        if(!countryData) return;
-        //set continent code as countryData.cont
-        setUrlParam("ct", countryData.cont);
-        
-        // Show popup for continent code, 
-        showPopup();
-    });
+<!-- <script>
     // function for popping up mappopup
     function showPopup(strType){
         
@@ -149,5 +46,5 @@ const country_list = [
         popup.classList.remove("hidden");
     }
     window.addEventListener("popstate", showPopup);
-</script>
+</script> -->
 
