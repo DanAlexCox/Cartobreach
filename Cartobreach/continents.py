@@ -1,6 +1,6 @@
 from .classes.classes import Continent
-from django.http import HttpResponse
 from pygal_maps_world.maps import SupranationalWorld #install pygal pygal_maps_world via pip
+from bs4 import BeautifulSoup # install beautifulsoup4 then install lxml
 
 #Constructing continent objects
 AF = Continent("Africa", "AF", "africa")
@@ -22,11 +22,45 @@ continentList = [AF, AN, AS, EU, NA, OC, SA]
 #     singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
 
 # function that creates and renders continent map to file continents map
-def renderContinentMap(request):
-    host = request.build_absolute_uri('/')[:-1] 
+def renderContinentMap():
     worldmap = SupranationalWorld(title='Continents',show_legend=False) # Create world map
     # adding the continents
     for continents in continentList:
-        worldmap.add(continents.getName(), {continents.getNameMap():continents.getValue()})
-                    #  links=[{'href': f'{host}/{continents.getAlphaCode()}/','target': '_self'}])
-    worldmap.render_to_file('static/images/continents_map.svg', force_uri_protocol='https', x_title="Hover over continent to see incident numbers.") # render the map in a SVG file
+        worldmap.add(
+            continents.getName(), {
+                continents.getNameMap(): {
+                    'value':continents.getValue(),
+                    'label':f'{continents.getName()} incidents: {continents.getValue()}',
+                    'xlink': f'/{continents.getAlphaCode()}/'
+                }
+                }
+            )
+    return worldmap.render().decode("utf-8")
+    
+    # mark_safe(svg.to_file('static/images/continents_map.svg', x_title="Hover over continent to see incident numbers.")) # render the map in a SVG file
+    
+# Inject links into SVG
+def injectLinks(svg_path, host, areaCodeList):
+    # open and read svg
+    with open(svg_path, "r", encoding="utf-8") as f:
+        soup = BeautifulSoup(f, "xml")
+    # print(soup)
+    # assigning continent codes with url string using a dictionary of key-values
+    continent_links = {}
+    for contObj in areaCodeList:
+        continent_links[contObj.getNameMap()] = (f"{host}/"+contObj.getAlphaCode()+"/")
+
+    # make a href
+    for path in soup.find_all("path"):
+        cls = path.get("class", "")
+        for continent, url in continent_links.items():
+            
+            if continent in cls:
+                a = soup.new_tag("a", **{
+                        "xlink:href": url,
+                        "target": "_self"
+                    })
+                path.wrap(a)
+    # inject <a> into svg
+    with open(svg_path, "w", encoding="utf-8") as f:
+        f.write(str(soup))
