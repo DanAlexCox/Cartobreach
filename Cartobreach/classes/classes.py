@@ -66,21 +66,36 @@ class Continent:
     
 # Class for countries
 class Country:
-    def __init__(self, name, color):
-        self._name = str(name) # name of country
-        self._color = str(color) # color of country
+    def __init__(self, name, alpha_code, cont_code, val=1):
+        self._name = name # name of country
+        self._alpha_code = alpha_code # alpha 2 code of country
+        self._cont_code = cont_code # continent code where country is
+        self._val = val # active value on map
     
     def getName(self):
-        self._name # name getter
+        return self._name # name getter
     
     def setName(self, value):
         self._name = value # name setter
-        
-    def getColor(self):
-        self._color # color getter
-        
-    def setColor(self, value):
-        self._color = value # color setter
+    
+    def getAlphaCode(self):
+        return self._alpha_code # country alpha code getter
+    
+    def setAlphaCode(self, value): # country setter
+        self._alpha_code = value
+    
+    def getContCode(self):
+        return self._cont_code # continent code getter
+    
+    def setContCode(self, value): # country setter to continent code
+        self._cont_code = value
+    
+    def getValue(self): # active value of country getter
+        return self._val
+    
+    def setValue(self, value): # active value of country setter
+        self._val = value
+    
 
 # Class for scaling continents
 
