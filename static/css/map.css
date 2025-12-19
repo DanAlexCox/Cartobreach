@@ -1,3 +1,7 @@
+h1 {
+    color: brown;
+}
+
 #map-container{
     width: 90%;
     height: 20%;
@@ -14,8 +18,8 @@
 .hidden {
     display: none;
 }
-#closePopup {
-    cursor: pointer;
-    float: right;
-    font-size: 18px;
+
+#mappopup {
+    width: 40%;
+    border-style: solid;
 }
