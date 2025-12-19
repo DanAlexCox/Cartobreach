@@ -53,7 +53,28 @@ def index(request):
     # replace function not working
     # svg = svg.replace("xlink:href", "href")
     mapSvg = mark_safe(svg)
-    
+    # get selected continent object
+    # filters dataset based on selected continent
+    dataset.df["receiver_country_alpha_2_code"] = dataset.cleanColumn(dataset.df["receiver_country_alpha_2_code"])
+    dataset.df["receiver_continent_code"] = dataset.df["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
+    dataset.df["receiver_continent_code"] = dataset.df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+    getContinent = request.GET.get('continent') # load GET continent (value should be .getName())
+    selected = None
+    for i in continents.continentList: 
+        if i.getName() == getContinent:
+            selected = i
+            contSet = dataset.filterSpecificColumn(dataset.df, dataset.df["receiver_continent_code"], selected.getAlphaCode())
+            # analytics of a continent
+            totalContinent = len(contSet.index) # total continent incidents
+            totalContinentPercent = round((float(totalContinent)/float(len(dataset.df.index)) * 100), 2) # percentage of total incidents in continent
+            corpContinentAttacks = dataset.countUncleanColumnValues(contSet["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in continent
+            corpContinentAttacksPercent = round((float(corpContinentAttacks)/float(totalContinent)) * 100, 2) # corporate continent attack percentage
+            miliContinentAttacks = dataset.countUncleanColumnValues(contSet["receiver_subcategory"], "Military") # military received attacks in continent
+            miliContinentAttacksPercent = round((float(miliContinentAttacks)/float(totalContinent)) * 100, 2) # military continent attack percentage
+            inciContSet = dataset.cleanColumn(contSet["incident_type"]) # clean incident type column of continent dataset
+            continentAttackTypePiechart = dataset.pieChart(inciContSet) # make pie chart of incident type in continent
+            continentAttackTypePieSvg = mark_safe(continentAttackTypePiechart)
+            break
     #content dictionary
     context = {
         'index' : "",
@@ -66,14 +87,19 @@ def index(request):
         'corporateattackspercent' : corporateAttacksPercent,
         'militaryattacks' : militaryAttacks,
         'militaryattackspercent' : militaryAttacksPercent,
-        'map': mapSvg,
-        'continentlist': continents.continentList,
+        'map' : mapSvg,
+        'continentlist' : continents.continentList,
     }
+    if selected != None:
+        context.update({
+            'continent' : getContinent,
+            'continenttotal' : totalContinent,
+            'continenttotalpercent' : totalContinentPercent,
+            'continentcorporate' : corpContinentAttacks,
+            'continentcorporatepercent' : corpContinentAttacksPercent,
+            'continentmilitary' : miliContinentAttacks,
+            'continentmilitarypercent' : miliContinentAttacksPercent,
+            'continentattacktypesvg' : continentAttackTypePieSvg,
+        })
+            
     return render(request, "index.html", context)
-
-# continent function
-def continent(request):
-    context = {
-        'continentlist': continents.continentList,
-    }
-    return render(request, "continent.html", context)
