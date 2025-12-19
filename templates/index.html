@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="{% static 'images/Cartobreach_Logo_No_Name.png' %}">
     <!-- map styler -->
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/map.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
     <title>Cartobreach</title> 
 </head> 
 <body>
@@ -29,9 +29,13 @@
     {% if mapload %}
         {% include mapload %}
     {% endif %}
-
+    <!-- load map analytics (analysis.html)-->
     {% if mapanalytics %}
         {% include mapanalytics %}
+    {% endif %}
+    <!-- include continent.html (as pop up) if continent GET value known -->
+    {% if continent %}
+        {% include "continent.html" %}
     {% endif %}
 </body> 
 </html>
