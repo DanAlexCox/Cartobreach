@@ -2,24 +2,14 @@
 <div id="map-container">
     <!-- Render svg with clickable feature to open continents.html-->
     {{ map }}
-    <form method="get" action="continent/" id="continentlist">
+    <form method="get" action="{{ index }}" id="continentlist">
         {% for continent in continentlist %}
             <label for id="{{ continent.getNameMap }}">{{ continent.getName }}</label>
-            <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getNameMap }}">
+            <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getName }}">
         {% endfor %}
         <button type="submit">Load continent</button>
     </form>
 </div>
-<!-- map info pop up-->
-<section id="mappopup">
-    <div id="popupContent">
-        <h1>Continent: </h1>
-        <!-- when single continent clicked load analysis of continent data-->
-        <p>
-            
-        </p>
-    </div>
-</section>
 
 <!-- <script>
     // function for popping up mappopup
