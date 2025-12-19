@@ -50,11 +50,9 @@ def index(request):
         continent.setValue(len(continentSet.index)) # total incidents in continent
     # load continents map
     svg = continents.renderContinentMap()
-    # replace function not working????????????????????
-    svg = svg.replace("xlink:href", "")
+    # replace function not working
+    # svg = svg.replace("xlink:href", "href")
     mapSvg = mark_safe(svg)
-    # inject continent links
-    # continents.injectLinks("static/images/continents_map.svg",request.build_absolute_uri("/")[:-1], continents.continentList)
     
     #content dictionary
     context = {
@@ -69,5 +67,13 @@ def index(request):
         'militaryattacks' : militaryAttacks,
         'militaryattackspercent' : militaryAttacksPercent,
         'map': mapSvg,
+        'continentlist': continents.continentList,
     }
     return render(request, "index.html", context)
+
+# continent function
+def continent(request):
+    context = {
+        'continentlist': continents.continentList,
+    }
+    return render(request, "continent.html", context)
