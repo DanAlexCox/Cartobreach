@@ -22,5 +22,6 @@ from Cartobreach import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index)
+    path('', views.index),
+    path('continent/', views.continent)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
