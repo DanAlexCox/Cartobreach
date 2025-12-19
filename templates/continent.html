@@ -1,5 +1,18 @@
-{% for continent in continentlist %}
-    {{ continent.getNameMap }}
-{% endfor %}
-
+<!-- map info pop up-->
+<section id="mappopup">
+    <div id="popupContent">
+        <h1>Continent: {{ continent }}</h1>
+        <!-- when single continent clicked load analysis of continent data-->
+        <li>
+            <ul>Total recorded incidents: {{ continenttotal }} ({{ continenttotalpercent }}% of the total global incidents)</ul>
+            <ul>Number of attacks on corporate industry: {{ continentcorporate }} ({{ continentcorporatepercent }}% of attacks in the continent)</ul>
+            <ul>Number of attacks on military forces: {{ continentmilitary }} ({{ continentmilitarypercent }}% of attacks in the continent)</ul>
+            <ul>Total incidents chart (Organised by incident type) {{ continentattacktypesvg }}</ul>
+            <ul>Attackers located: continentattackers</ul>
+            <ul>Attack entry chart </ul>
+            <ul>Percentage of incidents received a political response: continentpoliticresponse %</ul>
+            <ul>Total calculated intensity: continentweight</ul>
+        </li>
+    </div>
+</section>
 <a href=""><button>Go back to home page</button></a>
