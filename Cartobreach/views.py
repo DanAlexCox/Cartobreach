@@ -54,15 +54,17 @@ def index(request):
     # svg = svg.replace("xlink:href", "href")
     mapSvg = mark_safe(svg)
     # get selected continent object
-    # filters dataset based on selected continent
+    # make receiver continent code
     dataset.df["receiver_country_alpha_2_code"] = dataset.cleanColumn(dataset.df["receiver_country_alpha_2_code"])
     dataset.df["receiver_continent_code"] = dataset.df["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
     dataset.df["receiver_continent_code"] = dataset.df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+    
     getContinent = request.GET.get('continent') # load GET continent (value should be .getName())
     selected = None
     for i in continents.continentList: 
         if i.getName() == getContinent:
             selected = i
+            # filters dataset based on selected continent
             contSet = dataset.filterSpecificColumn(dataset.df, dataset.df["receiver_continent_code"], selected.getAlphaCode())
             # analytics of a continent
             totalContinent = len(contSet.index) # total continent incidents
@@ -72,8 +74,19 @@ def index(request):
             miliContinentAttacks = dataset.countUncleanColumnValues(contSet["receiver_subcategory"], "Military") # military received attacks in continent
             miliContinentAttacksPercent = round((float(miliContinentAttacks)/float(totalContinent)) * 100, 2) # military continent attack percentage
             inciContSet = dataset.cleanColumn(contSet["incident_type"]) # clean incident type column of continent dataset
-            continentAttackTypePiechart = dataset.pieChart(inciContSet) # make pie chart of incident type in continent
-            continentAttackTypePieSvg = mark_safe(continentAttackTypePiechart)
+            continentAttackTypePieChart = dataset.pieChart(inciContSet) # make pie chart of incident type in continent
+            continentAttackTypePieSvg = mark_safe(continentAttackTypePieChart)
+            # make attacker continent code and pie chart
+            contSet["initiator_alpha_2"] = dataset.cleanColumn(contSet["initiator_alpha_2"])
+            contSet["initiator_continent_code"] = contSet["initiator_alpha_2"].apply(dataset.convertCountryCodeToContinentCode)
+            contSet["initiator_continent_code"] = contSet["initiator_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+            continentAttackerLocationPieChart = dataset.pieChart(contSet["initiator_continent_code"])
+            continentAttackerLocationPieSvg = mark_safe(continentAttackerLocationPieChart)
+            # mitre initial access
+            mitreAccessContSet = dataset.cleanColumn(contSet["mitre_initial_access"]) # clean incident type column of continent dataset
+            continentMitreAccessPieChart = dataset.pieChart(mitreAccessContSet) # make pie chart of incident type in continent
+            continentMitreAccessPieSvg = mark_safe(continentMitreAccessPieChart)
+            
             break
     #content dictionary
     context = {
@@ -100,6 +113,8 @@ def index(request):
             'continentmilitary' : miliContinentAttacks,
             'continentmilitarypercent' : miliContinentAttacksPercent,
             'continentattacktypesvg' : continentAttackTypePieSvg,
+            'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
+            'continentmitreaccesssvg' : continentMitreAccessPieSvg,
         })
             
     return render(request, "index.html", context)
