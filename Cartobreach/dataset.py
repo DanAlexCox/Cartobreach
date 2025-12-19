@@ -9,7 +9,7 @@ from .continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
 pd.options.mode.chained_assignment = None
 
 # get data from csv
-df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=["incident_id", "name", "incident_type", "start_date", "end_date", "receiver_country_alpha_2_code", "receiver_category", "receiver_subcategory", "initiator_alpha_2", "initiator_category", "initiator_subcategory", "data_theft", "functional_impact", "intelligence_impact", "weighted_intensity"])
+df = pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv")
 
 # function that converts date formatted in DD.MM.YYYY
 def convertDateTime(column):
