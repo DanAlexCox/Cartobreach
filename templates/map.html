@@ -1,10 +1,14 @@
 <!-- map img -->
 <div id="map-container">
     <!-- Render svg with clickable feature to open continents.html-->
-     <!-- {% load static %}
-    <embed type="image/svg+xml" src="{% static 'images/continents_map.svg' %}"/> -->
     {{ map }}
-    
+    <form method="get" action="continent/" id="continentlist">
+        {% for continent in continentlist %}
+            <label for id="{{ continent.getNameMap }}">{{ continent.getName }}</label>
+            <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getNameMap }}">
+        {% endfor %}
+        <button type="submit">Load continent</button>
+    </form>
 </div>
 <!-- map info pop up-->
 <section id="mappopup">
