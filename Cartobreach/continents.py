@@ -16,7 +16,7 @@ continentList = [AF, AN, AS, EU, NA, OC, SA]
 
 # function that creates and renders continent map to file continents map
 def renderContinentMap():
-    worldmap = SupranationalWorld(title='Continents') # Create world map
+    worldmap = SupranationalWorld(title='Continents', show_legend=False) # Create world map
     # adding the continents
     for continents in continentList:
         worldmap.add(
