@@ -2,6 +2,7 @@
 import matplotlib.pyplot as ppl # import pyplot matlablib
 import pandas as pd # import pandas
 import pycountry_convert as pcc # import pycountry-convert
+import pygal as py
 from datetime import datetime # import datetime function
 from .continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
 
@@ -169,3 +170,24 @@ def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
     ppl.xticks(xtick_replace, xtick_values)
     ppl.savefig("Cartobreach/static/images/continent_incidents_per_month.png")
 
+# function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
+def pieChart(dataColumnSeries):
+    # initialize pie chart
+    pie = py.Pie()
+    pie.title = 'Pie chart'
+    # get list of unique values eg. continents (all 7 continent alpha codes)
+    uniqueList = []
+    for rowList in dataColumnSeries:
+        for i in rowList:
+            if i not in uniqueList:
+                uniqueList.append(i)
+    # combine whole series into macroList
+    macroList = []
+    for p in dataColumnSeries:
+        macroList.extend(p)
+    for iList in uniqueList: # count occurences of unique value in dataColumnSeries
+        iCount = macroList.count(iList)
+        iCountPercent = round(((float(iCount)/float(len(macroList))) * 100),2)
+        pie.add(iList, [{'value':iCount, 'label':str(iCountPercent)+"%"}])
+    return pie.render().decode("utf-8")
+    
