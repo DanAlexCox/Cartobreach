@@ -4,7 +4,7 @@ html {
     background-color: white;
     border: solid 5px black;
 }
-h1, h2, p, li, label, button, title {
+h1, h2, h3, p, li, label, button, title {
     font-family: Georgia, 'Times New Roman', Times, serif;
 }
 h1 {
@@ -22,12 +22,14 @@ h1 {
 #header-content {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 90%;
     background-color: rgb(194, 255, 249);
     border-top: solid 3px black;
     border-bottom: solid 3px black;
-    h1 {
+    #header-h {
         padding-left: 1%;
+
     }
 }
 #logo{
@@ -50,69 +52,131 @@ h1 {
 .map-forms, .map-analytics{
     display: flex;
     justify-self: center;
-    width: 70%;
+    width: 80%;
+    margin-top: 2%;
 }
 .map-forms{
-    width: 70%;
     flex-flow: column wrap;
     justify-content: center;
-    margin-top: 2%;
-    padding: 3%;
+    padding: 2%;
     background-color: rgb(149, 249, 239);
     border-top: solid 1px black;
     border-bottom: solid 1px black;
 }
-#filterform, #button-show, #continentlist {
-    border: dotted 2px black;
-}
-#filterform {
-    display: flex;
-    justify-self: right;
-}
 #button-show {
-    width: 80%;
+    width: 100%;
     height: 20%;    
     display: flex;
     justify-content: space-evenly;
     align-self: center;
+    button {
+        padding: 2% 5%;
+        font-size: large;
+        background-color: rgb(163, 195, 255);
+    }
 }
 button {
     background-color: white;
     cursor: pointer;
+    border-top: solid 3px black;
+    border-bottom: solid 3px black;
+    border-left: none;
+    border-right: none;
 }
 #continentlist{
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     order: 1;
 }
 .radio-list {
     padding: 1% 3%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-
-
+/* filter section styles */
+#filterform, #button-show, #continentlist {
+    padding-top: 1%;
+}
+#filterform {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 20%;
+    background-color: rgb(163, 195, 255);
+    border-top: solid 1px blue;
+    border-bottom: solid 1px blue;
+    padding: 2%;
+    h2 {
+        margin-bottom: 3%;
+    }
+    button[type="submit"]{
+        margin: 3% 0%
+    }
+}
+#filter-content {
+    display: flex;
+    flex-flow: column nowrap;
+}
+input[type="date"] {
+    width:50%;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: rgb(163, 195, 255);
+}
+input[type="date"]::-webkit-datetime-edit-text {
+    color: red;
+    padding: 0% 3%;
+}
+input[type="date"]::-webkit-datetime-edit-ampm-field{
+    background-color: brown;
+}
+/* map style */
+#map {
+    border-top: solid 1px blue;
+    border-bottom: solid 1px blue;
+    width: 100%;
+    object {
+        width: 100;
+    }
+}
+/* analysis style */
+.analytics {
+    border: solid 1px blue;
+    ul{
+        display: flex;
+        flex-flow: column wrap;
+        li {
+            padding: 2% 4%;
+        }
+    }
+    img {
+        width: 60%;
+        height: 40%;
+    }
+}
+/* map popup style */
 .mappopup{
     position:fixed;
-    top: 20%;
-    left: 10%;
-    width: 50%;
-    height: 70%;
-    border-style: solid;
+    top: 0%;
+    left: 60%;
+    width: 40%;
+    height: 100%;
+    border-left:solid 5px black;
     background-color: white;
     z-index: 10;
     overflow: auto;
+    li {
+        padding: 2% 0%;
+    }
 }
 .mappopup svg{
-    width: 80%;
+    width: 90%;
 }
 #popupContent {
     display: flex;
-}
-
-#map{
-    width: 100%;
-}
-#map object{
-    width:100%;
 }
 .hidden {
     display: none;
