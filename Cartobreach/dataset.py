@@ -78,9 +78,9 @@ def filterTwoColumns(dataset, column, value, alsocolumn, alsovalue):
     return dataset[cleanedColumn.apply(lambda x: value in x) & cleanedAlsoColumn.apply(lambda x: alsovalue in x)]
 
 # function that calculates total intensity of a region (continent/country) using weighted_intensity
-def totalAreaIntensity(area, alpha):
+def totalAreaIntensity(dataset, area, alpha):
     # filter to a region area
-    filteredDataframe = filterSpecificColumn(area, alpha)
+    filteredDataframe = filterSpecificColumn(dataset, area, alpha)
     # sum up weighted_intensity
     return filteredDataframe["weighted_intensity"].sum()
     
@@ -179,8 +179,9 @@ def pieChart(dataColumnSeries):
     uniqueList = []
     for rowList in dataColumnSeries:
         for i in rowList:
-            if i not in uniqueList:
-                uniqueList.append(i)
+            if i not in ["Not available", "N/A"]: # only include actual values
+                if i not in uniqueList:
+                    uniqueList.append(i)
     # combine whole series into macroList
     macroList = []
     for p in dataColumnSeries:
@@ -190,4 +191,24 @@ def pieChart(dataColumnSeries):
         iCountPercent = round(((float(iCount)/float(len(macroList))) * 100),2)
         pie.add(iList, [{'value':iCount, 'label':str(iCountPercent)+"%"}])
     return pie.render().decode("utf-8")
-    
+
+# function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars
+def barChart(dataColumnSeries):
+    bar = py.Bar()
+    bar.title = "Bar chart"
+    # find unique values
+    uniqueList = []
+    for rowList in dataColumnSeries:
+        for i in rowList:
+            if i not in ["Not available", "N/A"]: # only include actual values
+                if i not in uniqueList:
+                    uniqueList.append(i)
+    # combine whole series into list
+    macroList = []
+    for b in dataColumnSeries:
+        macroList.extend(b)
+    # count occurences of unique value in dataColumnSeries
+    for iList in uniqueList: # count occurences of unique value in dataColumnSeries
+        iCount = macroList.count(iList)
+        bar.add(iList, [iCount])
+    return bar.render().decode("utf-8")
