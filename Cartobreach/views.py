@@ -86,7 +86,13 @@ def index(request):
             mitreAccessContSet = dataset.cleanColumn(contSet["mitre_initial_access"]) # clean incident type column of continent dataset
             continentMitreAccessPieChart = dataset.pieChart(mitreAccessContSet) # make pie chart of incident type in continent
             continentMitreAccessPieSvg = mark_safe(continentMitreAccessPieChart)
-            
+            # total weighted intensity of continent
+            contSet["weighted_intensity"] = dataset.pd.to_numeric(contSet["weighted_intensity"], errors="coerce") # no need to call dataset.totalAreaIntensity, contSet is filtered and cleaned
+            continentTotalIntensity = contSet["weighted_intensity"].sum()
+            # mitre impact bar chart
+            mitreImpactContSet = dataset.cleanColumn(contSet["mitre_impact"]) # clean mitre impacts for continent dataset
+            continentMitreImpactBarChart = dataset.barChart(mitreImpactContSet) # make bar chart of mitre impact methods in continent
+            continentMitreImpactBarChart = mark_safe(continentMitreImpactBarChart)
             break
     #content dictionary
     context = {
@@ -115,6 +121,8 @@ def index(request):
             'continentattacktypesvg' : continentAttackTypePieSvg,
             'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
             'continentmitreaccesssvg' : continentMitreAccessPieSvg,
+            'continenttotalintensity' : continentTotalIntensity,
+            'continentmitreimpactsvg' : continentMitreImpactBarChart,
         })
             
     return render(request, "index.html", context)
