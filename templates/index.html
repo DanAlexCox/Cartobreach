@@ -15,7 +15,7 @@
         <div id="header-content">
             {% load static %}  
             <div id="logo-holder"><img src="{% static 'images/Cartobreach_Logo.png' %}" alt="Cartobreach logo" id="logo"></div>
-            <h1>Welcome to Cartobreach</h1>
+            <div id="header-h"><h1>Welcome to Cartobreach</h1></div>
         </div>
     </div>
     <div class="main">
@@ -41,11 +41,11 @@
                     <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getName }}">
                 </div>
                 {% endfor %}
-                <button type="submit">Load continent</button>
+                <button type="submit">Load continent analytics</button>
             </form>
-            {% include "filter.html" %}
         </section>
         <section class="map-analytics">
+            {% include "filter.html" %}
             <!-- load map (map.html) after clicking maploader button -->
             {% if mapload %}
                 {% include mapload %}
