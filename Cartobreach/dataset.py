@@ -173,7 +173,7 @@ def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
 # function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
 def pieChart(dataColumnSeries):
     # initialize pie chart
-    pie = py.Pie()
+    pie = py.Pie(show_legend = False)
     pie.title = 'Pie chart'
     # get list of unique values eg. continents (all 7 continent alpha codes)
     uniqueList = []
@@ -194,7 +194,7 @@ def pieChart(dataColumnSeries):
 
 # function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars
 def barChart(dataColumnSeries):
-    bar = py.Bar()
+    bar = py.Bar(show_legend = False)
     bar.title = "Bar chart"
     # find unique values
     uniqueList = []
