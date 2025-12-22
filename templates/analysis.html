@@ -1,13 +1,13 @@
 <!-- load dataset analytics (analysis.html) after clicking analyticsloader button -->
 <section class="analytics">
-    <li>
-        <ul>Total recorded incidents: {{totalincidents}}</ul>
-        <ul>Number of attacks on corporate industry: {{corporateattacks}} ({{corporateattackspercent}}% of total recorded incidents)</ul>
-        <ul>Number of attacks on military forces: {{militaryattacks}} ({{militaryattackspercent}}% of total recorded incidents)</ul>
+    <ul>
+        <li>Total recorded incidents: {{totalincidents}}</li>
+        <li>Number of attacks on corporate industry: {{corporateattacks}} ({{corporateattackspercent}}% of total recorded incidents)</li>
+        <li>Number of attacks on military forces: {{militaryattacks}} ({{militaryattackspercent}}% of total recorded incidents)</li>
         {% load static %}
-        <ul>Annual chart (Total incidents recorded each year)<img src="{% static 'images/incidents_per_year.png' %}" alt="Annual incidents"></ul>
+        <li>Annual chart (Total incidents recorded each year)<img src="{% static 'images/incidents_per_year.png' %}" alt="Annual incidents"></li>
         {% load static %}
-        <ul>Monthly chart (total incidents recorded each month grouped by receiver continent)<img src="{% static 'images/continent_incidents_per_month.png' %}" alt="Monthly continent victims"></ul>
+        <li>Monthly chart (total incidents recorded each month grouped by receiver continent)<img src="{% static 'images/continent_incidents_per_month.png' %}" alt="Monthly continent victims"></li>
         <p>Disclaimer: Data recorded by European Repository of Cyber Incidents (EuRepoC)</p>
-    </li>
+    </ul>
 </section>
