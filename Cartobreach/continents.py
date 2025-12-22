@@ -20,13 +20,14 @@ def renderContinentMap():
     # adding the continents
     for continents in continentList:
         worldmap.add(
-            continents.getName(), {
-                continents.getNameMap(): {
-                    'value':continents.getValue(),
-                    'label':f'{continents.getName()} incidents: {continents.getValue()}',
-                    'xlink:href':f'/continent/{continents.getNameMap()}/' 
-                    }
-                }
+            continents.getName(), [(continents.getNameMap(),continents.getValue())]
+                # continents.getNameMap(): {
+                #     'value':continents.getValue(),
+                #     'label':f'{continents.getName()} incidents: {continents.getValue()}',
+                #     'xlink:href':f'/continent/{continents.getNameMap()}/'
+                #     }
+                # }
+    
             )
     return worldmap.render().decode("utf-8")
     
