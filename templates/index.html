@@ -24,6 +24,13 @@
         <input type="hidden" name="mapanalytics" value="analysis.html">
         <button type="submit">Load analytics</button>
     </form>
+    <form method="get" action="{{ index }}" id="continentlist">
+        {% for continent in continentlist %}
+            <label for id="{{ continent.getNameMap }}">{{ continent.getName }}</label>
+            <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getName }}">
+        {% endfor %}
+        <button type="submit">Load continent</button>
+    </form>
     {% include "filter.html" %}
     <!-- load map (map.html) after clicking maploader button -->
     {% if mapload %}
