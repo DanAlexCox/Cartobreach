@@ -1,18 +1,17 @@
 <!-- map info pop up-->
-<section id="mappopup">
-    <div id="popupContent">
-        <h1>Continent: {{ continent }}</h1>
+<section class="mappopup">
+    <h1>Continent: {{ continent }}</h1>
+    <div id="popupContent"> 
         <!-- when single continent clicked load analysis of continent data-->
-        <li>
-            <ul>Total recorded incidents: {{ continenttotal }} ({{ continenttotalpercent }}% of the total global incidents)</ul>
-            <ul>Number of attacks on corporate industry: {{ continentcorporate }} ({{ continentcorporatepercent }}% of attacks in the continent)</ul>
-            <ul>Number of attacks on military forces: {{ continentmilitary }} ({{ continentmilitarypercent }}% of attacks in the continent)</ul>
-            <ul>Total incidents chart (Organised by incident type): {{ continentattacktypesvg }}</ul>
-            <ul>Attacker location chart: {{ continentattackerlocationsvg }}</ul>
-            <ul>Attack entry chart (most organisations unlikely to share vulnerability hence the low count): {{continentmitreaccesssvg}} </ul>
-            <ul>Total calculated intensity: {{ continenttotalintensity }}</ul>
-            <ul>What was actually impacted in the attack according to the MITRE ATT&CK framework: {{ continentmitreimpactsvg }}</ul>
-        </li>
-    </div>
+        <ul>
+            <li>Total recorded incidents: {{ continenttotal }} ({{ continenttotalpercent }}% of the total global incidents)</li>
+            <li>Number of attacks on corporate industry: {{ continentcorporate }} ({{ continentcorporatepercent }}% of attacks in the continent)</li>
+            <li>Number of attacks on military forces: {{ continentmilitary }} ({{ continentmilitarypercent }}% of attacks in the continent)</li>
+            <li>Total incidents chart (Organised by incident type): {{ continentattacktypesvg }}</li>
+            <li>Attacker location chart: {{ continentattackerlocationsvg }}</li>
+            <li>Attack entry chart (most organisations unlikely to share vulnerability hence the low count): {{continentmitreaccesssvg}} </li>
+            <li>Total calcliated intensity: {{ continenttotalintensity }}</li>
+            <li>What was actually impacted in the attack according to the MITRE ATT&CK framework: {{ continentmitreimpactsvg }}</li>
+        </ul>
 </section>
 <a href=""><button>Go back to home page</button></a>
