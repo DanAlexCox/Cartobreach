@@ -31,6 +31,15 @@ Cartobreach:
 - Continent data not considering data range filter
 - No home button
 
+## Upcoming features
+- Country version
+- Link to GitHub Repository on site
+- Add scatter diagrams
+- More advanced filter
+- Referencing original sources
+- Review section
+- Intensity scale on map
+
 ## Author
 Mr Daniel Alexander Cox
 Aston University
