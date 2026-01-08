@@ -22,6 +22,15 @@ Cartobreach:
 - csv
 - static
 
+## Known Issues
+- Main map unclickable
+- Charts unclear
+- No legends for charts
+- Monthly chart data cuts off at 2014
+- Site unreponsive when selecting Antarctica "ZeroDivisionError"
+- Continent data not considering data range filter
+- No home button
+
 ## Author
 Mr Daniel Alexander Cox
 Aston University
