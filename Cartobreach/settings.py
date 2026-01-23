@@ -123,7 +123,7 @@ USE_TZ = True
 # Static url for development
 STATIC_URL = '/static/'
 # Static root for deployment
-STATIC_ROOT = os.path.join(BASE_DIR, '/static/')
+STATIC_ROOT = os.path.join(BASE_DIR, '/staticfiles/')
 STATICFILES_DIRS = [BASE_DIR /"static"]
 
 # Media files (e.g., user-uploaded content)
