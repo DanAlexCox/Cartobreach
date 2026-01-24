@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-=pxz_==5lu$t!+0nf5*y_%4l2*x&cza-r_qtx@2jrx#qm@mx0c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'cartobreach.onrender.com',
+]
 
 
 # Application definition
