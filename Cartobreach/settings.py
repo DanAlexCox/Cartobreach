@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=pxz_==5lu$t!+0nf5*y_%4l2*x&cza-r_qtx@2jrx#qm@mx0c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'cartobreach.onrender.com',
