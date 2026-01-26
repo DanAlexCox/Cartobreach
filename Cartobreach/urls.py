@@ -23,4 +23,4 @@ from Cartobreach import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
-] + static(settings.STATIC_ROOT)
+] + static(settings.STATICFILES_DIRS)
