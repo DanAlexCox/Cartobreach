@@ -31,6 +31,10 @@ Cartobreach:
 - Continent data not considering data range filter
 - No home button
 
+## Hosting Issues
+- Static files not present due to Render limited free services
+- Long loading due to Render limited free services
+
 ## Upcoming features
 - Country version
 - Link to GitHub Repository on site
