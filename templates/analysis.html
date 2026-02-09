@@ -6,12 +6,9 @@
         <li>Number of attacks on military forces: {{militaryattacks}} ({{militaryattackspercent}}% of total recorded incidents)</li>
         
         <li>Annual chart (Total incidents recorded each year)</li>
-        {% load static %}
-        <img src="{% static 'images/incidents_per_year.png' %}" alt="Annual incidents">
-        
+        {{annualincidentsvg}}
         <li>Monthly chart (total incidents recorded each month grouped by receiver continent)</li>
-        {% load static %}
-        <img src="{% static 'images/continent_incidents_per_month.png' %}" alt="Monthly continent victims">
+        {{monthlyincidentsvg}}
     </ul>
     <p>Disclaimer: Data recorded by European Repository of Cyber Incidents (EuRepoC)</p>
 </section>
