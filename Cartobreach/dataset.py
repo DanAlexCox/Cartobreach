@@ -105,30 +105,24 @@ def filterDateRange(dataset, dateColumnSeries, min, max):
 
 # function that adds rows in a date range
 def countInDateRange(dataset, dateColumnSeries, min, max):
-    return filterDateRange(dataset, dateColumnSeries, min, max).count()
+    dateFiltered = filterDateRange(dataset, dateColumnSeries, min, max)
+    return len(dateFiltered.index)
 
-# function that constructs line plot for yearly incident counts between dataset minimum and maximum date
-def yearlyIncidentLinePlot(dataset, dateColumnSeries, dataMin, dataMax):
+# function that constructs bar plot for yearly incident counts between dataset minimum and maximum date
+def yearlyIncidentBarPlot(dataset, startdate='01.01.2020', enddate='01.01.2025'):
     # yearly date range list
-    yearRange = pd.date_range(start=dataMin, end=dataMax, freq='YS').to_pydatetime()
+    yearRange = pd.date_range(start=startdate, end=enddate, freq='YS').to_pydatetime()
     # date range counts of each year (count up to end of year, end of year)
+    bar = py.Bar(title='Total incidents recorded every year', x_title='Timeline',
+                            y_title='Number of incidents', x_label_rotation=30)
     x_values = []
-    xtick_replace = []
-    xtick_values = []
     y_values = []
     for i in range(0, len(yearRange)-1):
-        x_values.append(str(yearRange[i]))
-        if yearRange[i].year % 2 == 0: # determine x axis scale i.e. xticks
-            xtick_replace.append(str(yearRange[i]))
-            xtick_values.append(str(yearRange[i].year))
-        y_values.append(countInDateRange(dataset, dateColumnSeries, yearRange[i], yearRange[i+1]))
-    # plot line plot (x: year, y: number of incidents)
-    ppl.figure()
-    ppl.plot(x_values, y_values)
-    ppl.xlabel("Year")
-    ppl.xticks(xtick_replace, xtick_values)
-    ppl.ylabel("No. of Incidents")
-    ppl.savefig("Cartobreach/static/images/incidents_per_year.png")
+        x_values.append(str(yearRange[i].year))
+        y_values.append(countInDateRange(dataset, dataset['start_date'], yearRange[i], yearRange[i+1]))
+    bar.x_labels = x_values
+    bar.add ('Total each year', y_values)
+    return bar.render().decode("utf-8")
 
 # function that cuts data into specified range with one condition
 def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
@@ -141,26 +135,30 @@ def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
 
 # function that adds rows in data range
 def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
-    return filterDataRange(dateColumnSeries, dataColumn, value, min, max).count()
+    dataFiltered = filterDataRange(dateColumnSeries, dataColumn, value, min, max)
+    return len(dataFiltered.index)
 
 # function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
-def monthlyAllAreasIncidentLinePlot(filterColumnSeries):
+def monthlyAllAreasIncidentLinePlot(series, filterColumnSeries, startdate='01.01.2020', enddate='01.01.2025'):
     # dataset lifetime monthly range list for all areas 
-    monthRange = pd.date_range(start='01.01.2000', end = '01.01.2025', freq='MS').to_pydatetime()
+    monthRange = pd.date_range(start=startdate, end = enddate, freq='4MS').to_pydatetime()
     uniqueArea = filterColumnSeries.explode().dropna().unique() # get list of only unique values in dataColumn
-    line = py.DateTimeLine(title='Line Chart Monthly Incidents', x_title='Timeline',show_minor_x_labels=False,
-                            y_title='Incidents per month', show_dots=False, x_label_rotation=0,
+    line = py.DateTimeLine(title='Line Chart Quarterly Incidents', x_title='Timeline',show_minor_x_labels=False,
+                            y_title='Incidents every 4 months', show_dots=False, x_label_rotation=30,
                             x_value_formatter=lambda dt: str(dt.year)) # Set graph and axis titles
-    line.x_labels_major = [datetime(year, 1, 1) for year in range(2000, 2025)]
+    # get year for start and end date
+    startYear = int(startdate.split('.')[-1])
+    endYear = int(enddate.split('.')[-1])
+    line.x_labels_major = [datetime(year, 1, 1) for year in range(startYear, endYear)]
     for area in range(0, len(uniqueArea)):
-        filteredSeries = filterSpecificColumn(df, filterColumnSeries, uniqueArea[area]) # filter by column value eg. EU
+        filteredSeries = filterSpecificColumn(series, filterColumnSeries, uniqueArea[area]) # filter by column value eg. EU
         coords_values = []
         for i in range(0, len(monthRange)-1): # find count for each area
             coords_values.append((monthRange[i], countInDateRange(filteredSeries['start_date'], filteredSeries['start_date'],
                                                                     monthRange[i], monthRange[i+1])))
         # plot line graph figures
         line.add(str(uniqueArea[area]), coords_values)
-    return line.render()
+    return line.render().decode("utf-8")
 
 # function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
 def pieChart(dataColumnSeries):
