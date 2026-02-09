@@ -8,6 +8,13 @@ ds = dataset.df
 def filterDatasetByDate(startStartDate, endStartDate):
     return dataset.filterDateRange(ds, dataset.filterDateTime(ds["start_date"]), startStartDate, endStartDate)
 
+# make receiver continent code
+dataset.df["receiver_country_alpha_2_code"] = dataset.cleanColumn(dataset.df["receiver_country_alpha_2_code"])
+dataset.df["receiver_continent_code"] = dataset.df["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
+dataset.df["receiver_continent_code"] = dataset.df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+
+monthPlot = dataset.monthlyAllAreasIncidentLinePlot(dataset.df["receiver_continent_code"])
+
 # total incidents
 # totalIncidents = len(ds.index)
 
