@@ -22,18 +22,16 @@ valid_includes = ["map.html", "analysis.html", "filter.html"]
 # index page dictionary function
 def index(request):
     #default incident date range
-    startStartDate = request.GET.get('startdate', '2000-01-01')
+    startStartDate = request.GET.get('startdate', '2020-01-01')
     endStartDate = request.GET.get('enddate', '2025-01-01')
-    minDate = datetime.strptime(request.GET.get('startdate', '2000-01-01'), '%Y-%m-%d')
+    minDate = datetime.strptime(request.GET.get('startdate', '2020-01-01'), '%Y-%m-%d')
     maxDate = datetime.strptime(request.GET.get('enddate', '2025-01-01'), '%Y-%m-%d')
     # filter dataset
-    ds = tasks.filterDatasetByDate(minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
+    ds = dataset.filterDateRange(dataset.df, dataset.df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
     # filter variables from tasks.py
     totalIncidents = len(ds.index) # total incidents in date range
     corporateAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in date range
     corporateAttacksPercent = round((float(corporateAttacks) / float(totalIncidents)) * 100, 2) # corporate attacks percentage in date range
-    militaryAttacks = dataset.countUncleanColumnValues(ds["receiver_subcategory"],"Military") # military attacks in date range
-    militaryAttacksPercent = round((float(militaryAttacks) / float(totalIncidents)) * 100, 2) # military attacks percentage in range
     # check map button has been clicked
     mapload = request.POST.get('mapload')
     if mapload not in valid_includes:
@@ -56,20 +54,20 @@ def index(request):
     # svg = svg.replace("xlink:href", "href")
     mapSvg = mark_safe(svg)
     # get selected continent object
-    # make receiver continent code
-    dataset.df["receiver_country_alpha_2_code"] = dataset.cleanColumn(dataset.df["receiver_country_alpha_2_code"])
-    dataset.df["receiver_continent_code"] = dataset.df["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
-    dataset.df["receiver_continent_code"] = dataset.df["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
-    
     getContinent = request.GET.get('continent') # load GET continent (value should be .getName())
     selected = None
-    annualIncidentSvg = None
-    monthlyIncidentSvg = mark_safe(tasks.monthPlot)
+    
+    # format start and end date for graphs
+    filterStartDate = datetime.strftime(minDate, '%d.%m.%Y')
+    filterEndDate = datetime.strftime(maxDate, '%d.%m.%Y')
+    # Render graphs
+    totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
+    monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], filterStartDate, filterEndDate))
     for i in continents.continentList: 
         if i.getName() == getContinent:
             selected = i
             # filters dataset based on selected continent
-            contSet = dataset.filterSpecificColumn(dataset.df, dataset.df["receiver_continent_code"], selected.getAlphaCode())
+            contSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], selected.getAlphaCode())
             # analytics of a continent
             totalContinent = len(contSet.index) # total continent incidents
             totalContinentPercent = round((float(totalContinent)/float(len(dataset.df.index)) * 100), 2) # percentage of total incidents in continent
@@ -108,9 +106,7 @@ def index(request):
         'totalincidents' : totalIncidents,
         'corporateattacks' : corporateAttacks,
         'corporateattackspercent' : corporateAttacksPercent,
-        'militaryattacks' : militaryAttacks,
-        'militaryattackspercent' : militaryAttacksPercent,
-        'annualincidentsvg' : annualIncidentSvg,
+        'totalincidentsvg' : totalIncidentSvg,
         'monthlyincidentsvg' : monthlyIncidentSvg,
         'map' : mapSvg,
         'continentlist' : continents.continentList,
