@@ -143,32 +143,24 @@ def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
 def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
     return filterDataRange(dateColumnSeries, dataColumn, value, min, max).count()
 
-# function that constructs a scatter plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
-def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
-    uniqueArea = cleanedArea.explode().unique() # get list of only unique values in dataColumn
+# function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
+def monthlyAllAreasIncidentLinePlot(filterColumnSeries):
     # dataset lifetime monthly range list for all areas 
     monthRange = pd.date_range(start='01.01.2000', end = '01.01.2025', freq='MS').to_pydatetime()
-    xtick_replace= [] # replace select months
-    xtick_values = [] # xtick new scale values
-    area_allocation = [] #allocates x,y values to area
-    ppl.figure() # get all area data
+    uniqueArea = filterColumnSeries.explode().dropna().unique() # get list of only unique values in dataColumn
+    line = py.DateTimeLine(title='Line Chart Monthly Incidents', x_title='Timeline',show_minor_x_labels=False,
+                            y_title='Incidents per month', show_dots=False, x_label_rotation=0,
+                            x_value_formatter=lambda dt: str(dt.year)) # Set graph and axis titles
+    line.x_labels_major = [datetime(year, 1, 1) for year in range(2000, 2025)]
     for area in range(0, len(uniqueArea)):
-        x_values = [] # new area needs new x values
-        y_values = [] # new area needs new y values
+        filteredSeries = filterSpecificColumn(df, filterColumnSeries, uniqueArea[area]) # filter by column value eg. EU
+        coords_values = []
         for i in range(0, len(monthRange)-1): # find count for each area
-            x_values.append(str(monthRange[i]))
-            if (monthRange[i].month % 12 == 0) and (monthRange[i].year % 2 == 0): # scale for years
-                xtick_replace.append(str(monthRange[i]))
-                xtick_values.append(str(monthRange[i].year))
-            # count incidents for an area and within month range make function
-            y_values.append(countInDataRange(dateColumnSeries, cleanedArea, uniqueArea[area], monthRange[i], monthRange[i+1]))
-        area_allocation.append([uniqueArea[area],[x_values, y_values]])
+            coords_values.append((monthRange[i], countInDateRange(filteredSeries['start_date'], filteredSeries['start_date'],
+                                                                    monthRange[i], monthRange[i+1])))
         # plot line graph figures
-        ppl.plot(area_allocation[area][1][0], area_allocation[area][1][1])
-    ppl.xlabel("Timeline")
-    ppl.ylabel("Incidents per month")
-    ppl.xticks(xtick_replace, xtick_values)
-    ppl.savefig("Cartobreach/static/images/continent_incidents_per_month.png")
+        line.add(str(uniqueArea[area]), coords_values)
+    return line.render()
 
 # function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
 def pieChart(dataColumnSeries):
