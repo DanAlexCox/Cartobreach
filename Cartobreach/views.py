@@ -17,6 +17,8 @@ def get_type(value):
 
 valid_includes = ["map.html", "analysis.html", "filter.html"]
 
+
+
 # index page dictionary function
 def index(request):
     #default incident date range
@@ -61,6 +63,8 @@ def index(request):
     
     getContinent = request.GET.get('continent') # load GET continent (value should be .getName())
     selected = None
+    annualIncidentSvg = None
+    monthlyIncidentSvg = mark_safe(tasks.monthPlot)
     for i in continents.continentList: 
         if i.getName() == getContinent:
             selected = i
@@ -106,6 +110,8 @@ def index(request):
         'corporateattackspercent' : corporateAttacksPercent,
         'militaryattacks' : militaryAttacks,
         'militaryattackspercent' : militaryAttacksPercent,
+        'annualincidentsvg' : annualIncidentSvg,
+        'monthlyincidentsvg' : monthlyIncidentSvg,
         'map' : mapSvg,
         'continentlist' : continents.continentList,
     }
@@ -123,6 +129,5 @@ def index(request):
             'continentmitreaccesssvg' : continentMitreAccessPieSvg,
             'continenttotalintensity' : continentTotalIntensity,
             'continentmitreimpactsvg' : continentMitreImpactBarChart,
-        })
-            
+        })      
     return render(request, "index.html", context)
