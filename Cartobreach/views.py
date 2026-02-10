@@ -17,17 +17,32 @@ def get_type(value):
 
 valid_includes = ["map.html", "analysis.html", "filter.html"]
 
-
-
 # index page dictionary function
 def index(request):
     #default incident date range
     startStartDate = request.GET.get('startdate', '2020-01-01')
     endStartDate = request.GET.get('enddate', '2025-01-01')
-    minDate = datetime.strptime(request.GET.get('startdate', '2020-01-01'), '%Y-%m-%d')
-    maxDate = datetime.strptime(request.GET.get('enddate', '2025-01-01'), '%Y-%m-%d')
-    # filter dataset
+    minDate = datetime.strptime(startStartDate, '%Y-%m-%d')
+    maxDate = datetime.strptime(endStartDate, '%Y-%m-%d')
+    
+    # filter dataset using start and end date
     ds = dataset.filterDateRange(dataset.df, dataset.df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
+    
+    # get clean receiver category options
+    receiverCatFull = dataset.cleanColumn(dataset.df["receiver_category"]).explode().dropna().replace({
+        "Critical infrastruct" : "Critical infrastructure",
+        "Not available" : "Unknown"
+    })
+    receiverCatFull = receiverCatFull[~receiverCatFull.isin(["Mandiant"])]
+    receiverCat = receiverCatFull.sort_values().unique()
+    
+    # GET selected receivertype
+    selectedReceiverCat = request.GET.getlist("receivertype")
+    
+    # filter dataset ds using receiver categories
+    for i in selectedReceiverCat:
+        ds = dataset.filterSpecificColumn(ds, ds["receiver_category"], i)
+        
     # filter variables from tasks.py
     totalIncidents = len(ds.index) # total incidents in date range
     corporateAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in date range
@@ -101,6 +116,8 @@ def index(request):
         'index' : "",
         'startdate' : startStartDate,
         'enddate' : endStartDate,
+        'receivercatlist' : receiverCat,
+        'selectedreceivercats' : selectedReceiverCat,
         'mapload' : mapload,
         'mapanalytics' : mapanalytics,
         'totalincidents' : totalIncidents,
