@@ -11,6 +11,21 @@
                 <label for="enddate">End</label>
                 <input type="date" name="enddate" value="{{enddate}}">
             </div>
+            <h3>Select Victim Type</h3>
+            <div id="receiver-content">
+                {% csrf_token %}
+                <div id="receiver-type-content">
+                    {% for receivercat in receivercatlist %}
+                        {% if receivercat in selectedreceivercats %}
+                            <input type="checkbox" name="receivertype" value="{{receivercat}}" checked>
+                                {{receivercat}}</input>
+                        {% else %}
+                            <input type="checkbox" name="receivertype" value="{{receivercat}}">
+                                {{receivercat}}</input>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
         <button type="submit">Filter</button>
     </form>
