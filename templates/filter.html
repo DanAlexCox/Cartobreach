@@ -19,6 +19,18 @@
                         {% if receivercat in selectedreceivercats %}
                             <input type="checkbox" name="receivertype" value="{{receivercat}}" checked>
                                 {{receivercat}}</input>
+                            {% for receiversubcat in receiversubcatlist %}
+                                <div id="receiver-subtype-content">
+                                    <h4>Sub-type</h4>
+                                    {% if receiversubcat in selectedreceiversubcats %}
+                                        <input type="checkbox" name="receiversubtype" value="{{receiversubcat}}" checked>
+                                            {{receiversubcat}}</input>
+                                    {% else %}
+                                        <input type="checkbox" name="receiversubtype" value="{{receiversubcat}}">
+                                            {{receiversubcat}}</input>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
                         {% else %}
                             <input type="checkbox" name="receivertype" value="{{receivercat}}">
                                 {{receivercat}}</input>
