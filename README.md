@@ -25,8 +25,8 @@ Cartobreach:
 ## Known Issues
 - Main map unclickable
 - Charts unclear
-- No legends for charts
-- Monthly chart data cuts off at 2014
+- No legends for charts (not continents yet)
+- Monthly chart data cuts off at 2014 (done)
 - Site unreponsive when selecting Antarctica "ZeroDivisionError"
 - Continent data not considering data range filter
 - No home button
