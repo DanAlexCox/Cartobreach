@@ -39,26 +39,49 @@ def index(request):
     # GET selected receivertype
     selectedReceiverCat = request.GET.getlist("receivertype")
     
-    # filter dataset ds using receiver categories
-    for i in selectedReceiverCat:
-        ds = dataset.filterSpecificColumn(ds, ds["receiver_category"], i)
+    # filter dataset ds using selected receiver categories
+    receiverSubCatFull = None
+    for recCat in selectedReceiverCat:
+        ds = dataset.filterSpecificColumn(ds, ds["receiver_category"], recCat)
+        
+        # get clean receiver subcategory options from chosen receiver categories
+        receiverSubCatFull = dataset.cleanColumn(ds["receiver_subcategory"]).explode().dropna().replace({
+            "Not available" : "Other"
+        })
+        
+    # GET selected receiversubtype
+    selectedReceiverSubCat = request.GET.getlist("receiversubtype")
+        
+    # sort subcategories for check boxes
+    receiverSubCat = None
+    
+    if receiverSubCatFull is not None:
+        receiverSubCat = receiverSubCatFull.sort_values().unique()
+    
+        # filter dataset ds using selected receiver subcategories
+        for recSubCat in selectedReceiverSubCat:
+            ds = dataset.filterSpecificColumn(ds, ds["receiver_subcategory"], recSubCat)
         
     # filter variables from tasks.py
     totalIncidents = len(ds.index) # total incidents in date range
     corporateAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in date range
     corporateAttacksPercent = round((float(corporateAttacks) / float(totalIncidents)) * 100, 2) # corporate attacks percentage in date range
+    
     # check map button has been clicked
     mapload = request.POST.get('mapload')
     if mapload not in valid_includes:
         mapload = None
+        
     # check analytics button has been clicked
     mapanalytics = request.POST.get('mapanalytics')
     if mapanalytics not in valid_includes:
         mapanalytics = None
+        
     # make new column receiver_continent with unique values only
     ds["receiver_country_alpha_2_code"] = dataset.cleanColumn(ds["receiver_country_alpha_2_code"])
     ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
     ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+    
     # set total incident values for continents
     for continent in continents.continentList:
         continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continent.getAlphaCode()) # filter date filted range for each continent
@@ -118,6 +141,8 @@ def index(request):
         'enddate' : endStartDate,
         'receivercatlist' : receiverCat,
         'selectedreceivercats' : selectedReceiverCat,
+        'receiversubcatlist' : receiverSubCat,
+        'selectedreceiversubcats' : selectedReceiverSubCat,
         'mapload' : mapload,
         'mapanalytics' : mapanalytics,
         'totalincidents' : totalIncidents,
