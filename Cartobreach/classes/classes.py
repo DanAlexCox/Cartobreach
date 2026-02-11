@@ -96,9 +96,27 @@ class Country:
     def setValue(self, value): # active value of country setter
         self._val = value
     
-
 # Class for scaling continents
 
 # Class for scaling countries
 
 # Class for filter
+
+# Class for categories with sub types
+class Category:
+    def __init__(self, cat_type, cat_subtypes):
+        self._cat_type = cat_type # category type option
+        self._cat_subtypes = cat_subtypes # category subtype options
+        
+    def getCatType(self): # category type getter
+        return self._cat_type
+    
+    def setCatType(self, value): # category type setter
+        self._cat_type = value
+        
+    def getCatSubType(self): # category subtype getter
+        return self._cat_subtypes
+    
+    def setSubCatType(self, value): # category subtype setter
+        self._cat_subtypes = value
+    
