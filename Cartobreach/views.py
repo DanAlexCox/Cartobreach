@@ -6,6 +6,10 @@ from . import tasks
 from . import dataset
 from . import continents
 from . import countries
+from . import categories
+
+for rl in categories.receiverList:
+    print(rl.getCatType())
 
 #register library for templates
 register = template.Library()
