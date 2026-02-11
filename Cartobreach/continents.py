@@ -1,8 +1,8 @@
 from .classes.classes import Continent
-from pygal_maps_world.maps import SupranationalWorld #install pygal pygal_maps_world via pip
+from pygal_maps_world.maps import SupranationalWorld # install pygal pygal_maps_world via pip
 from bs4 import BeautifulSoup # install beautifulsoup4 then install lxml
 
-#Constructing continent objects
+# constructing continent class objects
 AF = Continent("Africa", "AF", "africa")
 AN = Continent("Antartica", "AN", "antartica")
 AS = Continent("Asia", "AS", "asia")
