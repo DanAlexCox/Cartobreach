@@ -66,30 +66,30 @@ class Continent:
     
 # Class for countries
 class Country:
-    def __init__(self, name, alpha_code, cont_code, val=1):
+    def __init__(self, name, alpha_code_up, alpha_code_low, val=1):
         self._name = name # name of country
-        self._alpha_code = alpha_code # alpha 2 code of country
-        self._cont_code = cont_code # continent code where country is
+        self._alpha_code_up = alpha_code_up # alpha 2 code upper case of country
+        self._alpha_code_low = alpha_code_low # alpha 2 code lower case of country
         self._val = val # active value on map
-    
+        
     def getName(self):
         return self._name # name getter
     
     def setName(self, value):
         self._name = value # name setter
     
-    def getAlphaCode(self):
-        return self._alpha_code # country alpha code getter
+    def getAlphaCodeUp(self):
+        return self._alpha_code_up # country upper case alpha code getter
     
-    def setAlphaCode(self, value): # country setter
-        self._alpha_code = value
+    def setAlphaCodeUp(self, value): # country upper case setter
+        self._alpha_code_up = value
     
-    def getContCode(self):
-        return self._cont_code # continent code getter
+    def getAlphaCodeLow(self):
+        return self._alpha_code_low # country lower case alpha code getter
     
-    def setContCode(self, value): # country setter to continent code
-        self._cont_code = value
-    
+    def setAlphaCodeLow(self, value): # country lower case setter
+        self._alpha_code_low = value
+        
     def getValue(self): # active value of country getter
         return self._val
     
