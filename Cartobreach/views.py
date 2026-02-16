@@ -29,7 +29,6 @@ def index(request):
     # filter dataset using start and end date
     ds = dataset.filterDateRange(dataset.df, dataset.df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
     
-    
     receiverCatList = [] # get receiver category options
     receiverSubCat = {} # create dictionary for receiver categories with their subcategories
     for receiverCat in categories.receiverList:
@@ -78,6 +77,7 @@ def index(request):
         continent.setValue(len(continentSet.index)) # total incidents in continent
     # load continents map
     svg = continents.renderContinentMap()
+    # svg = countries.renderCountryMap()
     # replace function not working
     # svg = svg.replace("xlink:href", "href")
     mapSvg = mark_safe(svg)
