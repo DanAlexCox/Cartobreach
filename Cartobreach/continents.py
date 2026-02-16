@@ -14,9 +14,9 @@ SA = Continent("South America", "SA", "south_america")
 # make continent list for getting individual supranationalworld svgs
 continentList = [AF, AN, AS, EU, NA, OC, SA]
 
-# function that creates and renders continent map to file continents map
+# function that creates and renders continent map
 def renderContinentMap():
-    worldmap = SupranationalWorld(title='Continents', show_legend=False) # Create world map
+    worldmap = SupranationalWorld(title='Continents') # Create world map
     # adding the continents
     for continents in continentList:
         worldmap.add(
@@ -30,12 +30,4 @@ def renderContinentMap():
     
             )
     return worldmap.render().decode("utf-8")
-    
-    # mark_safe(svg.to_file('static/images/continents_map.svg', x_title="Hover over continent to see incident numbers.")) # render the map in a SVG file
-
-# render svg images of all continents separately using loop
-# for i in range(0, len(continentList)):
-#     singleContinent = pygal.maps.world.SupranationalWorld(show_legend=False)
-#     singleContinent.add(continentList[i].getName(), [continentList[i].getNameMap()])
-#     singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
 
