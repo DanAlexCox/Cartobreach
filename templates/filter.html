@@ -15,11 +15,12 @@
             <div id="receiver-content">
                 {% csrf_token %}
                 <div id="receiver-type-content">
-                    {% for receivercat in receivercatlist %}
-                        {% if receivercat in selectedreceivercats %}
-                            <input type="checkbox" name="receivertype" value="{{receivercat}}" checked>
-                                {{receivercat}}</input>
-                            {% for receiversubcat in receiversubcatlist %}
+                    {% for key, value in receiversubcatdict.items %}
+                    <h4>Type</h4>
+                        {% if key in selectedreceivercats %}
+                            <input type="checkbox" name="receivertype" value="{{key}}" checked>
+                                {{key}}</input>
+                            {% for receiversubcat in value %}
                                 <div id="receiver-subtype-content">
                                     <h4>Sub-type</h4>
                                     {% if receiversubcat in selectedreceiversubcats %}
@@ -32,8 +33,8 @@
                                 </div>
                             {% endfor %}
                         {% else %}
-                            <input type="checkbox" name="receivertype" value="{{receivercat}}">
-                                {{receivercat}}</input>
+                            <input type="checkbox" name="receivertype" value="{{key}}">
+                                {{key}}</input>
                         {% endif %}
                     {% endfor %}
                 </div>
