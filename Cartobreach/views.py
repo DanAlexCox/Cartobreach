@@ -6,10 +6,7 @@ from . import tasks
 from . import dataset
 from . import continents
 from . import countries
-from . import categories
-
-for rl in categories.receiverList:
-    print(rl.getCatType())
+from . import categories 
 
 #register library for templates
 register = template.Library()
@@ -32,36 +29,25 @@ def index(request):
     # filter dataset using start and end date
     ds = dataset.filterDateRange(dataset.df, dataset.df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
     
-    # get clean receiver category options
-    receiverCatFull = dataset.cleanColumn(dataset.df["receiver_category"]).explode().dropna().replace({
-        "Critical infrastruct" : "Critical infrastructure",
-        "Not available" : "Unknown"
-    })
-    receiverCatFull = receiverCatFull[~receiverCatFull.isin(["Mandiant"])]
-    receiverCat = receiverCatFull.sort_values().unique()
+    
+    receiverCatList = [] # get receiver category options
+    receiverSubCat = {} # create dictionary for receiver categories with their subcategories
+    for receiverCat in categories.receiverList:
+        receiverCatList.append(receiverCat.getCatType())
+        receiverSubCat[receiverCat.getCatType()] = receiverCat.getCatSubType()
     
     # GET selected receivertype
     selectedReceiverCat = request.GET.getlist("receivertype")
-    
+
     # filter dataset ds using selected receiver categories
-    receiverSubCatFull = None
     for recCat in selectedReceiverCat:
         ds = dataset.filterSpecificColumn(ds, ds["receiver_category"], recCat)
-        
-        # get clean receiver subcategory options from chosen receiver categories
-        receiverSubCatFull = dataset.cleanColumn(ds["receiver_subcategory"]).explode().dropna().replace({
-            "Not available" : "Other"
-        })
-        
+
     # GET selected receiversubtype
     selectedReceiverSubCat = request.GET.getlist("receiversubtype")
         
-    # sort subcategories for check boxes
-    receiverSubCat = None
-    
-    if receiverSubCatFull is not None:
-        receiverSubCat = receiverSubCatFull.sort_values().unique()
-    
+    # check if receiverSubCatFull contains values
+    if selectedReceiverSubCat:
         # filter dataset ds using selected receiver subcategories
         for recSubCat in selectedReceiverSubCat:
             ds = dataset.filterSpecificColumn(ds, ds["receiver_subcategory"], recSubCat)
@@ -143,9 +129,9 @@ def index(request):
         'index' : "",
         'startdate' : startStartDate,
         'enddate' : endStartDate,
-        'receivercatlist' : receiverCat,
+        'receivercatlist' : receiverCatList,
         'selectedreceivercats' : selectedReceiverCat,
-        'receiversubcatlist' : receiverSubCat,
+        'receiversubcatdict' : receiverSubCat,
         'selectedreceiversubcats' : selectedReceiverSubCat,
         'mapload' : mapload,
         'mapanalytics' : mapanalytics,
