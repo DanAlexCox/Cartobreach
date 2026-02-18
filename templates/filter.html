@@ -7,7 +7,6 @@
                 {% csrf_token %}
                 <label for="startdate">Start</label>
                 <input type="date" name="startdate" value="{{startdate}}">
-                {% csrf_token %}
                 <label for="enddate">End</label>
                 <input type="date" name="enddate" value="{{enddate}}">
             </div>
@@ -40,6 +39,9 @@
                 </div>
             </div>
         </div>
+        <!-- Retain existing presubmitted non-filter variables -->
+        <input type="hidden" name="region" value="{{switchregion}}">
+        <!-- <input type="hidden" name="group" value="{{switchgroup}}"> -->
         <button type="submit">Filter</button>
         <button type="reset">Reset</button>
     </form>
