@@ -21,17 +21,30 @@
     <div class="main">
         <section class="switch-content">
             <h2>Switch between countries/continents</h2>
-            <label class="switch">
-                <!-- TASK: Default to continents -->
-                <input type="checkbox">
-                <span class="slider"></span>
-            </label>
-            <h2>Switch between receivers/attackers</h2>
-            <label class="switch">
-                <!-- TASK: Default to receivers -->
-                <input type="checkbox">
-                <span class="slider"></span>
-            </label>
+            <form method="get" action="" id="dataswitchform">
+                <!-- TASK: if statements for selected/unselected switches -->
+                {% csrf_token %}
+                <label class="switch">
+                    <!-- TASK: Default to continents (unchecked = continents, checked = countries) -->
+                    <!-- TASK: Ensure columns change (e.g. receiver/attacker continent/country)-->
+                    {% if switchregion == None %}
+                        <input type="checkbox" name="region">
+                    {% elif switchregion == 'on' %}
+                        <input type="checkbox" name="region" checked>
+                    {% else %}
+                        <input type="checkbox" name="region">
+                    {% endif %}
+                    <span class="slider"></span>
+                </label>
+                <h2>Switch between receivers/attackers</h2>
+                <label class="switch">
+                    <!-- TASK: Default to receivers (unchecked = receivers, checked = attackers) -->
+                    <!-- TASK: Ensure columns change (e.g. receiver/attacker continent/country)-->
+                    <!-- <input type="checkbox" name="group"> -->
+                    <span class="slider"></span>
+                </label>
+                <button type="submit">Switch data content</button>
+            </form>
         </section>
         <section class="map-forms">
             <div id="button-show">
@@ -60,13 +73,12 @@
         </section>
         <section class="map-analytics">
             {% include "filter.html" %}
-            <!-- load map (map.html) after clicking maploader button -->
-            {% if mapload %}
-                {% include mapload %}
-            {% endif %}
             <!-- load map analytics (analysis.html)-->
             {% if mapanalytics %}
                 {% include mapanalytics %}
+            {% else %}
+            <!-- load map (map.html) after clicking maploader button -->
+                {% include mapload %}
             {% endif %}
         </section>
     </div>
