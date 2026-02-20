@@ -106,7 +106,7 @@ def index(request):
             countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], country.getAlphaCodeUp())
             country.setValue(len(countrySet.index))
         # load countrys map
-        svg = countries.renderCountryMap()
+        svg = countries.renderCountryMap(totalIncidents)
     else:
         # set total incident values for continents
         for continent in continents.continentList:
