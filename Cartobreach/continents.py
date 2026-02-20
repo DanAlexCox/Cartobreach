@@ -1,5 +1,6 @@
 from .classes.classes import Continent
 from pygal_maps_world.maps import SupranationalWorld # install pygal pygal_maps_world via pip
+from pygal.style import Style # import custom styling for graph
 from bs4 import BeautifulSoup # install beautifulsoup4 then install lxml
 
 # constructing continent class objects
@@ -16,7 +17,9 @@ continentList = [AF, AN, AS, EU, NA, OC, SA]
 
 # function that creates and renders continent map
 def renderContinentMap():
-    worldmap = SupranationalWorld(title='Continents') # Create world map
+    # style colour of map
+    
+    worldmap = SupranationalWorld(title='Continents', legend_box_size = 10) # Create world map
     # adding the continents
     for continents in continentList:
         worldmap.add(
