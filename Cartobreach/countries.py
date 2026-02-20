@@ -1,6 +1,6 @@
 from pygal_maps_world.i18n import COUNTRIES # install pygal_maps_world
 from pygal_maps_world.maps import World #install pygal_maps_world via pip
-from . import continents
+from . import map
 from .classes.classes import Country
 import pycountry_convert as pc # import pycountry-convert
 
@@ -25,14 +25,19 @@ for code, name in COUNTRIES.items():
     countryList.append(country)
     
 # function that creates and renders country map
-def renderCountryMap():
-    worldmap = World(title='Countries')
+def renderCountryMap(total_value):
+    worldmap = World(title='Countries', legend_at_bottom = True, legend_at_bottom_columns=20, style=map.totalIncidentStyle, print_labels=True)
     # add the countries to map
     for countrys in countryList:
+        colour = map.styleColours(countrys.getValue(),total_value,255,0,0)
+        # TASK NOT FINISHED DYNAMIC COLOURING
         worldmap.add(
-            countrys.getName(), [{
-                'value': (countrys.getAlphaCodeLow(), countrys.getValue()),
-                'label': 'Total number of incidents',
+            countrys.getAlphaCodeUp(), [{
+                'value': (countrys.getAlphaCodeLow(),
+                          '\nTotal number of incidents - '+str(countrys.getValue())
+                          +'\nNew line'
+                          ),
+                'color' : colour,
                 'xlink': f'/country/{countrys.getName()}/'  # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
             }]
         )
