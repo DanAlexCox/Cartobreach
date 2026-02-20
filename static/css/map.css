@@ -181,9 +181,10 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
     border-top: solid 1px blue;
     border-bottom: solid 1px blue;
     width: 100%;
-    object {
-        width: 100;
-    }
+}
+/* pygal tooltip (on graph labels) formating */
+.tooltip{
+    transform: translate(10px, 10px);
 }
 /* analysis style */
 .analytics {
