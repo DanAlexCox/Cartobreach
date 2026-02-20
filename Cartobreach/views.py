@@ -101,8 +101,17 @@ def index(request):
         # load continents map
         svg = continents.renderContinentMap()
     elif selectRegion == 'on':
+        # set total incident values for each country
+        for country in countries.countryList:
+            countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], country.getAlphaCodeUp())
+            country.setValue(len(countrySet.index))
+        # load countrys map
         svg = countries.renderCountryMap()
     else:
+        # set total incident values for continents
+        for continent in continents.continentList:
+            continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continent.getAlphaCode()) # filter date filted range for each continent
+            continent.setValue(len(continentSet.index)) # total incidents in continent
         # load continents map
         svg = continents.renderContinentMap()
     # replace function not working
