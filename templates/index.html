@@ -84,6 +84,9 @@
     <!-- include continent.html (as pop up) if continent GET value known -->
     {% if continent %}
         {% include "continent.html" %}
+    <!-- included country.html (as pop up) if country GET value known -->
+    {% elif country %}
+        {% include "country.html" %}
     {% endif %}
 </body> 
 </html>
