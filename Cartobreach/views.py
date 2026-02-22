@@ -92,6 +92,9 @@ def index(request):
     ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
     ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
     
+    # get current full url path for adding specific region onto it
+    full_url = request.get_full_path()
+    
     # check what region is selected, change between continents (default: None) and countries (on)
     if selectRegion == None:
         # set total incident values for continents
@@ -106,7 +109,7 @@ def index(request):
             countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], country.getAlphaCodeUp())
             country.setValue(len(countrySet.index))
         # load countrys map
-        svg = countries.renderCountryMap(totalIncidents)
+        svg = countries.renderCountryMap(totalIncidents, full_url)
     else:
         # set total incident values for continents
         for continent in continents.continentList:
