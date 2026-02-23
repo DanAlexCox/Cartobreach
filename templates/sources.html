@@ -36,20 +36,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for sourcerow in sourcelist %}
+                <!-- Table list in order [Incident ID, Start Date, Incident Type, Receiver Country, Sources]-->
+                {% for row in tablelist %}
                     <tr>
-                        <td>ID</td>
-                        <td>Date</td>
-                        <td>Type</td>
-                        <td>Country/s</td>
+                        <td>{{ row.0 }}</td>
+                        <td>{{ row.1 }}</td>
+                        <td>
+                        {% for type in row.2 %}
+                            {{ type }}; 
+                        {% endfor %}
+                        </td>
+                        <td>
+                        {% for country in row.3 %}
+                            {{ country }}; 
+                        {% endfor %}
+                        </td>
                         <td class="source-row">
-                        {% for source in sourcerow %}
+                        {% for source in row.4 %}
                             {% if source in "Not available" %}
-                                {{ source }}
+                                {{ source }}; 
                             {% else %}
-                                <a href= "{{ source }}">{{ source }}</a>
+                                <a href= "{{ source }}">{{ source }}</a>; 
                             {% endif %}
-                            ;
                         {% endfor %}
                         </td>
                     </tr>
