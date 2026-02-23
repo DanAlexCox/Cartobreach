@@ -1,0 +1,11 @@
+/* CSS for source.html */
+.table-container {
+    width: 100%;
+}
+.sources-table {
+    width: 100%;
+    max-width: 100%;
+    border: 2px solid black;
+    table-layout: fixed;
+    word-wrap: break-word;
+}
