@@ -51,7 +51,7 @@ def filterDateTime(series):
     series = series.apply(convertDateTime)
     return series[series.apply(lambda x: isinstance(x, datetime))]
 
-# function that filters every row that doesnt have only value in each row
+# function that filters every row that does have only value in each row
 def filterSingleColumn(dataset, cellList):
     # clean column
     cellList = cleanColumn(cellList)
