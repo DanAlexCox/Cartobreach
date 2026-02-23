@@ -1,2 +1,63 @@
-<!-- List all sources under "sources_url"-->
-<!-- If selected and/or filtered data (GET parameters), list only them sources with the option to view full list-->
+<!DOCTYPE html>
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% load static %}
+        <link rel="icon" type="image/x-icon" href="{% static 'images/Cartobreach_Logo_No_Name.png' %}">
+        <!-- map styler -->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/source.css' %}">
+        <title>Cartobreach</title> 
+    </head> 
+    <body>
+        <form method="get" action="{{ index }}" id="gobackform">
+            <!-- filter/selected information via get -->
+            <input type="hidden" name="">
+            <input type="hidden" name="">
+            <input type="hidden" name="">
+            <input type="hidden" name="">
+            <input type="hidden" name="">
+            <input type="hidden" name="">
+            <button type="submit">Back to home page</button>
+        </form>
+        <h1>Sources Page</h1>
+        <blockquote>Sources may be represented as Not available</blockquote>
+        <!-- List all sources under "source_url"-->
+        <div id="table-container">
+            <table class="sources-table">
+                <thead>
+                    <tr>
+                        <th>Incident ID</th>
+                        <th>Known Start Date</th>
+                        <th>Incident Type</th>
+                        <th>Affected Country/s</th>
+                        <th>Sources</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for sourcerow in sourcelist %}
+                    <tr>
+                        <td>ID</td>
+                        <td>Date</td>
+                        <td>Type</td>
+                        <td>Country/s</td>
+                        <td class="source-row">
+                        {% for source in sourcerow %}
+                            {% if source in "Not available" %}
+                                {{ source }}
+                            {% else %}
+                                <a href= "{{ source }}">{{ source }}</a>
+                            {% endif %}
+                            ;
+                        {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                <!-- If selected and/or filtered data (GET parameters), list only them sources with the option to view full list-->
+            </table>
+        </div>
+        <!-- Show news outlets mostly covering this information, ordered by most covered to least covered-->
+    </body>
+</html>
