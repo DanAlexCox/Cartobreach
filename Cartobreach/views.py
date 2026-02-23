@@ -200,3 +200,18 @@ def index(request):
             'continentmitreimpactsvg' : continentMitreImpactBarChart,
         })      
     return render(request, "index.html", context)
+
+# sources page dictionary function
+def source(request):
+    # get database column "source_url"
+    sourceSeries = dataset.cleanColumn(dataset.df["source_url"])
+    sourceList = []
+    for source in sourceSeries:
+        sourceList.append(source)
+    # TASK: connect to index page if get request parameters from index known (in current url), filter "source_url"
+    context = {
+        "sources" : "",
+        "index" : "..",
+        "sourcelist" : sourceList,
+    }
+    return render(request, "sources.html", context)
