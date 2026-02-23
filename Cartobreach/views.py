@@ -203,15 +203,34 @@ def index(request):
 
 # sources page dictionary function
 def source(request):
-    # get database column "source_url"
-    sourceSeries = dataset.cleanColumn(dataset.df["source_url"])
-    sourceList = []
-    for source in sourceSeries:
-        sourceList.append(source)
+    # list of columns included in sources table
+    columnList = ['incident_id', 'start_date', 'incident_type', 'receiver_country', 'source_url']
+    # get dataset series
+    df = dataset.pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=columnList)
+    # clean incident types
+    df['incident_type'] = dataset.cleanColumn(df['incident_type'])
+    # clean receiver countries NOT ALPHA 2 CODE
+    df['receiver_country'] = dataset.cleanColumn(df['receiver_country'])
+    # clean database column "source_url"
+    df['source_url'] = dataset.cleanColumn(df["source_url"])
+    
+    tableList = []
+    # convert mini dataset into list
+    for _, row in df.iterrows():
+        tableList.append(
+            [
+                row['incident_id'],
+                row['start_date'],
+                row['incident_type'],
+                row['receiver_country'],
+                row['source_url']
+            ]
+    )
     # TASK: connect to index page if get request parameters from index known (in current url), filter "source_url"
+
     context = {
         "sources" : "",
         "index" : "..",
-        "sourcelist" : sourceList,
+        "tablelist" : tableList,
     }
     return render(request, "sources.html", context)
