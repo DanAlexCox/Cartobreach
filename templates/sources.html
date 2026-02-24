@@ -32,7 +32,7 @@
                         <th>Known Start Date</th>
                         <th>Incident Type</th>
                         <th>Affected Country/s</th>
-                        <th>Sources</th>
+                        <th class="source-head">Sources</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,7 +51,7 @@
                             {{ country }}; 
                         {% endfor %}
                         </td>
-                        <td class="source-row">
+                        <td class="source">
                         {% for source in row.4 %}
                             {% if source in "Not available" %}
                                 {{ source }}; 
