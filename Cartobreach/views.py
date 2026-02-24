@@ -205,6 +205,18 @@ def index(request):
 def source(request):
     # list of columns included in sources table
     columnList = ['incident_id', 'start_date', 'incident_type', 'receiver_country', 'source_url']
+    
+    # get request parameters submitted from index.html
+    startDate = request.GET.get('startdate','2000-01-01')
+    endDate = request.GET.get('enddate','2025-01-01')
+    # incidentType = request.GET.get # doesn't exist in filter yet
+    continent = request.GET.get('continent')
+    country = request.GET.get('country')
+    
+    
+    
+    
+    
     # get dataset series
     df = dataset.pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=columnList)
     # clean incident types
