@@ -11,6 +11,7 @@
         <title>Cartobreach</title> 
     </head> 
     <body>
+        {% csrf_token %}
         <form method="get" action="{{ index }}" id="gobackform">
             <!-- filter/selected information via get -->
             <input type="hidden" name="">
@@ -23,6 +24,28 @@
         </form>
         <h1>Sources Page</h1>
         <blockquote>Sources may be represented as Not available</blockquote>
+        <!-- Filter form with start/end date, countries, ascending/descending order -->
+        <form method="get" action="{{ sources }}" id="filterform">
+            <label for="sourcestartdate">Start Date: </label>
+            <input type="date" name="sourcestartdate" value="">
+            
+            <label for="sourceenddate">End Date: </label>
+            <input type="date" name="sourceenddate" value="">
+            <!-- Separate forms for switch and country search -->
+            <label for="orderswitch"></label>
+            <input type="checkbox" name="orderswitch">
+            
+            <label for="countrysearch">Find country</label>
+            <input type="text" name="countrysearch" value="">
+            <div id="countryoptions">
+                <p>Did you mean?</p>
+                <div id="countrysuggests">
+                    <!-- TASK: Find in country list with text countrysearch in name, copy into countrysearch -->
+                    <option name="">Example</option>
+                </div>
+            </div>
+            <button type="submit">Filter</button>
+        </form>
         <!-- List all sources under "source_url"-->
         <div id="table-container">
             <table class="sources-table">
