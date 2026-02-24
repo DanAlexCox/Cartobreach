@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
 from django import template
+from django.http import JsonResponse
 from datetime import datetime
 from . import dataset
 from . import continents
 from . import countries
+from .countries import countryList
 from . import categories 
 
 #register library for templates
@@ -207,15 +209,13 @@ def source(request):
     columnList = ['incident_id', 'start_date', 'incident_type', 'receiver_country', 'source_url']
     
     # get request parameters submitted from index.html
-    startDate = request.GET.get('startdate','2000-01-01')
-    endDate = request.GET.get('enddate','2025-01-01')
+    getStartDate = request.GET.get('startdate','2000-01-01')
+    getEndDate = request.GET.get('enddate','2025-01-01')
     # incidentType = request.GET.get # doesn't exist in filter yet
-    continent = request.GET.get('continent')
-    country = request.GET.get('country')
+    getContinent = request.GET.get('continent')
+    getCountry = request.GET.get('country')
     
-    
-    
-    
+    getCountrySearch = request.GET.get('countrysearch')
     
     # get dataset series
     df = dataset.pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=columnList)
@@ -246,3 +246,16 @@ def source(request):
         "tablelist" : tableList,
     }
     return render(request, "sources.html", context)
+
+# JSON function that deals with source.py autocomplete bar
+def jsonsearch(request):
+    query = request.GET.get('countrysearch',"").lower()
+    results = []
+    if query:
+        for c in countryList:
+            name = c.getName()
+            if query in name.lower():
+                results.append(name)
+            if len(results) == 10:
+                break
+    return JsonResponse(results, safe=False)
