@@ -8,4 +8,15 @@
     border: 2px solid black;
     table-layout: fixed;
     word-wrap: break-word;
+    border-collapse: collapse;
 }
+
+.sources-table td, .sources-table th {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.source-head, .source {
+    width: 50%;
+}
+
