@@ -36,16 +36,42 @@
             <input type="checkbox" name="orderswitch">
             
             <label for="countrysearch">Find country</label>
-            <input type="text" name="countrysearch" value="">
-            <div id="countryoptions">
-                <p>Did you mean?</p>
-                <div id="countrysuggests">
-                    <!-- TASK: Find in country list with text countrysearch in name, copy into countrysearch -->
-                    <option name="">Example</option>
-                </div>
+            <input type="text" name="countrysearch" id="countrysearch" placeholder="Look up countries" value="" autocomplete="off">
+            <div id="countrysuggestions">
+
             </div>
             <button type="submit">Filter</button>
         </form>
+<script>
+    const input = document.getElementById("countrysearch");
+    const suggestionBox = document.getElementById("countrysuggestions");
+
+    input.addEventListener("keyup", function(){
+        const query = input.value;
+        // if countrysearch is empty, hide suggestion box
+        if(query.length < 1){
+            suggestionBox.innerHTML = ""
+            return;
+        }
+        fetch(`/sources/?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionBox.innerHTML ="";
+
+                data.forEach(country => {
+                    const div = document.createElement("div");
+                    div.textContent = country;
+                    div.classList.add("suggestion-country");
+                    
+                    div.onclick = function() {
+                        input.value = country;
+                        suggestionBox.innerHTML = "";
+                    };
+                    suggestionBox.appendChild(div);
+                });
+            });
+    });
+</script>
         <!-- List all sources under "source_url"-->
         <div id="table-container">
             <table class="sources-table">
