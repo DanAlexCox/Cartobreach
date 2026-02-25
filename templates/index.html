@@ -15,10 +15,15 @@
             <div id="header-content">
                 {% load static %}  
                 <div id="logo-holder"><img src="{% static 'images/Cartobreach_Logo.png' %}" alt="Cartobreach logo" id="logo"></div>
-                <div id="header-h"><h1>Welcome to Cartobreach</h1></div>
+                <div id="header-h"><h1>Cartobreach</h1></div>
             </div>
         </div>
         <div class="main">
+            <ul class="nav-bar">
+                <a href="{{ index }}"><li>Home Page</li></a>
+                <a href="{{ aboutus }}"><li>About Us</li></a>
+                <a href="{{ sources }}"><li>Sources</li></a>
+            </ul>
             <section class="switch-content">
                 <h2>Switch between countries/continents</h2>
                 <form method="get" action="" id="dataswitchform">
