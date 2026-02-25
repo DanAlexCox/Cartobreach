@@ -25,5 +25,5 @@ urlpatterns = [
     path('', views.index),
     path('aboutus/', views.about),
     path('sources/', views.source),
-    path('sources/', views.jsonsearch)
+    path('jsonsearch/', views.jsonsearch)
 ] + static(settings.STATIC_URL)
