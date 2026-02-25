@@ -56,10 +56,10 @@ def index(request):
     
     
     # change start and enddate to string in d.m.y format
-    filterStartDate = datetime.strftime(minDate, '%d.%m.%Y')
-    filterEndDate = datetime.strftime(maxDate, '%d.%m.%Y')# change start and end date to datetime
     minDate = datetime.strptime(startStartDate, '%Y-%m-%d')
     maxDate = datetime.strptime(endStartDate, '%Y-%m-%d')
+    filterStartDate = datetime.strftime(minDate, '%d.%m.%Y')
+    filterEndDate = datetime.strftime(maxDate, '%d.%m.%Y')# change start and end date to datetime
     
     # filter dataset using start and end date
     ds = dataset.filterDateRange(dataset.df, dataset.df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
