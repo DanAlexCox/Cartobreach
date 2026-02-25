@@ -11,6 +11,11 @@
         <title>Cartobreach</title> 
     </head> 
     <body>
+        <ul class="nav-bar">
+            <a href="{{ index }}"><li>Home Page</li></a>
+            <a href="{{ aboutus }}"><li>About Us</li></a>
+            <a href="{{ sources }}"><li>Sources</li></a>
+        </ul>
         {% csrf_token %}
         <form method="get" action="{{ index }}" id="gobackform">
             <!-- filter/selected information via get -->
