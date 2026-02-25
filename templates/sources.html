@@ -30,16 +30,28 @@
         <h1>Sources Page</h1>
         <blockquote>Sources may be represented as Not available</blockquote>
         <!-- Filter form with start/end date, countries, ascending/descending order -->
-        <form method="get" action="{{ sources }}" id="filterform">
+        <form method="get" action="{{ sources }}" id="filterdateform">
             <label for="sourcestartdate">Start Date: </label>
-            <input type="date" name="sourcestartdate" value="">
+            <input type="date" name="sourcestartdate" value="{{ filterstartdate }}">
             
             <label for="sourceenddate">End Date: </label>
-            <input type="date" name="sourceenddate" value="">
+            <input type="date" name="sourceenddate" value="{{ filterenddate }}">
+            <button type="submit">Filter</button>
+        </form>
+        <form method="get" action="{{ sources }}" id="switchorderform">
             <!-- Separate forms for switch and country search -->
-            <label for="orderswitch"></label>
-            <input type="checkbox" name="orderswitch">
-            
+            <p>Dates in ascending (Asc)/descending (Desc) order</p>
+            {% if order == None %}
+                <label for="orderswitch">Asc</label>
+                <input type="checkbox" name="orderswitch" onchange="this.form.submit()">
+            {% elif order == 'on' %}
+                <label for="orderswitch">Desc</label>
+                <input type="checkbox" name="orderswitch" checked onchange="this.form.submit()">
+            {% else %}
+                <label for="orderswitch">Asc</label>
+                <input type="checkbox" name="orderswitch" onchange="this.form.submit()">
+        </form>
+        <form method="get" action="{{ sources }}" id="searchcountryform">
             <label for="countrysearch">Find country</label>
             <input type="text" name="countrysearch" id="countrysearch" placeholder="Look up countries" value="" autocomplete="off">
             <div id="countrysuggestions">
