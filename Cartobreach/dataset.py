@@ -138,6 +138,18 @@ def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
     dataFiltered = filterDataRange(dateColumnSeries, dataColumn, value, min, max)
     return len(dataFiltered.index)
 
+# function that orders based on date (ascending/descending)
+def orderByDate(dataset, dateColumn, order):
+    if not isinstance(dataset, pd.DataFrame):
+        return False
+    # check input 'order' is either ascending (True) or descending (False) source: https://www.geeksforgeeks.org/python/how-to-sort-a-pandas-dataframe-by-date/
+    if order in [True, False]:
+        dataset[dateColumn] = convertDateTime(dataset[dateColumn])
+        dataset = dataset.sort_values(by=dateColumn, ascending=order)
+        return dataset
+    else:
+        return "Invalid order"     
+
 # function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
 def monthlyAllAreasIncidentLinePlot(series, filterColumnSeries, startdate='01.01.2020', enddate='01.01.2025'):
     # dataset lifetime monthly range list for all areas 
