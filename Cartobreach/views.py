@@ -228,21 +228,52 @@ def source(request):
     # incidentType = request.GET.get # doesn't exist in filter yet
     getContinent = request.GET.get('continent')
     getCountry = request.GET.get('country')
-    
-    getCountrySearch = request.GET.get('countrysearch')
+    getCountrySearch = request.GET.get('countrysearch',"")
     
     # get dataset series
     df = dataset.pd.read_csv("Cartobreach/csv/eurepoc_global_dataset_1_3.csv", usecols=columnList)
     
-    # filter dataset by start and end date (same as index date filter)
     # change start and end date to datetime
     minDate = datetime.strptime(getStartDate, '%Y-%m-%d')
     maxDate = datetime.strptime(getEndDate, '%Y-%m-%d')
+    
+    # filter dataset by start and end date (same as index date filter)
     df = dataset.filterDateRange(df, df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
-    # clean incident types
-    df['incident_type'] = dataset.cleanColumn(df['incident_type'])
+    
     # clean receiver countries NOT ALPHA 2 CODE
     df['receiver_country'] = dataset.cleanColumn(df['receiver_country'])
+    
+    # remove whitespace
+    getCountrySearch = getCountrySearch.strip()
+    
+    # get list of countries to filter dataset
+    countrySearchList = str.split(getCountrySearch, ";")
+    while '' in countrySearchList:
+        countrySearchList.remove('')
+    
+    # print(dataset.countUncleanColumnValues(df['receiver_country'], 'China'))
+    # filter dataset that include all searching countries (i.e. SELECT countries OR other countries), ensuring no deplicates
+    totalDf = None
+    for oneSearch in countrySearchList:
+        oneSearch = oneSearch.strip() # removes any white space on left or right
+        singleDf = dataset.filterSpecificColumn(df, df['receiver_country'], oneSearch)
+        totalDf = dataset.pd.concat([totalDf, singleDf])
+    
+    # convert totalDf list into tuple. drop_duplicates doesnt has lists
+    for col in totalDf.columns:
+        totalDf[col] = totalDf[col].apply(
+            lambda x: tuple(x) if isinstance(x, list) else x
+        )
+    
+    # remove duplicates
+    df = totalDf.drop_duplicates()
+    
+    # count results after filtering/searching
+    totalResults = len(df.index)
+    
+    # clean incident types
+    df['incident_type'] = dataset.cleanColumn(df['incident_type'])
+    
     # clean database column "source_url"
     df['source_url'] = dataset.cleanColumn(df["source_url"])
     
@@ -275,6 +306,8 @@ def source(request):
         "filterstartdate" : getStartDate,
         "filterenddate" : getEndDate,
         "order" : getOrderSwitch,
+        "countrysearch" : getCountrySearch,
+        "totalcount" : totalResults,
         "tablelist" : tableList,
     }
     return render(request, "sources.html", context)
@@ -282,11 +315,17 @@ def source(request):
 # JSON function that deals with source.py autocomplete bar
 def jsonsearch(request):
     query = request.GET.get('countrysearch',"").lower()
+    
+    # split by semicolons for multi-country search
+    queryList = [c.strip() for c in query.split(";") if c.strip()]
+    
+    currentSearch = queryList[-1].lower() if queryList else ""
+    
     results = []
-    if query:
+    if currentSearch:
         for c in countryList:
             name = c.getName()
-            if query in name.lower():
+            if currentSearch in name.lower():
                 results.append(name)
             if len(results) == 10:
                 break
