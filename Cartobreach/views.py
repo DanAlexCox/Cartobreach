@@ -246,10 +246,17 @@ def source(request):
     # clean database column "source_url"
     df['source_url'] = dataset.cleanColumn(df["source_url"])
     
+    # sort into ascending order descending depending on getOrderSwitch
+    if getOrderSwitch == 'on': # descending order
+        order = False
+    else: # ascending order
+        order = True
+    df = dataset.orderByDate(df,'start_date', order)
     
     tableList = []
     # convert mini dataset into list
     for _, row in df.iterrows():
+        row['start_date'] = datetime.strftime(row['start_date'], '%d %B %Y') # 'number day' 'month name' 'full year'
         tableList.append(
             [
                 row['incident_id'],
@@ -258,7 +265,7 @@ def source(request):
                 row['receiver_country'],
                 row['source_url']
             ]
-    )
+        )    
     # TASK: connect to index page if get request parameters from index known (in current url), filter "source_url"
 
     context = {
