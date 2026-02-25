@@ -171,6 +171,8 @@ def index(request):
     #content dictionary
     context = {
         'index' : "",
+        'aboutus' : "aboutus/",
+        'sources' : "sources/",
         'startdate' : selectDict['filterstartdate'],
         'enddate' : selectDict['filterenddate'],
         'selectedreceivercats' : selectDict['filterreceivercategorylist'],
@@ -202,6 +204,17 @@ def index(request):
             'continentmitreimpactsvg' : continentMitreImpactBarChart,
         })      
     return render(request, "index.html", context)
+
+# about us page function
+def about(request):
+    githubRepoLink = "https://github.com/DanAlexCox/Cartobreach"
+    context = {
+        'index' : "..",
+        'aboutus' : "",
+        'sources' : "../sources/",
+        'repolink': githubRepoLink,
+    }
+    return render(request,"about.html", context)
 
 # sources page dictionary function
 def source(request):
@@ -241,8 +254,9 @@ def source(request):
     # TASK: connect to index page if get request parameters from index known (in current url), filter "source_url"
 
     context = {
-        "sources" : "",
         "index" : "..",
+        "aboutus" :"../aboutus/",
+        "sources" : "",
         "tablelist" : tableList,
     }
     return render(request, "sources.html", context)
