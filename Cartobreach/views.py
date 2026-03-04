@@ -107,9 +107,9 @@ def index(request):
         svg = continents.renderContinentMap()
     elif selectRegion == 'on':
         # set total incident values for each country
-        for country in countries.countryList:
-            countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], country.getAlphaCodeUp())
-            country.setValue(len(countrySet.index))
+        for countrySingle in countries.countryList:
+            countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], countrySingle.getAlphaCodeUp())
+            countrySingle.setValue(len(countrySet.index))
         # load countrys map
         svg = countries.renderCountryMap(totalIncidents, full_url)
     else:
@@ -119,8 +119,7 @@ def index(request):
             continent.setValue(len(continentSet.index)) # total incidents in continent
         # load continents map
         svg = continents.renderContinentMap()
-    # replace function not working
-    # svg = svg.replace("xlink:href", "href")
+        
     mapSvg = mark_safe(svg)
     # Render graphs
     totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
