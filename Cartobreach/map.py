@@ -20,5 +20,8 @@ def styleColours(value,max_value,red,green,blue):
 
     return rgb2hex(r,g,b)
 
-# function that returns a list
-
+# formats for styling maps
+totalIncidentStyle = map.Style(
+    tooltip_font_size=10,
+    # color=tuple(colorList), # convert to tuple for map.style usage
+)
