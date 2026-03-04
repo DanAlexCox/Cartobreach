@@ -28,20 +28,28 @@ for code, name in COUNTRIES.items():
 # function that creates and renders country map with links that add specific country to current parameters e.g. after filter form get params
 def renderCountryMap(total_value, getfullpath):
     # layout for map
-    worldmap = World(title='Countries', legend_at_bottom = True, legend_at_bottom_columns=20, style=map.totalIncidentStyle, print_labels=True)
-    
+    worldmap = World(title='Countries', legend_at_bottom = True, legend_at_bottom_columns=20, print_labels=True)
+    # colorList = []
     # add the countries to map
     for countrys in countryList:
-        colour = map.styleColours(countrys.getValue(),total_value,255,0,0)
-        # TASK NOT FINISHED DYNAMIC COLOURING
+        # colour = map.styleColours(countrys.getValue(),total_value,255,0,0) # get hex code from value
+        # colorList.append(colour) # add hex code into color list
+        
+        # task optional if have time on top of report/presentation: fix monotonic colour scheme
         worldmap.add(
             countrys.getAlphaCodeUp(), [{
                 'value': (countrys.getAlphaCodeLow(),
                           '\nTotal number of incidents - '+str(countrys.getValue())
                           +'\nNew line'
                           ),
-                'color' : colour,
+                # 'color' : colour,
                 'xlink': f"{getfullpath}&{urlencode({'country':countrys.getAlphaCodeUp()})}"  # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
             }]
         )
+    # formats for styling maps
+    totalIncidentStyle = map.Style(
+        tooltip_font_size=10,
+        # color=tuple(colorList), # convert to tuple for map.style usage
+    )
+    worldmap.style= totalIncidentStyle
     return worldmap.render().decode("utf-8")
