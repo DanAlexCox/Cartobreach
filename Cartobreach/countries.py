@@ -29,7 +29,7 @@ for code, name in COUNTRIES.items():
 # function that creates and renders country map with links that add specific country to current parameters e.g. after filter form get params
 def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate = 'N/A'):
     # layout for map
-    worldmap = World(title='Countries', legend_at_bottom = True, legend_at_bottom_columns=20, style=map.totalIncidentStyle, print_labels=True)
+    worldmap = World(title='Countries', legend_at_bottom = True, legend_at_bottom_columns=20, style=map.pygalStyle, print_labels=True)
     # colorList = []
     # add the countries to map
     for countrys in countryList:
