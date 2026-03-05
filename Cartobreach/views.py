@@ -43,13 +43,17 @@ def index(request):
     
         # condition requests
     if selectRegion == None:
-        getContinent = request.GET.get('continent') # load GET continent (value should be .getName())
+        getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
+        getCountry = None
         selectDict['receivercontinent'] = getContinent # dictionary add
     elif selectRegion == 'on':
-        getCountry = request.GET.get('country') # load GET continent (value should be .getName())
+        getContinent = None
+        getCountry = request.GET.get('country') # load GET country (value should be .getAlphaCodeUp())
         selectDict['receivercountry'] = getCountry # dictionary add
     else:
-        getContinent = None
+        getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
+        getCountry = None
+        selectRegion = None
     
     if mapanalytics not in valid_includes:
         mapload = request.POST.get('mapload', 'map.html')
@@ -203,13 +207,11 @@ def index(request):
     # TASK: determine check index switches i.e. region/group
         # construct dictionary for data analytics and svgs
     selected = None
-    dataList = {}
-    svgList = {}
     if selectRegion == None:
         for i in continents.continentList: 
-            if i.getName() == getContinent:
+            if i.getAlphaCode() == getContinent:
                 selected = i
-                selectDict['selectcontinent'] = selected
+                selectDict['selectcontinent'] = selected.getName()
                 # filters dataset based on selected continent
                 contSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], selected.getAlphaCode())
                 # analytics of a continent
@@ -218,28 +220,52 @@ def index(request):
                 corpContinentAttacks = dataset.countUncleanColumnValues(contSet["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in continent
                 corpContinentAttacksPercent = round((float(corpContinentAttacks)/float(totalContinent)) * 100, 2) # corporate continent attack percentage
                 inciContSet = dataset.cleanColumn(contSet["incident_type"]) # clean incident type column of continent dataset
-                continentAttackTypePieChart = dataset.pieChart(inciContSet) # make pie chart of incident type in continent
+                continentAttackTypePieChart = dataset.pieChart(inciContSet, "Recorded Incident Types Within Continent") # make pie chart of incident type in continent
                 continentAttackTypePieSvg = mark_safe(continentAttackTypePieChart)
                 # make attacker continent code and pie chart
                 contSet["initiator_alpha_2"] = dataset.cleanColumn(contSet["initiator_alpha_2"])
                 contSet["initiator_continent_code"] = contSet["initiator_alpha_2"].apply(dataset.convertCountryCodeToContinentCode)
                 contSet["initiator_continent_code"] = contSet["initiator_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
-                continentAttackerLocationPieChart = dataset.pieChart(contSet["initiator_continent_code"])
+                continentAttackerLocationPieChart = dataset.pieChart(contSet["initiator_continent_code"], "Known Attacker Locations")
                 continentAttackerLocationPieSvg = mark_safe(continentAttackerLocationPieChart)
                 # mitre initial access
                 mitreAccessContSet = dataset.cleanColumn(contSet["mitre_initial_access"]) # clean incident type column of continent dataset
-                continentMitreAccessPieChart = dataset.pieChart(mitreAccessContSet) # make pie chart of incident type in continent
+                continentMitreAccessPieChart = dataset.pieChart(mitreAccessContSet, "Known Recorded Infiltration Types") # make pie chart of infiltration type in continent
                 continentMitreAccessPieSvg = mark_safe(continentMitreAccessPieChart)
                 # total weighted intensity of continent
                 contSet["weighted_intensity"] = dataset.pd.to_numeric(contSet["weighted_intensity"], errors="coerce") # no need to call dataset.totalAreaIntensity, contSet is filtered and cleaned
                 continentTotalIntensity = contSet["weighted_intensity"].sum()
                 # mitre impact bar chart
                 mitreImpactContSet = dataset.cleanColumn(contSet["mitre_impact"]) # clean mitre impacts for continent dataset
-                continentMitreImpactBarChart = dataset.barChart(mitreImpactContSet) # make bar chart of mitre impact methods in continent
+                continentMitreImpactBarChart = dataset.barChart(mitreImpactContSet, "Known Recorded Mitre Impact Methods") # make bar chart of mitre impact methods in continent
                 continentMitreImpactBarChart = mark_safe(continentMitreImpactBarChart)
                 break
     elif selectRegion == 'on':
-        print('country selected')
+        for i in countryList: 
+            if i.getAlphaCodeUp() == getCountry:
+                selected = i
+                selectDict['selectcountry'] = selected.getName()
+                # filter dataset
+                countSet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], selected.getAlphaCodeUp())
+                # total recorded incidents
+                totalCountry = len(countSet.index)
+                totalCountryPercent = round((float(totalCountry)/float(len(ds.index)) * 100), 2)
+                # incident types graph
+                countryInciCountSet = dataset.cleanColumn(countSet["incident_type"]) # clean incident type column of continent dataset
+                countryIncidentTypePieChart = dataset.pieChart(countryInciCountSet, "Incident Types Within Country") # TASK: FIX PYGAL TITLE IN DATASET.PY
+                countryIncidentTypePieSvg = mark_safe(countryIncidentTypePieChart)
+                # number of attacks on critical infrastructure
+                countryCriticalSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.ci.getCatType()) # filter country
+                countryCriticalCount = len(countryCriticalSet.index)
+                countryCriticalPercent = round((float(countryCriticalCount)/float(totalCountry) * 100), 2)
+                # critical infrastructure subcategory graph
+                countryCriticalSet['receiver_subcategory'] = dataset.cleanColumn(countryCriticalSet['receiver_subcategory'])
+                countryCriticalChart = dataset.barChartSpecific(countryCriticalSet['receiver_subcategory'], "Critical Infrastructure Categories", categories.ci.getCatSubType())
+                countryCriticalSvg = mark_safe(countryCriticalChart)
+                # social groups w/ graph
+                # politic groups w/ graph
+                # multi target attacks
+                
     else:
         print('invalid input')
 
@@ -266,18 +292,30 @@ def index(request):
         'continentlist' : continents.continentList,
     }
     if selected != None:
-        context.update({
-            'continent' : selectDict['selectcontinent'],
-            'continenttotal' : totalContinent,
-            'continenttotalpercent' : totalContinentPercent,
-            'continentcorporate' : corpContinentAttacks,
-            'continentcorporatepercent' : corpContinentAttacksPercent,
-            'continentattacktypesvg' : continentAttackTypePieSvg,
-            'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
-            'continentmitreaccesssvg' : continentMitreAccessPieSvg,
-            'continenttotalintensity' : continentTotalIntensity,
-            'continentmitreimpactsvg' : continentMitreImpactBarChart,
-        })      
+        if getContinent != None:
+            context.update({
+                'continent' : selectDict['selectcontinent'],
+                'continenttotal' : totalContinent,
+                'continenttotalpercent' : totalContinentPercent,
+                'continentcorporate' : corpContinentAttacks,
+                'continentcorporatepercent' : corpContinentAttacksPercent,
+                'continentattacktypesvg' : continentAttackTypePieSvg,
+                'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
+                'continentmitreaccesssvg' : continentMitreAccessPieSvg,
+                'continenttotalintensity' : continentTotalIntensity,
+                'continentmitreimpactsvg' : continentMitreImpactBarChart,
+            })
+        elif getCountry != None:
+            context.update({
+                'country' : selectDict['selectcountry'],
+                'countrytotal' : totalCountry,
+                'countrytotalpercent' : totalCountryPercent,
+                'countryincidenttypesvg' : countryIncidentTypePieSvg,
+                'countrycriticaltotal' : countryCriticalCount,
+                'countrycriticalpercent' : countryCriticalPercent,
+                'countrycriticalsvg' : countryCriticalSvg,
+            })
+              
     return render(request, "index.html", context)
 
 # about us page function
