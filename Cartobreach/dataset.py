@@ -59,8 +59,9 @@ def filterSingleColumn(dataset, cellList):
 
 # function that filters every row that doesnt have only value in each row
 def filterMultipleColumns(dataset, column):
-    # clean column
-    column = cleanColumn(column)
+    # check first row if its a str not a list
+    if not isinstance(column.iloc[0], list):
+        column = cleanColumn(column)
     return dataset[column.apply(lambda x: isinstance(x, list) and len(x) > 1)]
 
 # function that filters a specific value from series
