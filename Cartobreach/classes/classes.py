@@ -66,7 +66,8 @@ class Continent:
     
 # Class for countries
 class Country:
-    def __init__(self, name, alpha_code_up, alpha_code_low, continent, val=1, most_inci='N/A', most_inci_count='N/A'):
+    def __init__(self, name, alpha_code_up, alpha_code_low, continent, val=1, most_inci='N/A', most_inci_count='N/A', crit_infra_count='N/A',
+                 edu_count='N/A', multi_count='N/A'):
         self._name = name # name of country
         self._alpha_code_up = alpha_code_up # alpha 2 code upper case of country
         self._alpha_code_low = alpha_code_low # alpha 2 code lower case of country
@@ -74,7 +75,9 @@ class Country:
         self._val = val # active value on map
         self._most_inci = most_inci # active value of most popular incident type
         self._most_inci_count = most_inci_count # active value of total most popular incident type
-        
+        self._crit_infra_count = crit_infra_count # active value of total critical infrastructure receivers
+        self._edu_count = edu_count # active value of total education receivers
+        self._multi_count = multi_count # active value of total incidents affecting more than current country
     def getName(self):
         return self._name # name getter
     
@@ -116,6 +119,24 @@ class Country:
     
     def setMostInciCount(self, value): # active value of country incident type count setter
         self._most_inci_count = value
+    
+    def getCritInfraCount(self): # active value of country incidents affecting critical infrastructure getter
+        return self._crit_infra_count
+    
+    def setCritInfraCount(self, value): # active value of country incidents affecting critical infrastructure setter
+        self._crit_infra_count = value
+    
+    def getEduCount(self): # active value of country incidents affecting education getter
+        return self._edu_count
+    
+    def setEduCount(self, value): # active value of country incidents affecting education setter
+        self._edu_count = value
+    
+    def getMultiCount(self): # active value of country incidents affecting multiple countries getter
+        return self._multi_count
+    
+    def setMultiCount(self, value): # active value of country incidents affecting multiple countries setter
+        self._multi_count = value
 
 # Class for categories with sub types
 class Category:
