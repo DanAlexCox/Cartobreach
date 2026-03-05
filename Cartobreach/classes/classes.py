@@ -66,12 +66,14 @@ class Continent:
     
 # Class for countries
 class Country:
-    def __init__(self, name, alpha_code_up, alpha_code_low, continent, val=1):
+    def __init__(self, name, alpha_code_up, alpha_code_low, continent, val=1, most_inci='N/A', most_inci_count='N/A'):
         self._name = name # name of country
         self._alpha_code_up = alpha_code_up # alpha 2 code upper case of country
         self._alpha_code_low = alpha_code_low # alpha 2 code lower case of country
         self._continent = continent # assigned continent
         self._val = val # active value on map
+        self._most_inci = most_inci # active value of most popular incident type
+        self._most_inci_count = most_inci_count # active value of total most popular incident type
         
     def getName(self):
         return self._name # name getter
@@ -102,6 +104,18 @@ class Country:
     
     def setValue(self, value): # active value of country setter
         self._val = value
+        
+    def getMostInci(self): # active value of country incident type getter
+        return self._most_inci
+    
+    def setMostInci(self, value): # active value of country incident type setter
+        self._most_inci = value
+        
+    def getMostInciCount(self): # active value of country incident type count getter
+        return self._most_inci_count
+    
+    def setMostInciCount(self, value): # active value of country incident type count setter
+        self._most_inci_count = value
 
 # Class for categories with sub types
 class Category:
