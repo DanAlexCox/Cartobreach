@@ -2,9 +2,11 @@
  <section class="mappopup">
     <h1>Country: {{ country }}</h1>
     <ul>
-      <li>Total recorded incidents: </li> <!-- Only filter by country not filtered database -->
+      <li>Total recorded incidents: {{ countrytotal }} ({{ countrytotalpercent }}% of filtered dataset)</li> <!-- Only filter by country not filtered database -->
       <li>Incident types graph: </li><!-- Include chart for incident type -->
-      <li>Number of attacks on critical infrastructure: </li> <!-- Include chart for specific infrastructure -->      
+      {{ countryincidenttypesvg }}
+      <li>Number of attacks on critical infrastructure: {{ countrycriticaltotal }} ({{ countrycriticalpercent}}% of filtered country dataset)</li> <!-- Include chart for specific infrastructure -->      
+      {{ countrycriticalsvg }}
       <li>Number of attacks on social groups: </li> <!-- Include chart for specific groups -->
       <li>Number of attacks affiliated with politics: </li> <!-- Include chart for specific groups -->
       <li>Multi target attacks related to country</li> <!-- Filter by country and other countries-->
