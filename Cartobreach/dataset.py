@@ -5,6 +5,7 @@ import pycountry_convert as pcc # import pycountry-convert
 import pygal as py
 from datetime import datetime # import datetime function
 from .continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
+from . import map
 
 pd.options.mode.chained_assignment = None
 
@@ -174,9 +175,9 @@ def monthlyAllAreasIncidentLinePlot(series, filterColumnSeries, startdate='01.01
     return line.render().decode("utf-8")
 
 # function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
-def pieChart(dataColumnSeries):
+def pieChart(dataColumnSeries, titleName='Pie Chart Template'):
     # initialize pie chart
-    pie = py.Pie(show_legend = False)
+    pie = py.Pie(title= titleName, legend_at_bottom=True, style=map.pygalSideStyle)
     pie.title = 'Pie chart'
     # get list of unique values eg. continents (all 7 continent alpha codes)
     uniqueList = []
@@ -196,8 +197,8 @@ def pieChart(dataColumnSeries):
     return pie.render().decode("utf-8")
 
 # function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars
-def barChart(dataColumnSeries):
-    bar = py.Bar(show_legend = False)
+def barChart(dataColumnSeries, titleName):
+    bar = py.Bar(title=titleName,legend_at_bottom=True, style=map.pygalSideStyle)
     bar.title = "Bar chart"
     # find unique values
     uniqueList = []
@@ -212,6 +213,20 @@ def barChart(dataColumnSeries):
         macroList.extend(b)
     # count occurences of unique value in dataColumnSeries
     for iList in uniqueList: # count occurences of unique value in dataColumnSeries
+        iCount = macroList.count(iList)
+        bar.add(iList, [iCount])
+    return bar.render().decode("utf-8")
+
+# function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars chosen from a string list
+def barChartSpecific(dataColumnSeries, titleName, specificList):
+    bar = py.Bar(title=titleName,legend_at_bottom=True, style=map.pygalSideStyle)
+    bar.title = "Bar chart"
+    # combine whole series into list
+    macroList = []
+    for b in dataColumnSeries:
+        macroList.extend(b)
+    # count occurences of unique value in dataColumnSeries
+    for iList in specificList: # count occurences of specified values in dataColumnSeries
         iCount = macroList.count(iList)
         bar.add(iList, [iCount])
     return bar.render().decode("utf-8")
