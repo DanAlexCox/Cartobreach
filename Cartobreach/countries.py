@@ -26,7 +26,7 @@ for code, name in COUNTRIES.items():
     countryList.append(country)
     
 # function that creates and renders country map with links that add specific country to current parameters e.g. after filter form get params
-def renderCountryMap(total_value, getfullpath, critInfra = 'N/A', educ = 'N/A', multiCountry = 'N/A', lastKnownName = 'N/A', lastDate = 'N/A'):
+def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate = 'N/A'):
     # layout for map
     worldmap = World(title='Countries', legend_at_bottom = True, legend_at_bottom_columns=20, style=map.totalIncidentStyle, print_labels=True)
     # colorList = []
@@ -39,18 +39,18 @@ def renderCountryMap(total_value, getfullpath, critInfra = 'N/A', educ = 'N/A', 
         # if parameters are int, collect percentage with respect to getValue() (total incidents with respect to total_value)
         totalPerc = countrys.getValue()/total_value * 100 if isinstance(total_value, int) else 'N/A'
         typePerc = countrys.getMostInciCount()/countrys.getValue() * 100 if isinstance(countrys.getMostInciCount(), int) else 'N/A'
-        critInfraPerc = critInfra/countrys.getValue() * 100 if isinstance(critInfra, int) else 'N/A'
-        eduPerc = educ/countrys.getValue() * 100 if isinstance(educ, int) else 'N/A'
-        multiPerc = multiCountry/countrys.getValue() * 100 if isinstance(multiCountry, int) else 'N/A'
+        critInfraPerc = countrys.getCritInfraCount()/countrys.getValue() * 100 if isinstance(countrys.getCritInfraCount(), int) else 'N/A'
+        eduPerc = countrys.getEduCount()/countrys.getValue() * 100 if isinstance(countrys.getEduCount(), int) else 'N/A'
+        multiPerc = countrys.getMultiCount()/countrys.getValue() * 100 if isinstance(countrys.getMultiCount(), int) else 'N/A'
         worldmap.add(
             countrys.getAlphaCodeUp(), [{
                 # value represents information displayed in the hoverover box "tooltip"
                 'value': (countrys.getAlphaCodeLow(),
                           '\nTotal number of incidents - '+str(countrys.getValue())+' ('+str(totalPerc)+'% of the filtered data)'
                           +'\nIncident type occurring the most - '+str(countrys.getMostInci())+' ('+str(typePerc)+'% of the filtered country data)' # most occurences of an incident type
-                          +'\nNumber of incidents affecting critical infrastructure - '+str(critInfra)+ ' ('+str(critInfraPerc)+'% of the filtered country data)'    # count critical infrastructure
-                          +'\nNumber of incidents affecting education - '+str(educ)+ ' ('+str(eduPerc)+'% of the filtered country data)'   # count education
-                          +'\nNumber of incidents affecting more than this country - '+str(multiCountry)+ ' ('+str(multiPerc)+'% of the filtered country data)'    # count only >1 country in receiver country
+                          +'\nNumber of incidents affecting critical infrastructure - '+str(countrys.getCritInfraCount())+ ' ('+str(critInfraPerc)+'% of the filtered country data)'    # count critical infrastructure
+                          +'\nNumber of incidents affecting education - '+str(countrys.getEduCount())+ ' ('+str(eduPerc)+'% of the filtered country data)'   # count education
+                          +'\nNumber of incidents affecting more than this country - '+str(countrys.getMultiCount())+ ' ('+str(multiPerc)+'% of the filtered country data)'    # count only >1 country in receiver country
                           +'\nLast known incident - '+str(lastKnownName)+' (dated: '+str(lastDate)+')'  # most recent incident "name" and "start date" 
                           ),
                 
