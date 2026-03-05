@@ -65,15 +65,6 @@
                         <button type="submit">Load analytics</button>
                     </form>
                 </div>
-                <form method="get" action="{{ index }}" id="continentlist">
-                    {% for continent in continentlist %}
-                    <div class="radio-list">
-                        <label for id="{{ continent.getNameMap }}">{{ continent.getName }}</label>
-                        <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getName }}">
-                    </div>
-                    {% endfor %}
-                    <button type="submit">Load continent analytics</button>
-                </form>
             </section>
             <section class="map-analytics">
                 {% include "filter.html" %}
