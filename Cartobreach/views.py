@@ -110,6 +110,15 @@ def index(request):
         for countrySingle in countries.countryList:
             countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], countrySingle.getAlphaCodeUp())
             countrySingle.setValue(len(countrySet.index))
+            # set country information for tooltip
+            if len(countrySet.index) > 0:
+                countrySet['incident_type'] = dataset.cleanColumn(countrySet['incident_type'])
+                mostInci = countrySet['incident_type'].explode().value_counts()
+                mostInciType = mostInci.index[0]    # value of most popular incident type
+                mostInciCount = mostInci.iloc[0]    # count of most popular incident type
+                countrySingle.setMostInci(mostInciType)
+                countrySingle.setMostInciCount(int(mostInciCount))
+                
         # load countrys map
         svg = countries.renderCountryMap(totalIncidents, full_url)
     else:
