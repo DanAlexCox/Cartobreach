@@ -1,6 +1,7 @@
 from pygal_maps_world.i18n import COUNTRIES # install pygal_maps_world
 from pygal_maps_world.maps import World 
 from urllib.parse import urlencode
+from textwrap import wrap
 from . import map
 from .classes.classes import Country
 import pycountry_convert as pc # import pycountry-convert
@@ -42,6 +43,19 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
         critInfraPerc = countrys.getCritInfraCount()/countrys.getValue() * 100 if isinstance(countrys.getCritInfraCount(), int) else 'N/A'
         eduPerc = countrys.getEduCount()/countrys.getValue() * 100 if isinstance(countrys.getEduCount(), int) else 'N/A'
         multiPerc = countrys.getMultiCount()/countrys.getValue() * 100 if isinstance(countrys.getMultiCount(), int) else 'N/A'
+        
+        # if recent name is longer that 100 character split
+        nameList = []
+        if len(countrys.getRecentName()) > 100:
+            nameList = wrap(countrys.getRecentName(),100) # help from: https://stackoverflow.com/a/48860937
+        else:
+            nameList.append(countrys.getRecentName())
+        
+        nameString =''
+        # construct name split for tooltip
+        for namePart in nameList:
+            nameString += str(namePart) +'\n'
+            
         worldmap.add(
             countrys.getAlphaCodeUp(), [{
                 # value represents information displayed in the hoverover box "tooltip"
@@ -51,7 +65,9 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
                           +'\nNumber of incidents affecting critical infrastructure - '+str(countrys.getCritInfraCount())+ ' ('+str(critInfraPerc)+'% of the filtered country data)'    # count critical infrastructure
                           +'\nNumber of incidents affecting education - '+str(countrys.getEduCount())+ ' ('+str(eduPerc)+'% of the filtered country data)'   # count education
                           +'\nNumber of incidents affecting more than this country - '+str(countrys.getMultiCount())+ ' ('+str(multiPerc)+'% of the filtered country data)'    # count only >1 country in receiver country
-                          +'\nLast known incident - '+str(lastKnownName)+' (dated: '+str(lastDate)+')'  # most recent incident "name" and "start date" 
+                          +'\nLast known incident:\n'
+                          + '- '+nameString # most recent incident "name" 
+                          +'- Dated: '+str(countrys.getRecentDate())  # most recent incident "start date" 
                           ),
                 
                 # 'color' : colour,
