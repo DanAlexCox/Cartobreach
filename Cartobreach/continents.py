@@ -19,7 +19,7 @@ continentList = [AF, AN, AS, EU, NA, OC, SA]
 # function that creates and renders continent map
 def renderContinentMap(total_value, getfullpath):
     # style colour of map
-    worldmap = SupranationalWorld(title='Continents', legend_at_bottom=True, legend_box_size = 10,style=map.totalIncidentStyle, print_labels=True) # Create world map
+    worldmap = SupranationalWorld(title='Continents', legend_at_bottom=True, legend_box_size = 10,style=map.pygalStyle, print_labels=True) # Create world map
     # adding the continents
     for continents in continentList:
         # if parameters are int, collect percentage with respect to getValue() (total incidents with respect to total_value)
