@@ -185,6 +185,7 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
 /* pygal tooltip (on graph labels) formating */
 .tooltip{
     transform: translate(10px, 10px);
+    pointer-events: none;
 }
 /* analysis style */
 .analytics {
