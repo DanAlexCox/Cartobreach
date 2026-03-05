@@ -21,7 +21,14 @@ def styleColours(value,max_value,red,green,blue):
     return rgb2hex(r,g,b)
 
 # formats for styling maps
-totalIncidentStyle = Style(
+pygalStyle = Style(
     tooltip_font_size=8,
+    # color=tuple(colorList), # convert to tuple for map.style usage
+)
+
+# formats for styling side graphs
+pygalSideStyle = Style(
+    title_font_size=30,
+    tooltip_font_size=16,
     # color=tuple(colorList), # convert to tuple for map.style usage
 )
