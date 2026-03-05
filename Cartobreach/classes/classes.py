@@ -102,12 +102,6 @@ class Country:
     
     def setValue(self, value): # active value of country setter
         self._val = value
-    
-# Class for scaling continents
-
-# Class for scaling countries
-
-# Class for filter
 
 # Class for categories with sub types
 class Category:
