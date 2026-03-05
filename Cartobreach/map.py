@@ -22,6 +22,6 @@ def styleColours(value,max_value,red,green,blue):
 
 # formats for styling maps
 totalIncidentStyle = Style(
-    tooltip_font_size=5,
+    tooltip_font_size=8,
     # color=tuple(colorList), # convert to tuple for map.style usage
 )
