@@ -184,8 +184,12 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
 }
 /* pygal tooltip (on graph labels) formating */
 .tooltip{
+    width: 200px !important;
+    max-width: 200px !important;
     transform: translate(10px, 10px);
     pointer-events: none;
+    word-wrap: break-word;
+    white-space: normal !important;
 }
 /* analysis style */
 .analytics {
