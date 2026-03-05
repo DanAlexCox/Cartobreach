@@ -119,6 +119,15 @@ def index(request):
                 countrySingle.setMostInci(mostInciType)
                 countrySingle.setMostInciCount(int(mostInciCount))
                 
+                criticalInfraCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
+                countrySingle.setCritInfraCount(int(criticalInfraCount))
+                
+                eduCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Education') # counting education incidents
+                countrySingle.setEduCount(int(eduCount))
+                
+                multiCountryFiltered = dataset.filterMultipleColumns(countrySet, countrySet['receiver_country_alpha_2_code'])
+                countrySingle.setMultiCount(len(multiCountryFiltered.index))
+                
         # load countrys map
         svg = countries.renderCountryMap(totalIncidents, full_url)
     else:
