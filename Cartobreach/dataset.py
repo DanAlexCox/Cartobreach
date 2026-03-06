@@ -196,6 +196,22 @@ def pieChart(dataColumnSeries, titleName='Pie Chart Template'):
         pie.add(iList, [{'value':iCount, 'label':str(iCountPercent)+"%"}])
     return pie.render().decode("utf-8")
 
+# function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values chosen from a string list
+# TASK FIX PIE CHART
+def pieChartSpecific(dataColumnSeries, specificList, titleName='Pie Chart Template'):
+    # initialize pie chart
+    pie = py.Pie(title= titleName, legend_at_bottom=True, style=map.pygalSideStyle)
+    pie.title = 'Pie chart'
+    # combine whole series into macroList
+    macroList = []
+    for p in dataColumnSeries:
+        macroList.extend(p)
+    for iList in specificList: # count occurences of unique value in dataColumnSeries
+        iCount = macroList.count(iList)
+        iCountPercent = round(((float(iCount)/float(len(macroList))) * 100),2)
+        pie.add(iList, [{'value':iCount, 'label':str(iCountPercent)+"%"}])
+    return pie.render().decode("utf-8")
+
 # function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars
 def barChart(dataColumnSeries, titleName):
     bar = py.Bar(title=titleName,legend_at_bottom=True, style=map.pygalSideStyle)
