@@ -188,7 +188,7 @@ def index(request):
         if selectRegion == 'on': 
             # set total incident values for each country
             for countrySingle in countries.countryList:
-                countrySet = dataset.filterSpecificColumn(ds, ds["initiator_alpha_2"], countrySingle.getAlphaCodeUp())
+                countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], countrySingle.getAlphaCodeUp())
                 countrySingle.setValue(len(countrySet.index))
                 # set country information for tooltip
                 if len(countrySet.index) > 0:
@@ -329,7 +329,6 @@ def index(request):
                 countrySocialSet['receiver_subcategory'] = dataset.cleanColumn(countrySocialSet['receiver_subcategory'])
                 countrySocialChart = dataset.barChartSpecific(countrySocialSet['receiver_subcategory'], "Social Group Categories", categories.sg.getCatSubType())
                 countrySocialSvg = mark_safe(countrySocialChart)
-                
                 # number of attacks on political groups
                 countryPoliticSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.sips.getCatType()) # filter country by category
                 countryPoliticCount = len(countryPoliticSet.index)
@@ -338,7 +337,20 @@ def index(request):
                 countryPoliticSet['receiver_subcategory'] = dataset.cleanColumn(countryPoliticSet['receiver_subcategory'])
                 countryPoliticChart = dataset.barChartSpecific(countryPoliticSet['receiver_subcategory'], "State Institutions & Political System Categories", categories.sips.getCatSubType())
                 countryPoliticSvg = mark_safe(countryPoliticChart)
-                # multi target attacks
+                # number of attacks on multiple continents
+                countryMultiSet = dataset.filterMultipleColumns(countSet, countSet['receiver_country_alpha_2_code']) # filter country by multiiple continent targets
+                countryMultiCount = len(countryMultiSet.index)
+                countryMultiPercent = round((float(countryMultiCount)/float(totalCountry) * 100), 2)
+                # remove selected country from countrylist
+                countryList.remove(selected)
+                
+                removedCodeList = []
+                for nonSelect in countryList:
+                    removedCodeList.append(nonSelect.getAlphaCodeUp())
+                # multiple target, specify other countries
+                countryMultiChart = dataset.barChartSpecific(countryMultiSet['receiver_country_alpha_2_code'], "Other Continents That Were Also Targeted", removedCodeList)
+                countryMultiSvg = mark_safe(countryMultiChart)
+                
     else:
         print('invalid input')
 
@@ -363,7 +375,6 @@ def index(request):
         'totalincidentsvg' : totalIncidentSvg,
         'monthlyincidentsvg' : monthlyIncidentSvg,
         'map' : mapSvg,
-        'continentlist' : continents.continentList,
     }
     if selected != None:
         if getReceiver != None:
@@ -397,6 +408,9 @@ def index(request):
                     'countrypolitictotal' : countryPoliticCount, # political group analysis
                     'countrypoliticpercent' : countryPoliticPercent,
                     'countrypoliticsvg' : countryPoliticSvg,
+                    'countrymultitotal' : countryMultiCount, # multi target analysis
+                    'countrymultipercent' : countryMultiPercent,
+                    'countrymultisvg' : countryMultiSvg,
                 })
         elif getAttacker != None:
             context.update({ 'attacker' : getAttacker, }) # signal to template to include attacker data
