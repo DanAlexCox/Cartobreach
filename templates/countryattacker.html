@@ -1,0 +1,20 @@
+<!-- selected country via GET value-->
+ <section class="mappopup">
+    <h1>Country: {{ country }}</h1>
+    <ul>
+      <li>Total recorded incidents: {{ countrytotal }} ({{ countrytotalpercent }}% of the filtered dataset)</li> <!-- Only filter by country not filtered database -->
+      <li>Incident types graph: </li><!-- Include chart for incident type -->
+      {{ countryincidenttypesvg }}
+      <li>Number of attacks on critical infrastructure: {{ countrycriticaltotal }} ({{ countrycriticalpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific infrastructure -->      
+      {{ countrycriticalsvg }}
+      <li>Number of attacks on social groups: {{ countrysocialtotal }} ({{ countrysocialpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
+      {{ countrysocialsvg }}
+      <li>Number of attacks affiliated with politics: {{ countrypolitictotal }} ({{ countrypoliticpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
+      {{ countrypoliticsvg }}
+      <li>Multi target attacks related to country</li> <!-- Filter by country and other countries-->
+      <li>Methods of attribution (addressing attacks to the public)</li>
+      <!-- LIST!!! Look at "attribution_type" and most 5-10 "attribution_source_url" each-->
+        <!-- Link to full selected filtered list of sources -->
+
+    </ul>
+ </section>

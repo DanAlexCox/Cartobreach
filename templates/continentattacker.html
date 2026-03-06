@@ -5,14 +5,15 @@
     <div id="popupContent"> 
         <!-- when single continent clicked load analysis of continent data-->
         <ul>
-            <li>Total recorded incidents: {{ continenttotal }} ({{ continenttotalpercent }}% of the total global incidents)</li>
-            <li>Number of attacks on corporate industry: {{ continentcorporate }} ({{ continentcorporatepercent }}% of attacks in the continent)</li>
-            <li>Total incidents chart (Organised by incident type): </li>
+            <li>Total recorded incidents: {{ continenttotal }} ({{ continenttotalpercent }}% of the filtered dataset)</li>
             {{ continentattacktypesvg }}
-            <li>Attacker location chart: </li>
+            <li>Number of attacks on critical infrastructure: {{ continentcriticaltotal }} ({{ continentcriticalpercent }}% of the filtered continent dataset)</li>
+            {{ continentcriticalsvg }}
+            <!-- move to attacker continent -->
+            <!-- <li>Attacker location chart: </li>
             {{ continentattackerlocationsvg }}
             <li>Attack entry chart (most organisations unlikely to share vulnerability hence the low count): </li>
-            {{continentmitreaccesssvg}}
+            {{continentmitreaccesssvg}} -->
             <li>Total calculated intensity: {{ continenttotalintensity }}</li>
             <li>What was actually impacted in the attack according to the MITRE ATT&CK framework: </li>
             {{ continentmitreimpactsvg }}
