@@ -296,6 +296,7 @@ def index(request):
     }
     if selected != None:
         if getReceiver != None:
+            context.update({ 'receiver' : getReceiver, }) # signal to template to include receiver data
             if getContinent != None:
                 context.update({
                     'continent' : selectDict['selectcontinent'],
@@ -327,6 +328,7 @@ def index(request):
                     'countrypoliticsvg' : countryPoliticSvg,
                 })
         elif getAttacker != None:
+            context.update({ 'attacker' : getAttacker, }) # signal to template to include attacker data
             if getContinent != None:
                 context.update({
                     'continent' : selectDict['selectcontinent'],
