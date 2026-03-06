@@ -101,7 +101,7 @@ def index(request):
    
     if mapanalytics not in valid_includes:
         mapanalytics = None
-        
+
     # convert country alpha codes for receivers and attackers    
     if selectGroup == 'on': # i.e. attacker selected
         ds["initiator_alpha_2"] = dataset.cleanColumn(ds["initiator_alpha_2"])
@@ -118,75 +118,145 @@ def index(request):
     # order dataset in descending order by start_date for retrieving recent incident, see recentIncidentName and recentIncidentDate
     ds = dataset.orderByDate(ds,'start_date', False)
     
+    # check what group is selected, change between attacker (on) and receiver (Default: None)
     # check what region is selected, change between continents (default: None) and countries (on)
-    if selectRegion == 'on': 
-        # set total incident values for each country
-        for countrySingle in countries.countryList:
-            countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], countrySingle.getAlphaCodeUp())
-            countrySingle.setValue(len(countrySet.index))
-            # set country information for tooltip
-            if len(countrySet.index) > 0:
-                countrySet['incident_type'] = dataset.cleanColumn(countrySet['incident_type'])
-                mostInci = countrySet['incident_type'].explode().value_counts()
-                mostInciType = mostInci.index[0]    # value of most popular incident type
-                mostInciCount = mostInci.iloc[0]    # count of most popular incident type
-                countrySingle.setMostInci(mostInciType)
-                countrySingle.setMostInciCount(int(mostInciCount))
+    if selectGroup == 'on': # attacker
+        if selectRegion == 'on': 
+            # set total incident values for each country
+            for countrySingle in countries.countryList:
+                countrySet = dataset.filterSpecificColumn(ds, ds["initiator_alpha_2"], countrySingle.getAlphaCodeUp())
+                countrySingle.setValue(len(countrySet.index))
+                # set country information for tooltip
+                if len(countrySet.index) > 0:
+                    countrySet['incident_type'] = dataset.cleanColumn(countrySet['incident_type'])
+                    mostInci = countrySet['incident_type'].explode().value_counts()
+                    mostInciType = mostInci.index[0]    # value of most popular incident type
+                    mostInciCount = mostInci.iloc[0]    # count of most popular incident type
+                    countrySingle.setMostInci(mostInciType)
+                    countrySingle.setMostInciCount(int(mostInciCount))
+                    
+                    # criticalInfraCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
+                    # countrySingle.setCritInfraCount(int(criticalInfraCount))
+                    
+                    # eduCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Education') # counting education incidents
+                    # countrySingle.setEduCount(int(eduCount))
+                    
+                    # multiCountryFiltered = dataset.filterMultipleColumns(countrySet, countrySet['initiator_alpha_2'])
+                    # countrySingle.setMultiCount(len(multiCountryFiltered.index))
+                    
+                    # get most recent name and start_date and add to continent objects
+                    recentIncidentName = countrySet['name'].explode().value_counts().index[0]
+                    recentIncidentDate = countrySet['start_date'].explode().value_counts().index[0]
+                    countrySingle.setRecentName(recentIncidentName)
+                    countrySingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
+                    
+            # load countrys map
+            svg = countries.renderCountryMap(totalIncidents, full_url)
+        else: # i.e. continent selected/defaulted to
+            # set total incident values for continents
+            for continentSingle in continents.continentList:
+                continentSet = dataset.filterSpecificColumn(ds, ds["initiator_continent_code"], continentSingle.getAlphaCode()) # filter date filted range for each continent
+                continentSingle.setValue(len(continentSet.index)) # total incidents in continent
                 
-                criticalInfraCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
-                countrySingle.setCritInfraCount(int(criticalInfraCount))
+                # set contient information for tooltip
+                if len(continentSet.index) > 0:
+                    continentSet['incident_type'] = dataset.cleanColumn(continentSet['incident_type'])
+                    mostInci = continentSet['incident_type'].explode().value_counts()
+                    mostInciType = mostInci.index[0]    # value of most popular incident type
+                    mostInciCount = mostInci.iloc[0]    # count of most popular incident type
+                    continentSingle.setMostInci(mostInciType)
+                    continentSingle.setMostInciCount(int(mostInciCount))
+                    
+                    # criticalInfraCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
+                    # continentSingle.setCritInfraCount(int(criticalInfraCount))
+                    
+                    # eduCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Education') # counting education incidents
+                    # continentSingle.setEduCount(int(eduCount))
+                    
+                    # multiCountryFiltered = dataset.filterMultipleColumns(continentSet, continentSet['receiver_continent_code'])
+                    # continentSingle.setMultiCount(len(multiCountryFiltered.index))
+                    
+                    # get most recent name and start_date and add to continent objects
+                    recentIncidentName = continentSet['name'].explode().value_counts().index[0]
+                    recentIncidentDate = continentSet['start_date'].explode().value_counts().index[0]
+                    continentSingle.setRecentName(recentIncidentName)
+                    continentSingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
+                    
+            # load continents map
+            svg = continents.renderContinentMap(totalIncidents, full_url)
+    else: # receiver
+        if selectRegion == 'on': 
+            # set total incident values for each country
+            for countrySingle in countries.countryList:
+                countrySet = dataset.filterSpecificColumn(ds, ds["initiator_alpha_2"], countrySingle.getAlphaCodeUp())
+                countrySingle.setValue(len(countrySet.index))
+                # set country information for tooltip
+                if len(countrySet.index) > 0:
+                    countrySet['incident_type'] = dataset.cleanColumn(countrySet['incident_type'])
+                    mostInci = countrySet['incident_type'].explode().value_counts()
+                    mostInciType = mostInci.index[0]    # value of most popular incident type
+                    mostInciCount = mostInci.iloc[0]    # count of most popular incident type
+                    countrySingle.setMostInci(mostInciType)
+                    countrySingle.setMostInciCount(int(mostInciCount))
+                    
+                    criticalInfraCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
+                    countrySingle.setCritInfraCount(int(criticalInfraCount))
+                    
+                    eduCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Education') # counting education incidents
+                    countrySingle.setEduCount(int(eduCount))
+                    
+                    multiCountryFiltered = dataset.filterMultipleColumns(countrySet, countrySet['initiator_alpha_2'])
+                    countrySingle.setMultiCount(len(multiCountryFiltered.index))
+                    
+                    # get most recent name and start_date and add to continent objects
+                    recentIncidentName = countrySet['name'].explode().value_counts().index[0]
+                    recentIncidentDate = countrySet['start_date'].explode().value_counts().index[0]
+                    countrySingle.setRecentName(recentIncidentName)
+                    countrySingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
+                    
+            # load countrys map
+            svg = countries.renderCountryMap(totalIncidents, full_url)
+        else: # i.e. continent selected/defaulted to
+            # set total incident values for continents
+            for continentSingle in continents.continentList:
+                continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continentSingle.getAlphaCode()) # filter date filted range for each continent
+                continentSingle.setValue(len(continentSet.index)) # total incidents in continent
                 
-                eduCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Education') # counting education incidents
-                countrySingle.setEduCount(int(eduCount))
-                
-                multiCountryFiltered = dataset.filterMultipleColumns(countrySet, countrySet['receiver_country_alpha_2_code'])
-                countrySingle.setMultiCount(len(multiCountryFiltered.index))
-                
-                # get most recent name and start_date and add to continent objects
-                recentIncidentName = countrySet['name'].explode().value_counts().index[0]
-                recentIncidentDate = countrySet['start_date'].explode().value_counts().index[0]
-                countrySingle.setRecentName(recentIncidentName)
-                countrySingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
-                
-        # load countrys map
-        svg = countries.renderCountryMap(totalIncidents, full_url)
-    else: # i.e. continent selected/defaulted to
-        # set total incident values for continents
-        for continentSingle in continents.continentList:
-            continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continentSingle.getAlphaCode()) # filter date filted range for each continent
-            continentSingle.setValue(len(continentSet.index)) # total incidents in continent
+                # set contient information for tooltip
+                if len(continentSet.index) > 0:
+                    continentSet['incident_type'] = dataset.cleanColumn(continentSet['incident_type'])
+                    mostInci = continentSet['incident_type'].explode().value_counts()
+                    mostInciType = mostInci.index[0]    # value of most popular incident type
+                    mostInciCount = mostInci.iloc[0]    # count of most popular incident type
+                    continentSingle.setMostInci(mostInciType)
+                    continentSingle.setMostInciCount(int(mostInciCount))
+                    
+                    criticalInfraCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
+                    continentSingle.setCritInfraCount(int(criticalInfraCount))
+                    
+                    eduCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Education') # counting education incidents
+                    continentSingle.setEduCount(int(eduCount))
+                    
+                    multiCountryFiltered = dataset.filterMultipleColumns(continentSet, continentSet['receiver_continent_code'])
+                    continentSingle.setMultiCount(len(multiCountryFiltered.index))
+                    
+                    # get most recent name and start_date and add to continent objects
+                    recentIncidentName = continentSet['name'].explode().value_counts().index[0]
+                    recentIncidentDate = continentSet['start_date'].explode().value_counts().index[0]
+                    continentSingle.setRecentName(recentIncidentName)
+                    continentSingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
+                    
+            # load continents map
+            svg = continents.renderContinentMap(totalIncidents, full_url)
             
-            # set contient information for tooltip
-            if len(continentSet.index) > 0:
-                continentSet['incident_type'] = dataset.cleanColumn(continentSet['incident_type'])
-                mostInci = continentSet['incident_type'].explode().value_counts()
-                mostInciType = mostInci.index[0]    # value of most popular incident type
-                mostInciCount = mostInci.iloc[0]    # count of most popular incident type
-                continentSingle.setMostInci(mostInciType)
-                continentSingle.setMostInciCount(int(mostInciCount))
-                
-                criticalInfraCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
-                continentSingle.setCritInfraCount(int(criticalInfraCount))
-                
-                eduCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Education') # counting education incidents
-                continentSingle.setEduCount(int(eduCount))
-                
-                multiCountryFiltered = dataset.filterMultipleColumns(continentSet, continentSet['receiver_continent_code'])
-                continentSingle.setMultiCount(len(multiCountryFiltered.index))
-                
-                # get most recent name and start_date and add to continent objects
-                recentIncidentName = continentSet['name'].explode().value_counts().index[0]
-                recentIncidentDate = continentSet['start_date'].explode().value_counts().index[0]
-                continentSingle.setRecentName(recentIncidentName)
-                continentSingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
-                
-        # load continents map
-        svg = continents.renderContinentMap(totalIncidents, full_url)
-        
     mapSvg = mark_safe(svg)
-    # Render graphs
-    totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
-    monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], filterStartDate, filterEndDate))
+    # Render graphs for attackers or receivers
+    if selectGroup == 'on':
+        totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
+        monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["initiator_continent_code"], filterStartDate, filterEndDate))
+    else:
+        totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
+        monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], filterStartDate, filterEndDate))
 
     selected = None
     if selectRegion == None:
@@ -282,13 +352,14 @@ def index(request):
         'selectedreceivercats' : selectDict['filterreceivercategorylist'],
         'selectedreceiversubcats' : selectDict['filterreceiversubcategorylist'],
         'switchregion' : selectDict['switchregion'],
+        'switchgroup' : selectDict['switchgroup'],
         'receivercatlist' : receiverCatList,
         'receiversubcatdict' : receiverSubCat,
         'mapload' : mapload,
         'mapanalytics' : mapanalytics,
         'totalincidents' : totalIncidents,
-        'corporateattacks' : criticalAttacks,
-        'corporateattackspercent' : criticalAttacksPercent,
+        'criticalattacks' : criticalAttacks,
+        'criticalattackspercent' : criticalAttacksPercent,
         'totalincidentsvg' : totalIncidentSvg,
         'monthlyincidentsvg' : monthlyIncidentSvg,
         'map' : mapSvg,
