@@ -24,7 +24,7 @@ def index(request):
     # template requests
         # get region switch info (default to continents if not known) OPTIONAL: handle url editting errors
     selectRegion = request.GET.get('region', None) # on or None
-    # selectGroup = request.GET.get('group') # on or None
+    selectGroup = request.GET.get('group', None) # on or None
     startStartDate = request.GET.get('startdate', '2020-01-01')
     endStartDate = request.GET.get('enddate', '2025-01-01')
     selectedReceiverCat = request.GET.getlist("receivertype")
@@ -35,13 +35,14 @@ def index(request):
     # make select dictionary
     selectDict = {}
     selectDict['switchregion'] = selectRegion
-    # selectDict['switchgroup'] = selectGroup
+    selectDict['switchgroup'] = selectGroup
     selectDict['filterstartdate'] = startStartDate
     selectDict['filterenddate'] = endStartDate
     selectDict['filterreceivercategorylist'] = selectedReceiverCat
     selectDict['filterreceiversubcategorylist'] = selectedReceiverSubCat
     
-        # condition requests
+    # condition requests
+    # find out if continent or country is selected on map
     if selectRegion == None:
         getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
         getCountry = None
@@ -55,6 +56,14 @@ def index(request):
         getCountry = None
         selectRegion = None
     
+    # find out if receiver or attacker is selected from switches
+    if selectGroup == 'on':
+        getReceiver = None
+        getAttacker = 'on' 
+    else:
+        getReceiver = 'on'
+        getAttacker = None 
+    
     if mapanalytics not in valid_includes:
         mapload = request.POST.get('mapload', 'map.html')
     
@@ -66,6 +75,7 @@ def index(request):
     
     # filter dataset using start and end date
     ds = dataset.filterDateRange(dataset.df, dataset.df["start_date"], minDate.strftime('%d.%m.%Y'), maxDate.strftime('%d.%m.%Y'))
+    
     # TASK: check what group is selected
     receiverCatList = [] # get receiver category options
     receiverSubCat = {} # create dictionary for receiver categories with their subcategories
@@ -84,18 +94,23 @@ def index(request):
             ds = dataset.filterSpecificColumn(ds, ds["receiver_subcategory"], recSubCat)
         
     # filter variables from tasks.py
-    totalIncidents = len(ds.index) # total incidents in date range
-    # TASK: update to include all/most critical infrastructure
-    corporateAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in date range
-    corporateAttacksPercent = round((float(corporateAttacks) / float(totalIncidents)) * 100, 2) # corporate attacks percentage in date range
+    totalIncidents = len(ds.index) # total incidents in filtered dataset
+    
+    criticalAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], categories.ci.getCatType()) # total critical infrastructure attacks in filtered dataset
+    criticalAttacksPercent = round((float(criticalAttacks) / float(totalIncidents)) * 100, 2) # critical infrastructure attacks percentage in filter dataset
    
     if mapanalytics not in valid_includes:
         mapanalytics = None
         
-    # make new column receiver_continent with unique values only
-    ds["receiver_country_alpha_2_code"] = dataset.cleanColumn(ds["receiver_country_alpha_2_code"])
-    ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
-    ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+    # convert country alpha codes for receivers and attackers    
+    if selectGroup == 'on': # i.e. attacker selected
+        ds["initiator_alpha_2"] = dataset.cleanColumn(ds["initiator_alpha_2"])
+        ds["initiator_continent_code"] = ds["initiator_alpha_2"].apply(dataset.convertCountryCodeToContinentCode)
+        ds["initiator_continent_code"] = ds["initiator_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
+    else: # i.e. receiver selected/defaulted to
+        ds["receiver_country_alpha_2_code"] = dataset.cleanColumn(ds["receiver_country_alpha_2_code"])
+        ds["receiver_continent_code"] = ds["receiver_country_alpha_2_code"].apply(dataset.convertCountryCodeToContinentCode)
+        ds["receiver_continent_code"] = ds["receiver_continent_code"].apply(lambda x: list(dict.fromkeys(x)))
     
     # get current full url path for adding specific region onto it
     full_url = request.get_full_path()
@@ -104,39 +119,7 @@ def index(request):
     ds = dataset.orderByDate(ds,'start_date', False)
     
     # check what region is selected, change between continents (default: None) and countries (on)
-    if selectRegion == None:
-        # set total incident values for continents
-        for continentSingle in continents.continentList:
-            continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continentSingle.getAlphaCode()) # filter date filted range for each continent
-            continentSingle.setValue(len(continentSet.index)) # total incidents in continent
-            
-            # set contient information for tooltip
-            if len(continentSet.index) > 0:
-                continentSet['incident_type'] = dataset.cleanColumn(continentSet['incident_type'])
-                mostInci = continentSet['incident_type'].explode().value_counts()
-                mostInciType = mostInci.index[0]    # value of most popular incident type
-                mostInciCount = mostInci.iloc[0]    # count of most popular incident type
-                continentSingle.setMostInci(mostInciType)
-                continentSingle.setMostInciCount(int(mostInciCount))
-                
-                criticalInfraCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
-                continentSingle.setCritInfraCount(int(criticalInfraCount))
-                
-                eduCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Education') # counting education incidents
-                continentSingle.setEduCount(int(eduCount))
-                
-                multiCountryFiltered = dataset.filterMultipleColumns(continentSet, continentSet['receiver_continent_code'])
-                continentSingle.setMultiCount(len(multiCountryFiltered.index))
-                
-                # get most recent name and start_date and add to continent objects
-                recentIncidentName = continentSet['name'].explode().value_counts().index[0]
-                recentIncidentDate = continentSet['start_date'].explode().value_counts().index[0]
-                continentSingle.setRecentName(recentIncidentName)
-                continentSingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
-                
-        # load continents map
-        svg = continents.renderContinentMap(totalIncidents, full_url)
-    elif selectRegion == 'on':
+    if selectRegion == 'on': 
         # set total incident values for each country
         for countrySingle in countries.countryList:
             countrySet = dataset.filterSpecificColumn(ds, ds["receiver_country_alpha_2_code"], countrySingle.getAlphaCodeUp())
@@ -167,7 +150,7 @@ def index(request):
                 
         # load countrys map
         svg = countries.renderCountryMap(totalIncidents, full_url)
-    else:
+    else: # i.e. continent selected/defaulted to
         # set total incident values for continents
         for continentSingle in continents.continentList:
             continentSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], continentSingle.getAlphaCode()) # filter date filted range for each continent
@@ -204,8 +187,7 @@ def index(request):
     # Render graphs
     totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
     monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], filterStartDate, filterEndDate))
-    # TASK: determine check index switches i.e. region/group
-        # construct dictionary for data analytics and svgs
+
     selected = None
     if selectRegion == None:
         for i in continents.continentList: 
@@ -287,7 +269,6 @@ def index(request):
                 countryPoliticChart = dataset.barChartSpecific(countryPoliticSet['receiver_subcategory'], "State Institutions & Political System Categories", categories.sips.getCatSubType())
                 countryPoliticSvg = mark_safe(countryPoliticChart)
                 # multi target attacks
-                
     else:
         print('invalid input')
 
@@ -306,45 +287,76 @@ def index(request):
         'mapload' : mapload,
         'mapanalytics' : mapanalytics,
         'totalincidents' : totalIncidents,
-        'corporateattacks' : corporateAttacks,
-        'corporateattackspercent' : corporateAttacksPercent,
+        'corporateattacks' : criticalAttacks,
+        'corporateattackspercent' : criticalAttacksPercent,
         'totalincidentsvg' : totalIncidentSvg,
         'monthlyincidentsvg' : monthlyIncidentSvg,
         'map' : mapSvg,
         'continentlist' : continents.continentList,
     }
     if selected != None:
-        if getContinent != None:
-            context.update({
-                'continent' : selectDict['selectcontinent'],
-                'continenttotal' : totalContinent, # overall continent analysis
-                'continenttotalpercent' : totalContinentPercent,
-                'continentcriticaltotal' : continentCriticalPercent, # critical infrastructure analysis
-                'continentcriticalpercent' : continentCriticalCount,
-                'continentcriticalsvg': continentCriticalSvg,
-                'continentattacktypesvg' : continentAttackTypePieSvg, # incident type analysis
-                'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
-                'continenttotalintensity' : continentTotalIntensity, # intensity analysis
-                'continentmitreaccesssvg' : continentMitreAccessPieSvg, # mitre analysis
-                'continentmitreimpactsvg' : continentMitreImpactBarChart,
-            })
-        elif getCountry != None:
-            context.update({
-                'country' : selectDict['selectcountry'],
-                'countrytotal' : totalCountry, # overall country analysis
-                'countrytotalpercent' : totalCountryPercent,
-                'countryincidenttypesvg' : countryIncidentTypePieSvg, # incident type analysis
-                'countrycriticaltotal' : countryCriticalCount, # critical infrastructure analysis
-                'countrycriticalpercent' : countryCriticalPercent,
-                'countrycriticalsvg' : countryCriticalSvg,
-                'countrysocialtotal' : countrySocialCount, # social group analysis
-                'countrysocialpercent' : countrySocialPercent,
-                'countrysocialsvg' : countrySocialSvg,
-                'countrypolitictotal' : countryPoliticCount, # political group analysis
-                'countrypoliticpercent' : countryPoliticPercent,
-                'countrypoliticsvg' : countryPoliticSvg,
-            })
-              
+        if getReceiver != None:
+            if getContinent != None:
+                context.update({
+                    'continent' : selectDict['selectcontinent'],
+                    'continenttotal' : totalContinent, # overall continent analysis
+                    'continenttotalpercent' : totalContinentPercent,
+                    'continentcriticaltotal' : continentCriticalPercent, # critical infrastructure analysis
+                    'continentcriticalpercent' : continentCriticalCount,
+                    'continentcriticalsvg': continentCriticalSvg,
+                    'continentattacktypesvg' : continentAttackTypePieSvg, # incident type analysis
+                    'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
+                    'continenttotalintensity' : continentTotalIntensity, # intensity analysis
+                    'continentmitreaccesssvg' : continentMitreAccessPieSvg, # mitre analysis
+                    'continentmitreimpactsvg' : continentMitreImpactBarChart,
+                })
+            elif getCountry != None:
+                context.update({
+                    'country' : selectDict['selectcountry'],
+                    'countrytotal' : totalCountry, # overall country analysis
+                    'countrytotalpercent' : totalCountryPercent,
+                    'countryincidenttypesvg' : countryIncidentTypePieSvg, # incident type analysis
+                    'countrycriticaltotal' : countryCriticalCount, # critical infrastructure analysis
+                    'countrycriticalpercent' : countryCriticalPercent,
+                    'countrycriticalsvg' : countryCriticalSvg,
+                    'countrysocialtotal' : countrySocialCount, # social group analysis
+                    'countrysocialpercent' : countrySocialPercent,
+                    'countrysocialsvg' : countrySocialSvg,
+                    'countrypolitictotal' : countryPoliticCount, # political group analysis
+                    'countrypoliticpercent' : countryPoliticPercent,
+                    'countrypoliticsvg' : countryPoliticSvg,
+                })
+        elif getAttacker != None:
+            if getContinent != None:
+                context.update({
+                    'continent' : selectDict['selectcontinent'],
+                    'continenttotal' : totalContinent, # overall continent analysis
+                    'continenttotalpercent' : totalContinentPercent,
+                    'continentcriticaltotal' : continentCriticalPercent, # critical infrastructure analysis
+                    'continentcriticalpercent' : continentCriticalCount,
+                    'continentcriticalsvg': continentCriticalSvg,
+                    'continentattacktypesvg' : continentAttackTypePieSvg, # incident type analysis
+                    'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
+                    'continenttotalintensity' : continentTotalIntensity, # intensity analysis
+                    'continentmitreaccesssvg' : continentMitreAccessPieSvg, # mitre analysis
+                    'continentmitreimpactsvg' : continentMitreImpactBarChart,
+                })
+            elif getCountry != None:
+                context.update({
+                    'country' : selectDict['selectcountry'],
+                    'countrytotal' : totalCountry, # overall country analysis
+                    'countrytotalpercent' : totalCountryPercent,
+                    'countryincidenttypesvg' : countryIncidentTypePieSvg, # incident type analysis
+                    'countrycriticaltotal' : countryCriticalCount, # critical infrastructure analysis
+                    'countrycriticalpercent' : countryCriticalPercent,
+                    'countrycriticalsvg' : countryCriticalSvg,
+                    'countrysocialtotal' : countrySocialCount, # social group analysis
+                    'countrysocialpercent' : countrySocialPercent,
+                    'countrysocialsvg' : countrySocialSvg,
+                    'countrypolitictotal' : countryPoliticCount, # political group analysis
+                    'countrypoliticpercent' : countryPoliticPercent,
+                    'countrypoliticsvg' : countryPoliticSvg,
+                }) 
     return render(request, "index.html", context)
 
 # about us page function
