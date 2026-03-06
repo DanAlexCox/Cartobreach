@@ -216,12 +216,19 @@ def index(request):
                 contSet = dataset.filterSpecificColumn(ds, ds["receiver_continent_code"], selected.getAlphaCode())
                 # analytics of a continent
                 totalContinent = len(contSet.index) # total continent incidents
-                totalContinentPercent = round((float(totalContinent)/float(len(dataset.df.index)) * 100), 2) # percentage of total incidents in continent
-                corpContinentAttacks = dataset.countUncleanColumnValues(contSet["receiver_category"], "Corporate Targets (corporate targets only coded if the respective company is not part of the critical infrastructure definition)") # total corporate attacks in continent
-                corpContinentAttacksPercent = round((float(corpContinentAttacks)/float(totalContinent)) * 100, 2) # corporate continent attack percentage
+                totalContinentPercent = round((float(totalContinent)/float(len(ds.index)) * 100), 2) # percentage of total incidents in continent of filtered dataset
+                # incident type analysis
                 inciContSet = dataset.cleanColumn(contSet["incident_type"]) # clean incident type column of continent dataset
                 continentAttackTypePieChart = dataset.pieChart(inciContSet, "Recorded Incident Types Within Continent") # make pie chart of incident type in continent
                 continentAttackTypePieSvg = mark_safe(continentAttackTypePieChart)
+                # critical infrastructure analysis
+                continentCriticalSet = dataset.filterSpecificColumn(contSet, contSet['receiver_category'], categories.ci.getCatType()) # filter continent by category
+                continentCriticalCount = len(continentCriticalSet.index)
+                continentCriticalPercent = round((float(continentCriticalCount)/float(totalContinent) * 100), 2)
+                # critical infrastructure subcategory graph
+                continentCriticalSet['receiver_subcategory'] = dataset.cleanColumn(continentCriticalSet['receiver_subcategory'])
+                continentCriticalChart = dataset.barChartSpecific(continentCriticalSet['receiver_subcategory'], "Critical Infrastructure Categories", categories.ci.getCatSubType())
+                continentCriticalSvg = mark_safe(continentCriticalChart)
                 # make attacker continent code and pie chart
                 contSet["initiator_alpha_2"] = dataset.cleanColumn(contSet["initiator_alpha_2"])
                 contSet["initiator_continent_code"] = contSet["initiator_alpha_2"].apply(dataset.convertCountryCodeToContinentCode)
@@ -255,15 +262,30 @@ def index(request):
                 countryIncidentTypePieChart = dataset.pieChart(countryInciCountSet, "Incident Types Within Country") # TASK: FIX PYGAL TITLE IN DATASET.PY
                 countryIncidentTypePieSvg = mark_safe(countryIncidentTypePieChart)
                 # number of attacks on critical infrastructure
-                countryCriticalSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.ci.getCatType()) # filter country
+                countryCriticalSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.ci.getCatType()) # filter country by category
                 countryCriticalCount = len(countryCriticalSet.index)
                 countryCriticalPercent = round((float(countryCriticalCount)/float(totalCountry) * 100), 2)
                 # critical infrastructure subcategory graph
                 countryCriticalSet['receiver_subcategory'] = dataset.cleanColumn(countryCriticalSet['receiver_subcategory'])
                 countryCriticalChart = dataset.barChartSpecific(countryCriticalSet['receiver_subcategory'], "Critical Infrastructure Categories", categories.ci.getCatSubType())
                 countryCriticalSvg = mark_safe(countryCriticalChart)
-                # social groups w/ graph
-                # politic groups w/ graph
+                # number of attacks on social groups
+                countrySocialSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.sg.getCatType()) # filter country by category
+                countrySocialCount = len(countrySocialSet.index)
+                countrySocialPercent = round((float(countryCriticalCount)/float(totalCountry) * 100), 2)
+                # social groups subcategory graph
+                countrySocialSet['receiver_subcategory'] = dataset.cleanColumn(countrySocialSet['receiver_subcategory'])
+                countrySocialChart = dataset.barChartSpecific(countrySocialSet['receiver_subcategory'], "Social Group Categories", categories.sg.getCatSubType())
+                countrySocialSvg = mark_safe(countrySocialChart)
+                
+                # number of attacks on political groups
+                countryPoliticSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.sips.getCatType()) # filter country by category
+                countryPoliticCount = len(countryPoliticSet.index)
+                countryPoliticPercent = round((float(countryPoliticCount)/float(totalCountry) * 100), 2)
+                # political groups subcategory graph
+                countryPoliticSet['receiver_subcategory'] = dataset.cleanColumn(countryPoliticSet['receiver_subcategory'])
+                countryPoliticChart = dataset.barChartSpecific(countryPoliticSet['receiver_subcategory'], "State Institutions & Political System Categories", categories.sips.getCatSubType())
+                countryPoliticSvg = mark_safe(countryPoliticChart)
                 # multi target attacks
                 
     else:
@@ -295,25 +317,32 @@ def index(request):
         if getContinent != None:
             context.update({
                 'continent' : selectDict['selectcontinent'],
-                'continenttotal' : totalContinent,
+                'continenttotal' : totalContinent, # overall continent analysis
                 'continenttotalpercent' : totalContinentPercent,
-                'continentcorporate' : corpContinentAttacks,
-                'continentcorporatepercent' : corpContinentAttacksPercent,
-                'continentattacktypesvg' : continentAttackTypePieSvg,
+                'continentcriticaltotal' : continentCriticalPercent, # critical infrastructure analysis
+                'continentcriticalpercent' : continentCriticalCount,
+                'continentcriticalsvg': continentCriticalSvg,
+                'continentattacktypesvg' : continentAttackTypePieSvg, # incident type analysis
                 'continentattackerlocationsvg' : continentAttackerLocationPieSvg,
-                'continentmitreaccesssvg' : continentMitreAccessPieSvg,
-                'continenttotalintensity' : continentTotalIntensity,
+                'continenttotalintensity' : continentTotalIntensity, # intensity analysis
+                'continentmitreaccesssvg' : continentMitreAccessPieSvg, # mitre analysis
                 'continentmitreimpactsvg' : continentMitreImpactBarChart,
             })
         elif getCountry != None:
             context.update({
                 'country' : selectDict['selectcountry'],
-                'countrytotal' : totalCountry,
+                'countrytotal' : totalCountry, # overall country analysis
                 'countrytotalpercent' : totalCountryPercent,
-                'countryincidenttypesvg' : countryIncidentTypePieSvg,
-                'countrycriticaltotal' : countryCriticalCount,
+                'countryincidenttypesvg' : countryIncidentTypePieSvg, # incident type analysis
+                'countrycriticaltotal' : countryCriticalCount, # critical infrastructure analysis
                 'countrycriticalpercent' : countryCriticalPercent,
                 'countrycriticalsvg' : countryCriticalSvg,
+                'countrysocialtotal' : countrySocialCount, # social group analysis
+                'countrysocialpercent' : countrySocialPercent,
+                'countrysocialsvg' : countrySocialSvg,
+                'countrypolitictotal' : countryPoliticCount, # political group analysis
+                'countrypoliticpercent' : countryPoliticPercent,
+                'countrypoliticsvg' : countryPoliticSvg,
             })
               
     return render(request, "index.html", context)
