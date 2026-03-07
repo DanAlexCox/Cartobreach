@@ -25,6 +25,11 @@ Cartobreach:
 ## Known Issues
 - Site unreponsive when selecting Antarctica "ZeroDivisionError"
 - Map links dont work if no form submitted before hand
+- Error handling for zero and zero division
+- Zero division error in country+attacker selected
+- Style filter types/sub-types
+- Last known incident occur not passing 2023
+- Stuck on specific region, need back/hide button
 
 ## Upcoming features
 - Add scatter diagrams
