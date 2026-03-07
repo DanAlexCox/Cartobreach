@@ -30,6 +30,8 @@ Cartobreach:
 - Style filter types/sub-types
 - Last known incident occur not passing 2023
 - Stuck on specific region, need back/hide button
+- Link index filter to sources filter
+- NoneType in source view function
 
 ## Upcoming features
 - Add scatter diagrams
