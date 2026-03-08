@@ -97,13 +97,22 @@ def specificIntensity(scorecolumn, regioncolumn, region):
     return filterSpecificColumn(regioncolumn, region)[scorecolumn].apply(lambda x: 2 if "2 points" in x else (1 if "1 point" in x else 0)).sum()
 
 # function that cuts data series into cut dates between minimum date and maximum
-def filterDateRange(dataset, dateColumnSeries, min, max):
-    filteredSeries = filterDateTime(dateColumnSeries) # filter date series
-    if isinstance(min, str) and isinstance(max, str): # if min and max dates are string
-        min = pd.Timestamp(datetime.strptime(min, '%d.%m.%Y')) #convert date string to datetime
-        max = pd.Timestamp(datetime.strptime(max, '%d.%m.%Y')) #convert date string to datetime
-    # union comparison of min and max ranges
-    return dataset[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+def filterDateRange(dataset, dateColumnSeries, min_date, max_date):
+
+    # convert column to datetime
+    dates = pd.to_datetime(dateColumnSeries, format="%d.%m.%Y", errors='coerce')
+
+    # convert min/max if strings
+    if isinstance(min_date, str):
+        min_date = pd.to_datetime(min_date, format="%d.%m.%Y")
+
+    if isinstance(max_date, str):
+        max_date = pd.to_datetime(max_date, format="%d.%m.%Y")
+
+    # boolean mask
+    mask = (dates >= min_date) & (dates < max_date)
+
+    return dataset.loc[mask]    
 
 # function that adds rows in a date range
 def countInDateRange(dataset, dateColumnSeries, min, max):
@@ -153,25 +162,29 @@ def orderByDate(dataset, dateColumn, order):
         return "Invalid order"     
 
 # function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
-def monthlyAllAreasIncidentLinePlot(series, filterColumnSeries, startdate='01.01.2020', enddate='01.01.2025'):
+def quarterAllAreasIncidentLinePlot(series, filterColumnSeries, legendList, startdate='01.01.2020', enddate='01.01.2025'):
+    if not isinstance(legendList, list):
+        print("legendlist not a list")
+        exit()
     # dataset lifetime monthly range list for all areas 
     monthRange = pd.date_range(start=startdate, end = enddate, freq='4MS').to_pydatetime()
-    uniqueArea = filterColumnSeries.explode().dropna().unique() # get list of only unique values in dataColumn
+                
     line = py.DateTimeLine(title='Line Chart Quarterly Incidents', x_title='Timeline',show_minor_x_labels=False,
-                            y_title='Incidents every 4 months', show_dots=False, x_label_rotation=30,
-                            x_value_formatter=lambda dt: str(dt.year)) # Set graph and axis titles
+                            y_title='Incidents every 4 months', show_dots=True, x_label_rotation=30,
+                            x_value_formatter=lambda dt: str(dt.year),legend_at_bottom = True,
+                            legend_at_bottom_columns=20) # Set graph and axis titles
     # get year for start and end date
     startYear = int(startdate.split('.')[-1])
     endYear = int(enddate.split('.')[-1])
     line.x_labels_major = [datetime(year, 1, 1) for year in range(startYear, endYear)]
-    for area in range(0, len(uniqueArea)):
-        filteredSeries = filterSpecificColumn(series, filterColumnSeries, uniqueArea[area]) # filter by column value eg. EU
+    for area in range(0, len(legendList)):
+        filteredSeries = filterSpecificColumn(series, filterColumnSeries, legendList[area]) # filter by column value eg. EU
         coords_values = []
         for i in range(0, len(monthRange)-1): # find count for each area
             coords_values.append((monthRange[i], countInDateRange(filteredSeries['start_date'], filteredSeries['start_date'],
                                                                     monthRange[i], monthRange[i+1])))
         # plot line graph figures
-        line.add(str(uniqueArea[area]), coords_values)
+        line.add(str(legendList[area]), coords_values)
     return line.render().decode("utf-8")
 
 # function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
