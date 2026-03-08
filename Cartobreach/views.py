@@ -251,13 +251,26 @@ def index(request):
             svg = continents.renderContinentMap(totalIncidents, full_url)
             
     mapSvg = mark_safe(svg)
-    # Render graphs for attackers or receivers
-    if selectGroup == 'on':
-        totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
-        monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["initiator_continent_code"], filterStartDate, filterEndDate))
-    else:
-        totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
-        monthlyIncidentSvg = mark_safe(dataset.monthlyAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], filterStartDate, filterEndDate))
+    # Render graphs for attackers or receivers and continents or countries
+    totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
+    if selectRegion == 'on': # country
+        # make list of country codes from premade countryList
+        countryCodeList = []
+        for code in countries.countryList:
+            countryCodeList.append(code.getAlphaCodeUp())
+        if selectGroup == 'on': # attacker
+            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["initiator_alpha_2"], countryCodeList, filterStartDate, filterEndDate))
+        else: # receiver
+            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_country_alpha_2_code"], countryCodeList, filterStartDate, filterEndDate))
+    else: # continent
+        # make list of continent codes from premade continentList
+        continentCodeList = []
+        for code in continents.continentList:
+            continentCodeList.append(code.getAlphaCode())
+        if selectGroup == 'on': # attacker
+            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["initiator_continent_code"], continentCodeList, filterStartDate, filterEndDate))
+        else: # receiver
+            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], continentCodeList, filterStartDate, filterEndDate))
 
     selected = None
     if selectRegion == None:
@@ -374,7 +387,7 @@ def index(request):
         'criticalattacks' : criticalAttacks,
         'criticalattackspercent' : criticalAttacksPercent,
         'totalincidentsvg' : totalIncidentSvg,
-        'monthlyincidentsvg' : monthlyIncidentSvg,
+        'quartersvg' : quarterIncidentSvg,
         'map' : mapSvg,
     }
     if selected != None:
