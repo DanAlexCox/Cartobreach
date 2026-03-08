@@ -118,6 +118,7 @@ def index(request):
     # order dataset in descending order by start_date for retrieving recent incident, see recentIncidentName and recentIncidentDate
     ds = dataset.orderByDate(ds,'start_date', False)
     
+    # map section
     # check what group is selected, change between attacker (on) and receiver (Default: None)
     # check what region is selected, change between continents (default: None) and countries (on)
     if selectGroup == 'on': # attacker
