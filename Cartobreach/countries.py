@@ -35,14 +35,34 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
     for countrys in countryList:
         # colour = map.styleColours(countrys.getValue(),total_value,255,0,0) # get hex code from value
         # colorList.append(colour) # add hex code into color list
-        
         # task optional if have time on top of report/presentation: fix monotonic colour scheme
-        # if parameters are int, collect percentage with respect to getValue() (total incidents with respect to total_value)
-        totalPerc = countrys.getValue()/total_value * 100 if isinstance(total_value, int) else 'N/A'
-        typePerc = countrys.getMostInciCount()/countrys.getValue() * 100 if isinstance(countrys.getMostInciCount(), int) else 'N/A'
-        critInfraPerc = countrys.getCritInfraCount()/countrys.getValue() * 100 if isinstance(countrys.getCritInfraCount(), int) else 'N/A'
-        eduPerc = countrys.getEduCount()/countrys.getValue() * 100 if isinstance(countrys.getEduCount(), int) else 'N/A'
-        multiPerc = countrys.getMultiCount()/countrys.getValue() * 100 if isinstance(countrys.getMultiCount(), int) else 'N/A'
+        
+        
+        # only calculate total country percentage value if total_value is an integer
+        if isinstance(total_value, int):
+            # only calculate country percentage values if countrys.getValue() is an integer
+            if isinstance(countrys.getValue(), int):
+                totalPerc = countrys.getValue()/total_value * 100 if total_value > 0 else 0
+                if isinstance(countrys.getMostInciCount(), int):
+                    typePerc = countrys.getMostInciCount()/countrys.getValue() * 100 if countrys.getMostInciCount() > 0 else 0
+                else:
+                    typePerc = 'N/A'
+                if isinstance(countrys.getCritInfraCount(), int):
+                    critInfraPerc = countrys.getCritInfraCount()/countrys.getValue() * 100 if countrys.getCritInfraCount() > 0 else 0
+                else:
+                    critInfraPerc = 'N/A'
+                if isinstance(countrys.getEduCount(), int):
+                    eduPerc = countrys.getEduCount()/countrys.getValue() * 100 if countrys.getEduCount() > 0 else 0
+                else:
+                    eduPerc = 'N/A'
+                if isinstance(countrys.getMultiCount(), int):
+                    multiPerc = countrys.getMultiCount()/countrys.getValue() * 100 if countrys.getMultiCount() > 0 else 0
+                else:
+                    multiPerc = 'N/A'
+            else:
+                print("cValue not an int")
+        else:
+            print("tValue not an int")
         
         # if recent name is longer that 100 character split
         nameList = []
@@ -69,8 +89,6 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
                           + '- '+nameString # most recent incident "name" 
                           +'- Dated: '+str(countrys.getRecentDate())  # most recent incident "start date" 
                           ),
-                
-                # 'color' : colour,
                 # xlink represents directory going to once series is clicked
                 'xlink': f"{getfullpath}&{urlencode({'country':countrys.getAlphaCodeUp()})}"  # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
             }]
