@@ -1,8 +1,9 @@
 <!-- filter post form -->
     <form method="get" action="" id="filterform">
-        <h2>Filter</h2>
+        <h3>Filter</h3>
         <div id="filter-range">
-            <h3>Data range</h3>
+            <h4>Data range</h4>
+            <p>*Incidents recorded between 1st Jan 2000 - 1st Jan 2025*</p>
             <div id="filter-content">
                 {% csrf_token %}
                 <label for="startdate">Start</label>
@@ -10,30 +11,36 @@
                 <label for="enddate">End</label>
                 <input type="date" name="enddate" value="{{enddate}}">
             </div>
-            <h3>Select Victim Type</h3>
+            <h4>Select Victim Type</h4>
             <div id="receiver-content">
                 {% csrf_token %}
                 <div id="receiver-type-content">
+                    <h4>Types</h4>
                     {% for key, value in receiversubcatdict.items %}
-                    <h4>Type</h4>
                         {% if key in selectedreceivercats %}
-                            <input type="checkbox" name="receivertype" value="{{key}}" checked>
-                                {{key}}</input>
+                            <div class="receiver-type-option">
+                                <input type="checkbox" name="receivertype" id="{{key}}" value="{{key}}" checked>
+                                <label for="{{key}}">-{{key}}</label>
+                            </div>
+                            <h4>Sub-types</h4>
+                            <div class="receiver-type-subtype-options">
                             {% for receiversubcat in value %}
-                                <div id="receiver-subtype-content">
-                                    <h4>Sub-type</h4>
+                                <div class="receiver-subtype-option">
                                     {% if receiversubcat in selectedreceiversubcats %}
-                                        <input type="checkbox" name="receiversubtype" value="{{receiversubcat}}" checked>
-                                            {{receiversubcat}}</input>
+                                        <input type="checkbox" name="receiversubtype" id="{{receiversubcat}}" value="{{receiversubcat}}" checked>
+                                        <label for="{{receiversubcat}}">-{{receiversubcat}}</label>
                                     {% else %}
-                                        <input type="checkbox" name="receiversubtype" value="{{receiversubcat}}">
-                                            {{receiversubcat}}</input>
+                                        <input type="checkbox" name="receiversubtype" id="{{receiversubcat}}" value="{{receiversubcat}}">
+                                        <label for="{{receiversubcat}}">-{{receiversubcat}}</label>
                                     {% endif %}
                                 </div>
                             {% endfor %}
+                            </div>
                         {% else %}
-                            <input type="checkbox" name="receivertype" value="{{key}}">
-                                {{key}}</input>
+                            <div class="receiver-type-option">
+                                <input type="checkbox" name="receivertype" id="{{key}}" value="{{key}}">
+                                <label for="{{key}}">-{{key}}</label>
+                            </div>
                         {% endif %}
                     {% endfor %}
                 </div>
