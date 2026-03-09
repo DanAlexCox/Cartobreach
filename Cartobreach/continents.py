@@ -40,6 +40,13 @@ def renderContinentMap(total_value, getfullpath):
         # construct name split for tooltip
         for namePart in nameList:
             nameString += str(namePart) +'\n'
+            
+        # check if other get variable exist (i.e. check if getfullpath has ? in it)
+        xLinkString = ''
+        if '?' in getfullpath:
+            xLinkString = f"{getfullpath}&{urlencode({'continent':continents.getAlphaCode()})}"
+        else:
+            xLinkString = f"{getfullpath}?{urlencode({'continent':continents.getAlphaCode()})}"
         
         worldmap.add(
             continents.getName(), [{
@@ -53,7 +60,7 @@ def renderContinentMap(total_value, getfullpath):
                           + '- '+nameString # most recent incident "name" 
                           +'- Dated: '+str(continents.getRecentDate())  # most recent incident "start date" 
                           ),
-                'xlink' :f"{getfullpath}&{urlencode({'continent':continents.getAlphaCode()})}"  # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
+                'xlink' : xLinkString # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
             }]
         )
     return worldmap.render().decode("utf-8")
