@@ -37,26 +37,25 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
         # colorList.append(colour) # add hex code into color list
         # task optional if have time on top of report/presentation: fix monotonic colour scheme
         
-        
         # only calculate total country percentage value if total_value is an integer
         if isinstance(total_value, int):
             # only calculate country percentage values if countrys.getValue() is an integer
             if isinstance(countrys.getValue(), int):
                 totalPerc = countrys.getValue()/total_value * 100 if total_value > 0 else 0
                 if isinstance(countrys.getMostInciCount(), int):
-                    typePerc = countrys.getMostInciCount()/countrys.getValue() * 100 if countrys.getMostInciCount() > 0 else 0
+                    typePerc = countrys.getMostInciCount()/countrys.getValue() * 100 if countrys.getValue() > 0 else 0
                 else:
                     typePerc = 'N/A'
                 if isinstance(countrys.getCritInfraCount(), int):
-                    critInfraPerc = countrys.getCritInfraCount()/countrys.getValue() * 100 if countrys.getCritInfraCount() > 0 else 0
+                    critInfraPerc = countrys.getCritInfraCount()/countrys.getValue() * 100 if countrys.getValue() > 0 else 0
                 else:
                     critInfraPerc = 'N/A'
                 if isinstance(countrys.getEduCount(), int):
-                    eduPerc = countrys.getEduCount()/countrys.getValue() * 100 if countrys.getEduCount() > 0 else 0
+                    eduPerc = countrys.getEduCount()/countrys.getValue() * 100 if countrys.getValue() > 0 else 0
                 else:
                     eduPerc = 'N/A'
                 if isinstance(countrys.getMultiCount(), int):
-                    multiPerc = countrys.getMultiCount()/countrys.getValue() * 100 if countrys.getMultiCount() > 0 else 0
+                    multiPerc = countrys.getMultiCount()/countrys.getValue() * 100 if countrys.getValue() > 0 else 0
                 else:
                     multiPerc = 'N/A'
             else:
@@ -75,6 +74,13 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
         # construct name split for tooltip
         for namePart in nameList:
             nameString += str(namePart) +'\n'
+        
+        # check if other get variable exist (i.e. check if getfullpath has ? in it)
+        xLinkString = ''
+        if '?' in getfullpath:
+            xLinkString = f"{getfullpath}&{urlencode({'country':countrys.getAlphaCodeUp()})}"
+        else:
+            xLinkString = f"{getfullpath}?{urlencode({'country':countrys.getAlphaCodeUp()})}"
             
         worldmap.add(
             countrys.getAlphaCodeUp(), [{
@@ -90,7 +96,7 @@ def renderCountryMap(total_value, getfullpath, lastKnownName = 'N/A', lastDate =
                           +'- Dated: '+str(countrys.getRecentDate())  # most recent incident "start date" 
                           ),
                 # xlink represents directory going to once series is clicked
-                'xlink': f"{getfullpath}&{urlencode({'country':countrys.getAlphaCodeUp()})}"  # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
+                'xlink': xLinkString  # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
             }]
         )
     return worldmap.render().decode("utf-8")

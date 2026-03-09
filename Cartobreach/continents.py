@@ -22,12 +22,31 @@ def renderContinentMap(total_value, getfullpath):
     worldmap = SupranationalWorld(title='Continents', legend_at_bottom=True, legend_box_size = 10,style=map.pygalStyle, print_labels=True) # Create world map
     # adding the continents
     for continents in continentList:
-        # if parameters are int, collect percentage with respect to getValue() (total incidents with respect to total_value)
-        totalPerc = continents.getValue()/total_value * 100 if isinstance(total_value, int) else 'N/A'
-        typePerc = continents.getMostInciCount()/continents.getValue() * 100 if isinstance(continents.getMostInciCount(), int) else 'N/A'
-        critInfraPerc = continents.getCritInfraCount()/continents.getValue() * 100 if isinstance(continents.getCritInfraCount(), int) else 'N/A'
-        eduPerc = continents.getEduCount()/continents.getValue() * 100 if isinstance(continents.getEduCount(), int) else 'N/A'
-        multiPerc = continents.getMultiCount()/continents.getValue() * 100 if isinstance(continents.getMultiCount(), int) else 'N/A'
+        # only calculate total continent percentage value if total_value is an integer
+        if isinstance(total_value, int):
+            # only calculate continent percentage values if continents.getValue() is an integer
+            if isinstance(continents.getValue(), int):
+                totalPerc = continents.getValue()/total_value * 100 if total_value > 0 else 0
+                if isinstance(continents.getMostInciCount(), int):
+                    typePerc = continents.getMostInciCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    typePerc = 'N/A'
+                if isinstance(continents.getCritInfraCount(), int):
+                    critInfraPerc = continents.getCritInfraCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    critInfraPerc = 'N/A'
+                if isinstance(continents.getEduCount(), int):
+                    eduPerc = continents.getEduCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    eduPerc = 'N/A'
+                if isinstance(continents.getMultiCount(), int):
+                    multiPerc = continents.getMultiCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    multiPerc = 'N/A'
+            else:
+                print("cValue not an int")
+        else:
+            print("tValue not an int")
         
         # if recent name is longer that 100 character split
         nameList = []
