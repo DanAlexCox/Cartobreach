@@ -167,7 +167,7 @@ def quarterAllAreasIncidentLinePlot(series, filterColumnSeries, legendList, star
         print("legendlist not a list")
         exit()
     # dataset lifetime monthly range list for all areas 
-    monthRange = pd.date_range(start=startdate, end = enddate, freq='4MS').to_pydatetime()
+    monthRange = pd.date_range(start=startdate, end = enddate, freq='3MS').to_pydatetime()
                 
     line = py.DateTimeLine(title='Line Chart Quarterly Incidents', x_title='Timeline',show_minor_x_labels=False,
                             y_title='Incidents every 4 months', show_dots=True, x_label_rotation=30,
