@@ -19,50 +19,70 @@
             </div>
         </div>
         <div class="main">
-            <ul class="nav-bar">
-                <a href="{{ index }}"><li>Home Page</li></a>
-                <a href="{{ aboutus }}"><li>About Us</li></a>
-                <a href="{{ sources }}"><li>Sources</li></a>
-            </ul>
-            <section class="switch-content">
-                <h2>Switch between countries/continents</h2>
-                <form method="get" action="" id="dataswitchform">
-                    <!-- TASK: if statements for selected/unselected switches -->
-                    {% csrf_token %}
-                    <label class="switch">
-                        {% if switchregion == 'on' %}
-                            <input type="checkbox" name="region" checked onchange="this.form.submit()">
-                        {% else %}
-                            <input type="checkbox" name="region" onchange="this.form.submit()">
-                        {% endif %}
-                        <span class="slider"></span>
-                    </label>
-                    <h2>Switch between receivers/attackers</h2>
-                    <label class="switch">
-                        {% if switchgroup == 'on' %}
-                            <input type="checkbox" name="group" checked onchange="this.form.submit()">
-                        {% else %}
-                            <input type="checkbox" name="group" onchange="this.form.submit()">
-                        {% endif %}
-                        <span class="slider"></span>
-                    </label>
-                </form>
+            <section class="navbar">
+                <ul class="nav-bar">
+                    <a href="{{ index }}"><li>Home Page</li></a>
+                    <a href="{{ aboutus }}"><li>About Us</li></a>
+                    <a href="{{ sources }}"><li>Sources</li></a>
+                </ul>
             </section>
-            <section class="map-forms">
+            <section class="site-forms">
                 <div id="button-show">
-                <!-- Button to load map and hide map-->
+                    {% if mapanalytics %}
+                    <!-- Button to load map-->
                     <form method="post" action ="" id="mapshow">
                         {% csrf_token %}
                         <input type="hidden" name="mapload" value="map.html">
                         <button type="submit">Load map</button>
                     </form>
+                    {% else %}
                     <!-- Button to load analytics section (visually on the right of map)-->
                     <form method="post" action ="" id="analysisshow">
                         {% csrf_token %}
                         <input type="hidden" name="mapanalytics" value="analysis.html">
                         <button type="submit">Load analytics</button>
                     </form>
+                    {% endif %}
                 </div>
+                <section class="switch-content">
+                    <div class="single-switch">
+                        <h4>Switch for data relating to continents/countries</h4>
+                        <form method="get" action="" id="dataregionswitchform">
+                            <!-- TASK: if statements for selected/unselected switches -->
+                            {% csrf_token %}
+                            <label class="switch">
+                                {% if switchregion == 'on' %}
+                                    <input type="checkbox" name="region" id="country-selected" checked onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                            </label>
+                            <label for="country-selected">Countrys</label>
+                                {% else %}
+                                    <input type="checkbox" name="region" id="continent-selected" onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                            </label>
+                            <label for="continent-selected">Continents</label>
+                                {% endif %}
+                                
+                        </form>
+                    </div>
+                    <div class="single-switch">
+                        <h4>Switch for data relating to attack receivers or attackers</h4>
+                        <form method="get" action="" id="datagroupswitchform">
+                            <label class="switch">
+                                {% if switchgroup == 'on' %}
+                                    <input type="checkbox" name="group" id="receiver-selected" checked onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                            </label>
+                            <label for="receiver-selected">Attack Receivers</label>
+                                {% else %}
+                                    <input type="checkbox" name="group" id="attacker-selected" onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                            </label>
+                            <label for="attacker-selected">Attackers</label>
+                                {% endif %}
+                        </form>
+                    </div>
+                </section>
             </section>
             <section class="map-analytics">
                 {% include "filter.html" %}
