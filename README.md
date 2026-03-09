@@ -23,19 +23,13 @@ Cartobreach:
 - static
 
 ## Known Issues
-- Site unreponsive when selecting Antarctica "ZeroDivisionError"
-- Map links dont work if no form submitted before hand
-- Error handling for zero and zero division
-- Zero division error in country+attacker selected
-- Style filter types/sub-types
-- Last known incident occur not passing 2023
+- No chart titles
 - Stuck on specific region, need back/hide button
-- Link index filter to sources filter
-- NoneType in source view function
+- Link index filter to sources filter not vice versa
+- Problem with values and assigning to map
 
 ## Upcoming features
 - Add scatter diagrams
-- Review section
 
 ## Author
 Mr Daniel Alexander Cox
