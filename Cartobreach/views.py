@@ -136,18 +136,9 @@ def index(request):
                     countrySingle.setMostInci(mostInciType)
                     countrySingle.setMostInciCount(int(mostInciCount))
                     
-                    # criticalInfraCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
-                    # countrySingle.setCritInfraCount(int(criticalInfraCount))
-                    
-                    # eduCount = dataset.countUncleanColumnValues(countrySet['receiver_category'], 'Education') # counting education incidents
-                    # countrySingle.setEduCount(int(eduCount))
-                    
-                    # multiCountryFiltered = dataset.filterMultipleColumns(countrySet, countrySet['initiator_alpha_2'])
-                    # countrySingle.setMultiCount(len(multiCountryFiltered.index))
-                    
                     # get most recent name and start_date and add to continent objects
-                    recentIncidentName = countrySet['name'].explode().value_counts().index[0]
-                    recentIncidentDate = countrySet['start_date'].explode().value_counts().index[0]
+                    recentIncidentDate = countrySet['start_date'].max()
+                    recentIncidentName = (countrySet.iloc[countrySet['start_date'].argmax()])['name']
                     countrySingle.setRecentName(recentIncidentName)
                     countrySingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
                     
@@ -168,18 +159,9 @@ def index(request):
                     continentSingle.setMostInci(mostInciType)
                     continentSingle.setMostInciCount(int(mostInciCount))
                     
-                    # criticalInfraCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Critical infrastructure') # counting critical infrastructure incidents
-                    # continentSingle.setCritInfraCount(int(criticalInfraCount))
-                    
-                    # eduCount = dataset.countUncleanColumnValues(continentSet['receiver_category'], 'Education') # counting education incidents
-                    # continentSingle.setEduCount(int(eduCount))
-                    
-                    # multiCountryFiltered = dataset.filterMultipleColumns(continentSet, continentSet['receiver_continent_code'])
-                    # continentSingle.setMultiCount(len(multiCountryFiltered.index))
-                    
                     # get most recent name and start_date and add to continent objects
-                    recentIncidentName = continentSet['name'].explode().value_counts().index[0]
-                    recentIncidentDate = continentSet['start_date'].explode().value_counts().index[0]
+                    recentIncidentDate = continentSet['start_date'].max()
+                    recentIncidentName = (continentSet.iloc[continentSet['start_date'].argmax()])['name']
                     continentSingle.setRecentName(recentIncidentName)
                     continentSingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
                     
@@ -210,8 +192,8 @@ def index(request):
                     countrySingle.setMultiCount(len(multiCountryFiltered.index))
                     
                     # get most recent name and start_date and add to continent objects
-                    recentIncidentName = countrySet['name'].explode().value_counts().index[0]
-                    recentIncidentDate = countrySet['start_date'].explode().value_counts().index[0]
+                    recentIncidentDate = countrySet['start_date'].max()
+                    recentIncidentName = (countrySet.iloc[countrySet['start_date'].argmax()])['name']
                     countrySingle.setRecentName(recentIncidentName)
                     countrySingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
                     
@@ -242,10 +224,12 @@ def index(request):
                     continentSingle.setMultiCount(len(multiCountryFiltered.index))
                     
                     # get most recent name and start_date and add to continent objects
-                    recentIncidentName = continentSet['name'].explode().value_counts().index[0]
-                    recentIncidentDate = continentSet['start_date'].explode().value_counts().index[0]
+                    recentIncidentDate = continentSet['start_date'].max()
+                    recentIncidentName = (continentSet.iloc[continentSet['start_date'].argmax()])['name']
+                    
                     continentSingle.setRecentName(recentIncidentName)
                     continentSingle.setRecentDate(datetime.strftime(recentIncidentDate, '%d.%m.%Y'))
+                    
                     
             # load continents map
             svg = continents.renderContinentMap(totalIncidents, full_url)
@@ -272,6 +256,7 @@ def index(request):
         else: # receiver
             quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], continentCodeList, filterStartDate, filterEndDate))
 
+    # selected a map region
     selected = None
     if selectRegion == None:
         for i in continents.continentList: 
@@ -370,6 +355,56 @@ def index(request):
                     countryMultiSet = dataset.filterMultipleColumns(countSet, countSet['receiver_country_alpha_2_code']) # filter country by multiiple continent targets
                     countryMultiCount = len(countryMultiSet.index)
                     countryMultiPercent = round((float(countryMultiCount)/float(totalCountry) * 100), 2)
+                    # get attribution sources list
+                    countSet['source_url'] = dataset.cleanColumn(countSet['source_url'])
+                    attributeList = []
+                    for sourceList in countSet['source_url']: 
+                        attributeList = attributeList+sourceList
+                    # get source domain and unique domain list
+                    domainList = []
+                    uniqueList = []
+                    for source in attributeList:
+                        source = source.split('/')
+                        if "https:" in source[0]:
+                            domainList.append(source[2])
+                            if source[2] not in uniqueList:
+                                uniqueList.append(source[2])
+                    
+                    # get domain popularity count and organise urls into domain locations
+                    countList = []
+                    listDomainList = []
+                    for uniqueDomain in uniqueList:
+                        # count occurrences in domainList
+                        countDomain = domainList.count(uniqueDomain)
+                        countList.append(countDomain)
+
+                        # collect attributes that contain the domain
+                        uniqueDomainList = [attribute for attribute in attributeList if uniqueDomain in attribute]
+
+                        # limit to max 5
+                        uniqueDomainList = uniqueDomainList[:5]
+
+                        listDomainList.append(uniqueDomainList)
+                    
+                    # new panda dataframe
+                    upd = dataset.pd.DataFrame(
+                        {
+                            "domain_url" : uniqueList,
+                            "source_url" : listDomainList,
+                            "domain_count" : countList
+                        }
+                    )
+                    
+                    # convert highest 5 domain counts from dataframe into list
+                    updTopFive = upd.nlargest(5, ['domain_count'])
+                    domainTopList = []
+                    for i in range(len(updTopFive.index)):
+                        rowList = [] # constructing row data  into list
+                        rowList.append(updTopFive.iloc[i]['domain_url'])
+                        rowList.append(updTopFive.iloc[i]['source_url'])
+                        rowList.append(updTopFive.iloc[i]['domain_count'])
+                        domainTopList.append(rowList)
+                    
                     # remove selected country from countrylist
                     countryList.remove(selected)
                     
@@ -455,6 +490,7 @@ def index(request):
                     'countrymultitotal' : countryMultiCount, # multi target analysis
                     'countrymultipercent' : countryMultiPercent,
                     'countrymultisvg' : countryMultiSvg,
+                    'countrysourcetable' : domainTopList # nested list
                 })
         elif getAttacker != None:
             context.update({ 'attacker' : getAttacker, }) # signal to template to include attacker data
