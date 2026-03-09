@@ -506,22 +506,22 @@ def source(request):
     while '' in countrySearchList:
         countrySearchList.remove('')
     
-    # print(dataset.countUncleanColumnValues(df['receiver_country'], 'China'))
-    # filter dataset that include all searching countries (i.e. SELECT countries OR other countries), ensuring no deplicates
-    totalDf = None
-    for oneSearch in countrySearchList:
-        oneSearch = oneSearch.strip() # removes any white space on left or right
-        singleDf = dataset.filterSpecificColumn(df, df['receiver_country'], oneSearch)
-        totalDf = dataset.pd.concat([totalDf, singleDf])
-    
-    # convert totalDf list into tuple. drop_duplicates doesnt has lists
-    for col in totalDf.columns:
-        totalDf[col] = totalDf[col].apply(
-            lambda x: tuple(x) if isinstance(x, list) else x
-        )
-    
-    # remove duplicates
-    df = totalDf.drop_duplicates()
+    if getCountrySearch:
+        # filter dataset that include all searching countries (i.e. SELECT countries OR other countries), ensuring no deplicates
+        totalDf = None
+        for oneSearch in countrySearchList:
+            oneSearch = oneSearch.strip() # removes any white space on left or right
+            singleDf = dataset.filterSpecificColumn(df, df['receiver_country'], oneSearch)
+            totalDf = dataset.pd.concat([totalDf, singleDf])
+        
+        # convert totalDf list into tuple. drop_duplicates doesnt has lists
+        for col in totalDf.columns:
+            totalDf[col] = totalDf[col].apply(
+                lambda x: tuple(x) if isinstance(x, list) else x
+            )
+        
+        # remove duplicates
+        df = totalDf.drop_duplicates()
     
     # count results after filtering/searching
     totalResults = len(df.index)
