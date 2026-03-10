@@ -1,5 +1,6 @@
 <!-- filter post form -->
-    <form method="get" action="" id="filterform">
+<div id="filterform">
+    <form method="get" action="" id="filterSubmitform">
         <h3>Filter</h3>
         <div id="filter-range">
             <h4>Data range</h4>
@@ -50,5 +51,11 @@
         <input type="hidden" name="region" value="{{switchregion}}">
         <input type="hidden" name="group" value="{{switchgroup}}">
         <button type="submit">Filter</button>
-        <button type="reset">Reset</button>
     </form>
+    <!-- Reset page button -->
+    <form method="post" action=".." id="resetform">
+        {% csrf_token %}
+        <input type="hidden" name="reset" value = "reset">
+        <button type="submit">Reset</button>
+    </form>
+</div>
