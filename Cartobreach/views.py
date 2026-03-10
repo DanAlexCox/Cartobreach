@@ -394,7 +394,6 @@ def index(request):
 
                             # limit to max 5
                             uniqueDomainList = uniqueDomainList[:5]
-
                             listDomainList.append(uniqueDomainList)
                         
                         # new panda dataframe
@@ -405,23 +404,21 @@ def index(request):
                                 "domain_count" : countList
                             }
                         )
-                        
                         # convert highest 5 domain counts from dataframe into list
                         updTopFive = upd.nlargest(5, ['domain_count'])
                         domainTopList = []
                         for i in range(len(updTopFive.index)):
-                            rowList = [] # constructing row data  into list
-                            rowList.append(updTopFive.iloc[i]['domain_url'])
+                            rowList = [] # constructing row data into list
+                            rowList.append([updTopFive.iloc[i]['domain_url']]) # make list despite being single, for iteration if
+                            rowList.append([updTopFive.iloc[i]['domain_count']]) # make list despite being single, for iteration if
                             rowList.append(updTopFive.iloc[i]['source_url'])
-                            rowList.append(updTopFive.iloc[i]['domain_count'])
                             domainTopList.append(rowList)
                         
                         # remove selected country from countrylist
-                        countryList.remove(selected)
-                        
                         removedCodeList = []
                         for nonSelect in countryList:
-                            removedCodeList.append(nonSelect.getAlphaCodeUp())
+                            if nonSelect != selected: # avoid removing selected from list, will impact the dataset after usage
+                                removedCodeList.append(nonSelect.getAlphaCodeUp())
                         # multiple target, specify other countries
                         countryMultiChart = dataset.barChartSpecific(countryMultiSet['receiver_country_alpha_2_code'], "Other Continents That Were Also Targeted", removedCodeList)
                         countryMultiSvg = mark_safe(countryMultiChart)
