@@ -25,8 +25,12 @@ def cleanColumn(column):
 
 # function for counting how many instances are in an uncleaned column
 def countUncleanColumnValues(column, search):
-    # clean column and turn into list
-    cleanedColumn = cleanColumn(column)
+    # check if column already has been cleaned
+    if column.apply(lambda v: isinstance(v, list)).all():
+        cleanedColumn = column
+    else:
+        # clean column and turn into list
+        cleanedColumn = cleanColumn(column)
     return cleanedColumn.apply(lambda x: isinstance(x, list) and search in x).sum()
 
 # function that converts country alpha codes to continents
