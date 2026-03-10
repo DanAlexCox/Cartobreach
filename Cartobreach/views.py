@@ -31,6 +31,7 @@ def index(request):
     selectedReceiverSubCat = request.GET.getlist("receiversubtype")
     mapanalytics = request.POST.get('mapanalytics')
     filterReset = request.POST.get('reset')
+    popUpClose = request.POST.get('popup')
     mapload = None
     
     if filterReset == 'reset':
@@ -47,13 +48,19 @@ def index(request):
     # condition requests
     # find out if continent or country is selected on map
     if selectRegion == None:
-        getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
         getCountry = None
-        selectDict['receivercontinent'] = getContinent # dictionary add
+        if popUpClose != 'close': # check if close button is pressed to hide code
+            getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
+            selectDict['receivercontinent'] = getContinent # dictionary add
+        else:
+            getContinent = None
     elif selectRegion == 'on':
         getContinent = None
-        getCountry = request.GET.get('country') # load GET country (value should be .getAlphaCodeUp())
-        selectDict['receivercountry'] = getCountry # dictionary add
+        if popUpClose != 'close': # check if close button is pressed to hide code
+            getCountry = request.GET.get('country') # load GET country (value should be .getAlphaCodeUp())
+            selectDict['receivercountry'] = getCountry # dictionary add
+        else: 
+            getCountry = None
     else:
         getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
         getCountry = None
@@ -310,17 +317,98 @@ def index(request):
                         mitreImpactContSet = dataset.cleanColumn(contSet["mitre_impact"]) # clean mitre impacts for continent dataset
                         continentMitreImpactBarChart = dataset.barChart(mitreImpactContSet, "Known Recorded Mitre Impact Methods") # make bar chart of mitre impact methods in continent
                         continentMitreImpactBarChart = mark_safe(continentMitreImpactBarChart)
+                        
+                        # number of attacks on social groups
+                        continentSocialSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.sg.getCatType()) # filter country by category
+                        continentSocialCount = len(countrySocialSet.index)
+                        continentSocialPercent = round((float(countryCriticalCount)/float(totalCountry) * 100), 2)
+                        # social groups subcategory graph
+                        continentSocialSet['receiver_subcategory'] = dataset.cleanColumn(countrySocialSet['receiver_subcategory'])
+                        continentSocialChart = dataset.barChartSpecific(countrySocialSet['receiver_subcategory'], "Social Group Categories", categories.sg.getCatSubType())
+                        continentSocialSvg = mark_safe(countrySocialChart)
+                        # number of attacks on political groups
+                        continentPoliticSet = dataset.filterSpecificColumn(countSet, countSet['receiver_category'], categories.sips.getCatType()) # filter country by category
+                        continentPoliticCount = len(countryPoliticSet.index)
+                        continentPoliticPercent = round((float(countryPoliticCount)/float(totalCountry) * 100), 2)
+                        # political groups subcategory graph
+                        continentPoliticSet['receiver_subcategory'] = dataset.cleanColumn(countryPoliticSet['receiver_subcategory'])
+                        continentPoliticChart = dataset.barChartSpecific(countryPoliticSet['receiver_subcategory'], "State Institutions & Political System Categories", categories.sips.getCatSubType())
+                        continentPoliticSvg = mark_safe(countryPoliticChart)
+                        # number of attacks on multiple continents
+                        continentMultiSet = dataset.filterMultipleColumns(countSet, countSet['receiver_country_alpha_2_code']) # filter country by multiiple continent targets
+                        continentMultiCount = len(countryMultiSet.index)
+                        continentMultiPercent = round((float(countryMultiCount)/float(totalCountry) * 100), 2)
+                        # get attribution sources list
+                        contSet['source_url'] = dataset.cleanColumn(countSet['source_url'])
+                        attributeList = []
+                        for sourceList in contSet['source_url']: 
+                            attributeList = attributeList+sourceList
+                        # get source domain and unique domain list
+                        domainList = []
+                        uniqueList = []
+                        for source in attributeList:
+                            source = source.split('/')
+                            if "https:" in source[0]:
+                                domainList.append(source[2])
+                                if source[2] not in uniqueList:
+                                    uniqueList.append(source[2])
+                        
+                        # get domain popularity count and organise urls into domain locations
+                        countList = []
+                        listDomainList = []
+                        for uniqueDomain in uniqueList:
+                            # count occurrences in domainList
+                            countDomain = domainList.count(uniqueDomain)
+                            countList.append(countDomain)
+
+                            # collect attributes that contain the domain
+                            uniqueDomainList = [attribute for attribute in attributeList if uniqueDomain in attribute]
+
+                            # limit to max 5
+                            uniqueDomainList = uniqueDomainList[:5]
+                            listDomainList.append(uniqueDomainList)
+                        
+                        # new panda dataframe
+                        upd = dataset.pd.DataFrame(
+                            {
+                                "domain_url" : uniqueList,
+                                "source_url" : listDomainList,
+                                "domain_count" : countList
+                            }
+                        )
+                        # convert highest 5 domain counts from dataframe into list
+                        updTopFive = upd.nlargest(5, ['domain_count'])
+                        domainTopList = []
+                        for i in range(len(updTopFive.index)):
+                            rowList = [] # constructing row data into list
+                            rowList.append([updTopFive.iloc[i]['domain_url']]) # make list despite being single, for iteration if
+                            rowList.append([updTopFive.iloc[i]['domain_count']]) # make list despite being single, for iteration if
+                            rowList.append(updTopFive.iloc[i]['source_url'])
+                            domainTopList.append(rowList)
+                        
+                        # remove selected country from countrylist
+                        removedCodeList = []
+                        for nonSelect in continents.continentList:
+                            if nonSelect != selected: # avoid removing selected from list, will impact the dataset after usage
+                                removedCodeList.append(nonSelect.getAlphaCode())
+                        # multiple target, specify other countries
+                        continentMultiChart = dataset.barChartSpecific(countryMultiSet['receiver_country_alpha_2_code'], "Other Continents That Were Also Targeted", removedCodeList)
+                        continentMultiSvg = mark_safe(countryMultiChart)
                     else:
                         totalContinentPercent = 0
                         continentAttackTypePieSvg = 'No known incidents affected this region'
                         continentCriticalCount = 0
                         continentCriticalPercent = 0
                         continentCriticalSvg = 'No known incidents affected this region'
-                        continentAttackerLocationPieSvg = 'No known incidents affected this region'
-                        continentMitreAccessPieSvg = 'No known incidents affected this region'
-                        continentTotalIntensity = 0
-                        continentMitreImpactBarChart = 'No known incidents affected this region'
-                        
+                        continentSocialCount = 0
+                        continentSocialPercent = 0
+                        continentSocialSvg = 'No existing incidents affected this region'
+                        continentPoliticCount = 0
+                        continentPoliticPercent = 0
+                        continentPoliticSvg = 'No existing incidents affected this region'
+                        continentMultiCount = 0
+                        continentMultiPercent = 0
+                        continentMultiSvg = 'No existing incidents affected this region'
                     break
         elif selectRegion == 'on':
             for i in countryList: 
