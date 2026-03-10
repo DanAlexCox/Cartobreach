@@ -1,53 +1,54 @@
 <!-- selected country via GET value-->
- <section class="mappopup">
-    <h1>Country: {{ country }}</h1>
-    <ul>
-      <li>Total recorded incidents: {{ countrytotal }} ({{ countrytotalpercent }}% of the filtered dataset)</li> <!-- Only filter by country not filtered database -->
-      <li>Incident types graph: </li><!-- Include chart for incident type -->
-      {{ countryincidenttypesvg }}
-      <li>Number of attacks on critical infrastructure: {{ countrycriticaltotal }} ({{ countrycriticalpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific infrastructure -->      
-      {{ countrycriticalsvg }}
-      <li>Number of attacks on social groups: {{ countrysocialtotal }} ({{ countrysocialpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
-      {{ countrysocialsvg }}
-      <li>Number of attacks affiliated with politics: {{ countrypolitictotal }} ({{ countrypoliticpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
-      {{ countrypoliticsvg }}
-      <li>Multi target attacks related to country: {{ countrymultitotal }} ({{ countrymultipercent }}% of the filtered country datas)</li> <!-- Filter by country and other countries-->
-      {{ countrymultisvg }}
-      <li>Most common domains addressing attacks to the public</li>
-      <!-- LIST!!! Look at 5-10 "source_url" with most coverage of region each-->
-      <table>
-        <thead>
-          <tr>
-            <th>Domain</th>
-            <th>Count</th>
-            <th>Recent Source Examples</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for source in countrysourcetable %}
-          <tr>
-            {% for data in source %}
-            <td>
-              {% if 'http://' in data %}
-                {% for url in data %}
-                <a href= "{{ url }}">{{ url }}</a>; 
-                {% endfor %}
+<section class="mappopup">
+  <h1>Country: {{ country }}</h1>
+  <form></form>
+  <ul>
+    <li>Total recorded incidents: {{ countrytotal }} ({{ countrytotalpercent }}% of the filtered dataset)</li> <!-- Only filter by country not filtered database -->
+    <li>Incident types graph: </li><!-- Include chart for incident type -->
+    {{ countryincidenttypesvg }}
+    <li>Number of attacks on critical infrastructure: {{ countrycriticaltotal }} ({{ countrycriticalpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific infrastructure -->      
+    {{ countrycriticalsvg }}
+    <li>Number of attacks on social groups: {{ countrysocialtotal }} ({{ countrysocialpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
+    {{ countrysocialsvg }}
+    <li>Number of attacks affiliated with politics: {{ countrypolitictotal }} ({{ countrypoliticpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
+    {{ countrypoliticsvg }}
+    <li>Multi target attacks related to country: {{ countrymultitotal }} ({{ countrymultipercent }}% of the filtered country datas)</li> <!-- Filter by country and other countries-->
+    {{ countrymultisvg }}
+    <li>Most common domains addressing attacks to the public</li>
+    <!-- LIST!!! Look at 5-10 "source_url" with most coverage of region each-->
+    <table>
+      <thead>
+        <tr>
+          <th>Domain</th>
+          <th>Count</th>
+          <th>Recent Source Examples</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for source in countrysourcetable %}
+        <tr>
+          {% for data in source %}
+          <td>
+            {% for single in data %}
+              {% if 'https://' in single %}
+              <a href= "{{ single }}">{{ single }}</a>;
               {% else %}
-                {{ data }}
+                {{ single }}
               {% endif %}
-            </td>
             {% endfor %}
-          </tr>
+          </td>
           {% endfor %}
-        </tbody>
-        <!-- Link to full selected filtered list of sources -->
-      </table>
-      <form method="get" action="{{sources}}" id="sourcesdirect">
-        <input type="hidden" name="sourcestartdate" value="{{startdate}}">
-        <input type="hidden" name="sourceenddate" value="{{enddate}}">
-        <input type="hidden" name="countrysearch" value="{{country}}">
-        <input type="hidden" name="order" value="on">
-        <button type="submit">See full list for region</button>
-      </form>
-    </ul>
- </section>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <!-- Link to full selected filtered list of sources -->
+    </table>
+    <form method="get" action="{{sources}}" id="sourcesdirect">
+      <input type="hidden" name="sourcestartdate" value="{{startdate}}">
+      <input type="hidden" name="sourceenddate" value="{{enddate}}">
+      <input type="hidden" name="countrysearch" value="{{country}}">
+      <input type="hidden" name="order" value="on">
+      <button type="submit">See full list for region</button>
+    </form>
+  </ul>
+</section>
