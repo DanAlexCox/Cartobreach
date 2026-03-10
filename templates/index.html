@@ -8,6 +8,11 @@
         <!-- map styler -->
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+        {% if continent %}
+            <style>.main {pointer-events: none;}</style>
+        {% elif country %}
+            <style>.main {pointer-events: none;}</style>
+        {% endif %}
         <title>Cartobreach</title> 
     </head> 
     <body>
@@ -18,6 +23,7 @@
                 <div id="header-h"><h1>Cartobreach</h1></div>
             </div>
         </div>
+
         <div class="main">
             <section class="navbar">
                 <ul class="nav-bar">
@@ -33,14 +39,14 @@
                     <form method="post" action ="" id="mapshow">
                         {% csrf_token %}
                         <input type="hidden" name="mapload" value="map.html">
-                        <button type="submit">Load map</button>
+                        <button type="submit">See Map</button>
                     </form>
                     {% elif totalincidents > 0 %}
                     <!-- Button to load analytics section (visually on the right of map)-->
                     <form method="post" action ="" id="analysisshow">
                         {% csrf_token %}
                         <input type="hidden" name="mapanalytics" value="analysis.html">
-                        <button type="submit">Load analytics</button>
+                        <button type="submit">See Global Analytics</button>
                     </form>
                     {% endif %}
                 </div>
