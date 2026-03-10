@@ -97,7 +97,10 @@ def index(request):
     totalIncidents = len(ds.index) # total incidents in filtered dataset
     
     criticalAttacks = dataset.countUncleanColumnValues(ds["receiver_category"], categories.ci.getCatType()) # total critical infrastructure attacks in filtered dataset
-    criticalAttacksPercent = round((float(criticalAttacks) / float(totalIncidents)) * 100, 2) # critical infrastructure attacks percentage in filter dataset
+    if totalIncidents > 0:
+        criticalAttacksPercent = round((float(criticalAttacks) / float(totalIncidents)) * 100, 2) # critical infrastructure attacks percentage in filter dataset
+    else:
+        criticalAttacksPercent = 0
    
     if mapanalytics not in valid_includes:
         mapanalytics = None
@@ -235,26 +238,31 @@ def index(request):
             svg = continents.renderContinentMap(totalIncidents, full_url)
             
     mapSvg = mark_safe(svg)
-    # Render graphs for attackers or receivers and continents or countries
-    totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
-    if selectRegion == 'on': # country
-        # make list of country codes from premade countryList
-        countryCodeList = []
-        for code in countries.countryList:
-            countryCodeList.append(code.getAlphaCodeUp())
-        if selectGroup == 'on': # attacker
-            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["initiator_alpha_2"], countryCodeList, filterStartDate, filterEndDate))
-        else: # receiver
-            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_country_alpha_2_code"], countryCodeList, filterStartDate, filterEndDate))
-    else: # continent
-        # make list of continent codes from premade continentList
-        continentCodeList = []
-        for code in continents.continentList:
-            continentCodeList.append(code.getAlphaCode())
-        if selectGroup == 'on': # attacker
-            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["initiator_continent_code"], continentCodeList, filterStartDate, filterEndDate))
-        else: # receiver
-            quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], continentCodeList, filterStartDate, filterEndDate))
+    
+    if mapanalytics != None:
+        # Render graphs for attackers or receivers and continents or countries in global analysis
+        totalIncidentSvg = mark_safe(dataset.yearlyIncidentBarPlot(ds, filterStartDate, filterEndDate))
+        if selectRegion == 'on': # country
+            # make list of country codes from premade countryList
+            countryCodeList = []
+            for code in countries.countryList:
+                countryCodeList.append(code.getAlphaCodeUp())
+            if selectGroup == 'on': # attacker
+                quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["initiator_alpha_2"], countryCodeList, filterStartDate, filterEndDate))
+            else: # receiver
+                quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_country_alpha_2_code"], countryCodeList, filterStartDate, filterEndDate))
+        else: # continent
+            # make list of continent codes from premade continentList
+            continentCodeList = []
+            for code in continents.continentList:
+                continentCodeList.append(code.getAlphaCode())
+            if selectGroup == 'on': # attacker
+                quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["initiator_continent_code"], continentCodeList, filterStartDate, filterEndDate))
+            else: # receiver
+                quarterIncidentSvg = mark_safe(dataset.quarterAllAreasIncidentLinePlot(ds, ds["receiver_continent_code"], continentCodeList, filterStartDate, filterEndDate))
+    else:
+        totalIncidentSvg = None
+        quarterIncidentSvg = None
 
     # selected a map region
     selected = None
