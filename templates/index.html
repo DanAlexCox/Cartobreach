@@ -35,7 +35,7 @@
                         <input type="hidden" name="mapload" value="map.html">
                         <button type="submit">Load map</button>
                     </form>
-                    {% else %}
+                    {% elif totalincidents > 0 %}
                     <!-- Button to load analytics section (visually on the right of map)-->
                     <form method="post" action ="" id="analysisshow">
                         {% csrf_token %}
@@ -110,12 +110,12 @@
                                     <input type="checkbox" name="group" id="receiver-selected" checked onchange="this.form.submit()">
                                     <span class="slider"></span>
                             </label>
-                            <label for="receiver-selected">Attack Receivers</label>
+                            <label for="receiver-selected">Attackers</label>
                                 {% else %}
                                     <input type="checkbox" name="group" id="attacker-selected" onchange="this.form.submit()">
                                     <span class="slider"></span>
                             </label>
-                            <label for="attacker-selected">Attackers</label>
+                            <label for="attacker-selected">Attack Receivers</label>
                                 {% endif %}
                         </form>
                     </div>
