@@ -48,6 +48,7 @@
                     <div class="single-switch">
                         <h4>Switch for data relating to continents/countries</h4>
                         <form method="get" action="" id="dataregionswitchform">
+                            {% csrf_token %}
                             {% if startdate %}
                                 <input type="hidden" name="startdate" value="{{startdate}}">
                             {% endif %}
@@ -55,15 +56,18 @@
                                 <input type="hidden" name="enddate" value="{{enddate}}">
                             {% endif %}
                             {% if selectedreceivercats %}
-                                <input type="hidden" name="receivertype" value="{{selectedreceivercats}}">
+                                {% for cat in selectedreceivercats %}
+                                <input type="hidden" name="receivertype" id="{{cat}}" value="{{cat}}">
+                                {% endfor %}
                             {% endif %}
                             {% if selectedreceiversubcats %}
-                                <input type="hidden" name="receiversubtype" value="{{selectedreceiversubcats}}">
+                                {% for subcat in selectedreceiversubcats %}
+                                <input type="hidden" name="receiversubtype" id="{{subcat}}" value="{{subcats}}">
+                                {% endfor %}
                             {% endif %}
                             {% if switchgroup %}
                                 <input type="hidden" name="group" value="{{switchgroup}}">
                             {% endif %}
-                            {% csrf_token %}
                             <label class="switch">
                             {% if switchregion == 'on' %}
                                 <input type="checkbox" name="region" id="country-selected" checked onchange="this.form.submit()">
@@ -81,6 +85,7 @@
                     <div class="single-switch">
                         <h4>Switch for data relating to attack receivers or attackers</h4>
                         <form method="get" action="" id="datagroupswitchform">
+                            {% csrf_token %}
                             {% if startdate %}
                                 <input type="hidden" name="startdate" value="{{startdate}}">
                             {% endif %}
@@ -88,10 +93,14 @@
                                 <input type="hidden" name="enddate" value="{{enddate}}">
                             {% endif %}
                             {% if selectedreceivercats %}
-                                <input type="hidden" name="receivertype" value="{{selectedreceivercats}}">
+                                {% for cat in selectedreceivercats %}
+                                <input type="hidden" name="receivertype" id="{{cat}}" value="{{cat}}">
+                                {% endfor %}
                             {% endif %}
                             {% if selectedreceiversubcats %}
-                                <input type="hidden" name="receiversubtype" value="{{selectedreceiversubcats}}">
+                                {% for subcat in selectedreceiversubcats %}
+                                <input type="hidden" name="receiversubtype" id="{{subcat}}" value="{{subcats}}">
+                                {% endfor %}
                             {% endif %}
                             {% if switchregion %}
                                 <input type="hidden" name="region" value="{{switchregion}}">
