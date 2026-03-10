@@ -48,26 +48,54 @@
                     <div class="single-switch">
                         <h4>Switch for data relating to continents/countries</h4>
                         <form method="get" action="" id="dataregionswitchform">
-                            <!-- TASK: if statements for selected/unselected switches -->
+                            {% if startdate %}
+                                <input type="hidden" name="startdate" value="{{startdate}}">
+                            {% endif %}
+                            {% if enddate %}
+                                <input type="hidden" name="enddate" value="{{enddate}}">
+                            {% endif %}
+                            {% if selectedreceivercats %}
+                                <input type="hidden" name="receivertype" value="{{selectedreceivercats}}">
+                            {% endif %}
+                            {% if selectedreceiversubcats %}
+                                <input type="hidden" name="receiversubtype" value="{{selectedreceiversubcats}}">
+                            {% endif %}
+                            {% if switchgroup %}
+                                <input type="hidden" name="group" value="{{switchgroup}}">
+                            {% endif %}
                             {% csrf_token %}
                             <label class="switch">
-                                {% if switchregion == 'on' %}
-                                    <input type="checkbox" name="region" id="country-selected" checked onchange="this.form.submit()">
-                                    <span class="slider"></span>
+                            {% if switchregion == 'on' %}
+                                <input type="checkbox" name="region" id="country-selected" checked onchange="this.form.submit()">
+                                <span class="slider"></span>
                             </label>
                             <label for="country-selected">Countrys</label>
-                                {% else %}
-                                    <input type="checkbox" name="region" id="continent-selected" onchange="this.form.submit()">
-                                    <span class="slider"></span>
+                            {% else %}
+                                <input type="checkbox" name="region" id="continent-selected" onchange="this.form.submit()">
+                                <span class="slider"></span>
                             </label>
                             <label for="continent-selected">Continents</label>
-                                {% endif %}
-                                
+                            {% endif %}
                         </form>
                     </div>
                     <div class="single-switch">
                         <h4>Switch for data relating to attack receivers or attackers</h4>
                         <form method="get" action="" id="datagroupswitchform">
+                            {% if startdate %}
+                                <input type="hidden" name="startdate" value="{{startdate}}">
+                            {% endif %}
+                            {% if enddate %}
+                                <input type="hidden" name="enddate" value="{{enddate}}">
+                            {% endif %}
+                            {% if selectedreceivercats %}
+                                <input type="hidden" name="receivertype" value="{{selectedreceivercats}}">
+                            {% endif %}
+                            {% if selectedreceiversubcats %}
+                                <input type="hidden" name="receiversubtype" value="{{selectedreceiversubcats}}">
+                            {% endif %}
+                            {% if switchregion %}
+                                <input type="hidden" name="region" value="{{switchregion}}">
+                            {% endif %}
                             <label class="switch">
                                 {% if switchgroup == 'on' %}
                                     <input type="checkbox" name="group" id="receiver-selected" checked onchange="this.form.submit()">
