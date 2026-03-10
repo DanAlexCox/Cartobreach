@@ -27,7 +27,7 @@ Cartobreach:
 - Stuck on specific region, need back/hide button
 - Link index filter to sources filter not vice versa
 - Problem with values and assigning to map?????
-- Switches and filter not save each others forms
+- Finish region analysis for attackers and receivers
 
 ## Upcoming features
 - Add scatter diagrams
