@@ -272,8 +272,8 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
 .mappopup{
     position:fixed;
     top: 0%;
-    left: 60%;
-    width: 40%;
+    left: 40%;
+    width: 60%;
     height: 100%;
     border-left:solid 5px black;
     background-color: white;
@@ -288,6 +288,17 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
 }
 #popupContent {
     display: flex;
+}
+.mappopup table {
+    border: 2px solid black;
+    table-layout: fixed;
+    word-wrap: break-word;
+    border-collapse: collapse;
+}
+
+.mappopup td, .mappopup th {
+    border: 1px solid black;
+    border-collapse: collapse;
 }
 .hidden {
     display: none;
