@@ -1,8 +1,7 @@
-html {
+body {
     display: flex;
     flex-direction: column;
     background-color: white;
-    border: solid 5px black;
 }
 h1, h2, h3, p, li, label, button, title {
     font-family: Georgia, 'Times New Roman', Times, serif;
@@ -23,13 +22,12 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 90%;
+    width: 100%;
     background-color: rgb(194, 255, 249);
     border-top: solid 3px black;
     border-bottom: solid 3px black;
     #header-h {
         padding-left: 1%;
-
     }
 }
 #logo{
@@ -49,20 +47,53 @@ h1 {
 .main {
     position: relative;
 }
-
-.navbar, .site-forms, .map-analytics{
+/* Navbar container */
+.navbar{
     display: flex;
     justify-self: center;
-    width: 80%;
-    margin-top: 2%;
+    justify-content: space-between;
+    background-color: rgba(249, 249, 249, 1);
+    width: 100%;
+    border-bottom: solid 3px black;
+}
+.nav-bar {
+    display: flex;
+    justify-self: center;
+    justify-content: space-around;
+    padding: 6px 10px;
+    margin: 1%;
+}
+.nav-bar {
+  list-style: none;
+  width: 100%;
+}
+.nav-bar a {
+    padding: 2% 5%;
+    border: 3px solid rgb(0, 0, 0);
+}
+.nav-bar li {
+    text-decoration: none;
+    font-size: 20px;
+    color: black;
+    font-display: block;
+}
+/* site form styling */
+.site-forms, .map-analytics{
+    display: flex;
+    justify-self: center;
+    width: 90%;
+    margin-top: 0;
 }
 .site-forms{
     flex-flow: column wrap;
     justify-content: center;
     padding: 2%;
     background-color: rgb(149, 249, 239);
-    border-top: solid 1px black;
     border-bottom: solid 1px black;
+    h4 {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
 }
 #button-show {
     width: 100%;
@@ -158,7 +189,7 @@ button {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    width: 30%;
+    width: 25%;
     background-color: rgb(163, 195, 255);
     border-top: solid 1px blue;
     border-bottom: solid 1px blue;

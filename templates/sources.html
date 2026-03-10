@@ -7,15 +7,26 @@
         <link rel="icon" type="image/x-icon" href="{% static 'images/Cartobreach_Logo_No_Name.png' %}">
         <!-- map styler -->
         {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+        {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'css/source.css' %}">
         <title>Cartobreach</title> 
     </head> 
     <body>
-        <ul class="nav-bar">
-            <a href="{{ index }}"><li>Home Page</li></a>
-            <a href="{{ aboutus }}"><li>About Us</li></a>
-            <a href="{{ sources }}"><li>Sources</li></a>
-        </ul>
+        <div class="header">
+            <div id="header-content">
+                {% load static %}  
+                <div id="logo-holder"><img src="{% static 'images/Cartobreach_Logo.png' %}" alt="Cartobreach logo" id="logo"></div>
+                <div id="header-h"><h1>Cartobreach</h1></div>
+            </div>
+        </div>
+        <section class="navbar">
+            <ul class="nav-bar">
+                <a href="{{ index }}"><li>Home Page</li></a>
+                <a href="{{ aboutus }}"><li>About Us</li></a>
+                <a href="{{ sources }}"><li>Sources</li></a>
+            </ul>
+        </section>
         <h1>Sources Page</h1>
         <blockquote>Sources may be represented as Not available</blockquote>
         <!-- Filter form with start/end date -->
