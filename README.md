@@ -26,7 +26,8 @@ Cartobreach:
 - No chart titles
 - Stuck on specific region, need back/hide button
 - Link index filter to sources filter not vice versa
-- Problem with values and assigning to map
+- Problem with values and assigning to map?????
+- Switches and filter not save each others forms
 
 ## Upcoming features
 - Add scatter diagrams
