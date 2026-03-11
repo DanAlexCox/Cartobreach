@@ -1,20 +1,60 @@
 <!-- selected country via GET value-->
  <section class="mappopup">
-    <h1>Country: {{ country }}</h1>
-    <ul>
-      <li>Total recorded incidents: {{ countrytotal }} ({{ countrytotalpercent }}% of the filtered dataset)</li> <!-- Only filter by country not filtered database -->
-      <li>Incident types graph: </li><!-- Include chart for incident type -->
-      {{ countryincidenttypesvg }}
-      <li>Number of attacks on critical infrastructure: {{ countrycriticaltotal }} ({{ countrycriticalpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific infrastructure -->      
-      {{ countrycriticalsvg }}
-      <li>Number of attacks on social groups: {{ countrysocialtotal }} ({{ countrysocialpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
-      {{ countrysocialsvg }}
-      <li>Number of attacks affiliated with politics: {{ countrypolitictotal }} ({{ countrypoliticpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
-      {{ countrypoliticsvg }}
-      <li>Multi target attacks related to country</li> <!-- Filter by country and other countries-->
-      <li>Methods of attribution (addressing attacks to the public)</li>
-      <!-- LIST!!! Look at "attribution_type" and most 5-10 "attribution_source_url" each-->
-        <!-- Link to full selected filtered list of sources -->
-
-    </ul>
+  <h1>Known Attackers From Country: {{ country }}</h1>
+  <form method="post" action="{{ index }}" id="popupform">
+    {% csrf_token %}
+    <input type="hidden" name="popup" value="close">
+    <button type="submit">Close Pop Up</button>
+  </form>
+  <!-- when single country clicked load analysis of country data-->
+  <ul>
+      <li>Total recorded incidents: {{ total }} ({{ totalpercent }}% of the filtered dataset)</li>
+      {{ attacktypesvg }}
+      <li>Number of attacks on critical infrastructure: {{ criticaltotal }} ({{ criticalpercent }}% of the filtered country dataset)</li>
+      {{ criticalsvg }}
+      <li>What was actually impacted in the attack according to the MITRE ATT&CK framework: </li>
+      {{ mitreimpactsvg }}
+      <li>Number of attacks on social groups: {{ socialtotal }} ({{ socialpercent }}% of the filtered country dataset)</li> <!-- Include chart for specific groups -->
+      {{ socialsvg }}
+      <li>Number of attacks affiliated with politics: {{ politictotal }} ({{ politicpercent }}% of the filtered continent dataset)</li> <!-- Include chart for specific groups -->
+      {{ politicsvg }}
+      <li>Multi target attacks related to country: {{ multitotal }} ({{ multipercent }}% of the filtered continent dataset)</li> <!-- Filter by country and other countries-->
+      {{ multisvg }}
+      <li>Most common domains addressing attacks to the public</li>
+      <!-- LIST!!! Look at 5-10 "source_url" with most coverage of region each-->
+      <table>
+          <thead>
+              <tr>
+                  <th>Domain</th>
+                  <th>Count</th>
+                  <th>Recent Source Examples</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for source in sourcetable %}
+              <tr>
+              {% for data in source %}
+              <td>
+                  {% for single in data %}
+                  {% if 'https://' in single %}
+                  <a href= "{{ single }}">{{ single }}</a>;
+                  {% else %}
+                      {{ single }}
+                  {% endif %}
+                  {% endfor %}
+              </td>
+              {% endfor %}
+              </tr>
+              {% endfor %}
+          </tbody>
+          <!-- Link to full selected filtered list of sources -->
+      </table>
+      <form method="get" action="{{sources}}" id="sourcesdirect">
+          <input type="hidden" name="sourcestartdate" value="{{startdate}}">
+          <input type="hidden" name="sourceenddate" value="{{enddate}}">
+          <input type="hidden" name="continentsearch" value="{{continent}}">
+          <input type="hidden" name="order" value="on">
+          <button type="submit">See full list for region</button>
+      </form>
+  </ul>
  </section>
