@@ -1,11 +1,11 @@
 <!-- load dataset analytics (analysis.html) after clicking analyticsloader button -->
-<!-- TASK: UPDATE ANALYTICS WITH REGION AND GROUP -->
+<!-- TASK: UPDATE ANALYTICS MORE ANALYSIS -->
 <section class="analytics">
     <ul>
         <li>Total recorded incidents: {{totalincidents}}</li>
         <li>Annual total chart (Total incidents recorded each year)</li>
         {{totalincidentsvg}}
-        <li>Quarterly total chart for each continent (total incidents recorded each quarter grouped by victim's continent)</li>
+        <li>Quarterly total chart for each region (total incidents recorded each quarter grouped by region)</li>
         {{quartersvg}}
         <li>Number of attacks on critical infrastructure: {{criticalattacks}} ({{criticalattackspercent}}% of total recorded incidents)</li>
     </ul>
