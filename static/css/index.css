@@ -263,10 +263,10 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
             padding: 2% 4%;
         }
     }
-    img {
-        width: 60%;
-        height: 40%;
-    }
+}
+
+.analytics svg {
+    width: 60%;
 }
 /* map popup style */
 .mappopup{
