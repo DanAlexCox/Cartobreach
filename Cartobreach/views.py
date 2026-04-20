@@ -554,10 +554,8 @@ def source(request):
     df['source_url'] = dataset.cleanColumn(df["source_url"])
     
     # sort into ascending order descending depending on getOrderSwitch
-    if getOrderSwitch == 'on': # descending order
-        order = False
-    else: # ascending order
-        order = True
+    order = False if getOrderSwitch == 'on' else True # descending if on
+    
     df = dataset.orderByDate(df,'start_date', order)
     
     tableList = []
