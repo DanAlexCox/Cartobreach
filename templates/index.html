@@ -1,66 +1,158 @@
 <!DOCTYPE html>
 <html lang="en"> 
-<head> 
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load static %}
-    <link rel="icon" type="image/x-icon" href="{% static 'images/Cartobreach_Logo_No_Name.png' %}">
-    <!-- map styler -->
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
-    <title>Cartobreach</title> 
-</head> 
-<body>
-    <div class="header">
-        <div id="header-content">
-            {% load static %}  
-            <div id="logo-holder"><img src="{% static 'images/Cartobreach_Logo.png' %}" alt="Cartobreach logo" id="logo"></div>
-            <div id="header-h"><h1>Welcome to Cartobreach</h1></div>
-        </div>
-    </div>
-    <div class="main">
-        <section class="map-forms">
-            <div id="button-show">
-            <!-- Button to load map and hide map-->
-                <form method="post" action ="" id="mapshow">
-                    {% csrf_token %}
-                    <input type="hidden" name="mapload" value="map.html">
-                    <button type="submit">Load map</button>
-                </form>
-                <!-- Button to load analytics section (visually on the right of map)-->
-                <form method="post" action ="" id="analysisshow">
-                    {% csrf_token %}
-                    <input type="hidden" name="mapanalytics" value="analysis.html">
-                    <button type="submit">Load analytics</button>
-                </form>
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% load static %}
+        <link rel="icon" type="image/x-icon" href="{% static 'images/Cartobreach_Logo_No_Name.png' %}">
+        <!-- map styler -->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+        {% if continent %}
+            <style>.main {pointer-events: none;}</style>
+        {% elif country %}
+            <style>.main {pointer-events: none;}</style>
+        {% endif %}
+        <title>Cartobreach</title> 
+    </head> 
+    <body>
+        <div class="header">
+            <div id="header-content">
+                {% load static %}  
+                <div id="logo-holder"><img src="{% static 'images/Cartobreach_Logo.png' %}" alt="Cartobreach logo" id="logo"></div>
+                <div id="header-h"><h1>Cartobreach</h1></div>
             </div>
-            <form method="get" action="{{ index }}" id="continentlist">
-                {% for continent in continentlist %}
-                <div class="radio-list">
-                    <label for id="{{ continent.getNameMap }}">{{ continent.getName }}</label>
-                    <input type="radio" name="continent" id="{{ continent.getNameMap }}" value="{{ continent.getName }}">
+        </div>
+        <div class="main">
+            <section class="navbar">
+                <ul class="nav-bar">
+                    <a href="{{ index }}"><li>Home Page</li></a>
+                    <a href="{{ aboutus }}"><li>About Us</li></a>
+                    <a href="{{ sources }}"><li>Sources</li></a>
+                </ul>
+            </section>
+            <section class="site-forms">
+                <div id="button-show">
+                    {% if mapanalytics %}
+                    <!-- Button to load map-->
+                    <form method="post" action ="" id="mapshow">
+                        {% csrf_token %}
+                        <input type="hidden" name="mapload" value="map.html">
+                        <button type="submit">See Map</button>
+                    </form>
+                    {% elif totalincidents > 0 %}
+                    <!-- Button to load analytics section (visually on the right of map)-->
+                    <form method="post" action ="" id="analysisshow">
+                        {% csrf_token %}
+                        <input type="hidden" name="mapanalytics" value="analysis.html">
+                        <button type="submit">See Global Analytics</button>
+                    </form>
+                    {% endif %}
                 </div>
-                {% endfor %}
-                <button type="submit">Load continent analytics</button>
-            </form>
-        </section>
-        <section class="map-analytics">
-            {% include "filter.html" %}
-            <!-- load map (map.html) after clicking maploader button -->
-            {% if mapload %}
-                {% include mapload %}
+                <section class="switch-content">
+                    <div class="single-switch">
+                        <h4>Switch for data relating to continents/countries</h4>
+                        <form method="get" action="" id="dataregionswitchform">
+                            {% csrf_token %}
+                            {% if startdate %}
+                                <input type="hidden" name="startdate" value="{{startdate}}">
+                            {% endif %}
+                            {% if enddate %}
+                                <input type="hidden" name="enddate" value="{{enddate}}">
+                            {% endif %}
+                            {% if selectedreceivercats %}
+                                {% for cat in selectedreceivercats %}
+                                <input type="hidden" name="receivertype" id="{{cat}}" value="{{cat}}">
+                                {% endfor %}
+                            {% endif %}
+                            {% if selectedreceiversubcats %}
+                                {% for subcat in selectedreceiversubcats %}
+                                <input type="hidden" name="receiversubtype" id="{{subcat}}" value="{{subcats}}">
+                                {% endfor %}
+                            {% endif %}
+                            {% if switchgroup %}
+                                <input type="hidden" name="group" value="{{switchgroup}}">
+                            {% endif %}
+                            <label class="switch">
+                            {% if switchregion == 'on' %}
+                                <input type="checkbox" name="region" id="country-selected" checked onchange="this.form.submit()">
+                                <span class="slider"></span>
+                            </label>
+                            <label for="country-selected">Countrys</label>
+                            {% else %}
+                                <input type="checkbox" name="region" id="continent-selected" onchange="this.form.submit()">
+                                <span class="slider"></span>
+                            </label>
+                            <label for="continent-selected">Continents</label>
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="single-switch">
+                        <h4>Switch for data relating to attack receivers or attackers</h4>
+                        <form method="get" action="" id="datagroupswitchform">
+                            {% csrf_token %}
+                            {% if startdate %}
+                                <input type="hidden" name="startdate" value="{{startdate}}">
+                            {% endif %}
+                            {% if enddate %}
+                                <input type="hidden" name="enddate" value="{{enddate}}">
+                            {% endif %}
+                            {% if selectedreceivercats %}
+                                {% for cat in selectedreceivercats %}
+                                <input type="hidden" name="receivertype" id="{{cat}}" value="{{cat}}">
+                                {% endfor %}
+                            {% endif %}
+                            {% if selectedreceiversubcats %}
+                                {% for subcat in selectedreceiversubcats %}
+                                <input type="hidden" name="receiversubtype" id="{{subcat}}" value="{{subcats}}">
+                                {% endfor %}
+                            {% endif %}
+                            {% if switchregion %}
+                                <input type="hidden" name="region" value="{{switchregion}}">
+                            {% endif %}
+                            <label class="switch">
+                                {% if switchgroup == 'on' %}
+                                    <input type="checkbox" name="group" id="receiver-selected" checked onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                            </label>
+                            <label for="receiver-selected">Attackers</label>
+                                {% else %}
+                                    <input type="checkbox" name="group" id="attacker-selected" onchange="this.form.submit()">
+                                    <span class="slider"></span>
+                            </label>
+                            <label for="attacker-selected">Attack Receivers</label>
+                                {% endif %}
+                        </form>
+                    </div>
+                </section>
+            </section>
+            <section class="map-analytics">
+                {% include "filter.html" %}
+                <!-- load map analytics (analysis.html)-->
+                {% if mapanalytics %}
+                    {% include mapanalytics %}
+                {% else %}
+                <!-- load map (map.html) after clicking maploader button -->
+                    {% include mapload %}
+                {% endif %}
+            </section>
+        </div>
+        <!-- include continent.html (as pop up) if continent GET value known -->
+        {% if continent %}
+            {% if receiver %}
+                {% include "continentreceiver.html" %}
+            {% elif attacker %}
+                {% include "continentattacker.html" %}
             {% endif %}
-            <!-- load map analytics (analysis.html)-->
-            {% if mapanalytics %}
-                {% include mapanalytics %}
+        <!-- included country.html (as pop up) if country GET value known -->
+        {% elif country %}
+            {% if receiver %}
+                {% include "countryreceiver.html" %}
+            {% elif attacker %}
+                {% include "countryattacker.html" %}
             {% endif %}
-        </section>
-    </div>
-    <!-- include continent.html (as pop up) if continent GET value known -->
-    {% if continent %}
-        {% include "continent.html" %}
-    {% endif %}
-</body> 
+        {% endif %}
+    </body>
 </html>
 
 

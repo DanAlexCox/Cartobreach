@@ -1,0 +1,72 @@
+
+/* CSS for order switch */
+#switchorderform .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+#switchorderform .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+#switchorderform .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+#switchorderform .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+#switchorderform input:checked + .slider {
+    background-color: #2196F3;
+}
+#switchorderform input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+#switchorderform input:checked + .slider:before {
+    transform: translateX(26px);
+}
+/* CSS for search form */
+#searchcountryform {
+    width: 50%;
+}
+
+#countrysearch {
+    width: 90%;
+}
+
+/* CSS for table */
+.table-container {
+    width: 100%;
+}
+.sources-table {
+    width: 100%;
+    max-width: 100%;
+    border: 2px solid black;
+    table-layout: fixed;
+    word-wrap: break-word;
+    border-collapse: collapse;
+}
+
+.sources-table td, .sources-table th {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.source-head, .source {
+    width: 50%;
+}

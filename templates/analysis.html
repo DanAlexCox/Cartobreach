@@ -1,17 +1,14 @@
 <!-- load dataset analytics (analysis.html) after clicking analyticsloader button -->
+<!-- TASK: UPDATE ANALYTICS MORE ANALYSIS -->
 <section class="analytics">
     <ul>
         <li>Total recorded incidents: {{totalincidents}}</li>
-        <li>Number of attacks on corporate industry: {{corporateattacks}} ({{corporateattackspercent}}% of total recorded incidents)</li>
-        <li>Number of attacks on military forces: {{militaryattacks}} ({{militaryattackspercent}}% of total recorded incidents)</li>
-        
-        <li>Annual chart (Total incidents recorded each year)</li>
-        {% load static %}
-        <img src="{% static 'images/incidents_per_year.png' %}" alt="Annual incidents">
-        
-        <li>Monthly chart (total incidents recorded each month grouped by receiver continent)</li>
-        {% load static %}
-        <img src="{% static 'images/continent_incidents_per_month.png' %}" alt="Monthly continent victims">
+        <li>Annual total chart (Total incidents recorded each year)</li>
+        {{totalincidentsvg}}
+        <li>Quarterly total chart for each region (total incidents recorded each quarter grouped by region)</li>
+        {{quartersvg}}
+        <li>Number of attacks on critical infrastructure: {{criticalattacks}} ({{criticalattackspercent}}% of total recorded incidents)</li>
     </ul>
-    <p>Disclaimer: Data recorded by European Repository of Cyber Incidents (EuRepoC)</p>
+    <a href="https://eurepoc.eu/methodology/"><p>Disclaimer: Data recorded by European Repository of Cyber Incidents (EuRepoC)</p></a>
+    <a href="https://zenodo.org/records/14965395"><p>Database found here</p></a>
 </section>

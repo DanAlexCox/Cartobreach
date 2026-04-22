@@ -1,37 +1,7 @@
 <!-- map img -->
 <div id="map">
+    <p>*Hover over a map region to view various analytics for that area*</p>
     <!-- Render svg with clickable feature to open continents.html-->
     {{ map }}
 </div>
-
-<!-- <script>
-    // function for popping up mappopup
-    function showPopup(strType){
-        
-        const poppup = document.getElementById("mappopup");
-        const content = document.getElementById("popupContent");
-        const param = getUrlParam();
-        if(!param){
-            content.style.visibility = "hidden";
-        } 
-
-        if (param.type === "ct") {
-
-            content.innerHTML = `
-                <h3>${contName}</h3>
-                <p>Continent code: <strong>${param.code}</strong></p>`;
-        }
-        // if (param.type === "cy") {
-        //     const country = Object.values(countryBySvg).find(
-        //     c => c.count === param.code
-        // );
-        // if (!country) return;
-        //     content.innerHTML = `
-        //         <h3>${country.count}</h3>
-        //         <p>Continent: <strong>${continentNames[country.cont]}</strong></p>`;
-        // }
-        popup.classList.remove("hidden");
-    }
-    window.addEventListener("popstate", showPopup);
-</script> -->
 

@@ -1,16 +1,61 @@
 <!-- filter post form -->
-    <form method="get" action="" id="filterform">
-        <h2>Filter</h2>
+<div id="filterform">
+    <form method="get" action="" id="filterSubmitform">
+        <h3>Filter</h3>
         <div id="filter-range">
-            <h3>Data range</h3>
+            <h4>Data range</h4>
+            <p>*Incidents recorded between 1st Jan 2000 - 1st Jan 2025*</p>
             <div id="filter-content">
                 {% csrf_token %}
                 <label for="startdate">Start</label>
                 <input type="date" name="startdate" value="{{startdate}}">
-                {% csrf_token %}
                 <label for="enddate">End</label>
                 <input type="date" name="enddate" value="{{enddate}}">
             </div>
+            <h4>Select Victim Type Within Each Region</h4>
+            <div id="receiver-content">
+                {% csrf_token %}
+                <div id="receiver-type-content">
+                    <h4>Types</h4>
+                    {% for key, value in receiversubcatdict.items %}
+                        {% if key in selectedreceivercats %}
+                            <div class="receiver-type-option">
+                                <input type="checkbox" name="receivertype" id="{{key}}" value="{{key}}" checked>
+                                <label for="{{key}}">{{key}}</label>
+                            </div>
+                            <h4>Sub-types</h4>
+                            <div class="receiver-type-subtype-options">
+                            {% for receiversubcat in value %}
+                                <div class="receiver-subtype-option">
+                                    {% if receiversubcat in selectedreceiversubcats %}
+                                        <input type="checkbox" name="receiversubtype" id="{{receiversubcat}}" value="{{receiversubcat}}" checked>
+                                        <label for="{{receiversubcat}}">{{receiversubcat}}</label>
+                                    {% else %}
+                                        <input type="checkbox" name="receiversubtype" id="{{receiversubcat}}" value="{{receiversubcat}}">
+                                        <label for="{{receiversubcat}}">{{receiversubcat}}</label>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="receiver-type-option">
+                                <input type="checkbox" name="receivertype" id="{{key}}" value="{{key}}">
+                                <label for="{{key}}">{{key}}</label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
+        <!-- Retain existing presubmitted non-filter variables -->
+        <input type="hidden" name="region" value="{{switchregion}}">
+        <input type="hidden" name="group" value="{{switchgroup}}">
         <button type="submit">Filter</button>
     </form>
+    <!-- Reset page button -->
+    <form method="post" action=".." id="resetform">
+        {% csrf_token %}
+        <input type="hidden" name="reset" value = "reset">
+        <button type="submit">Reset</button>
+    </form>
+</div>

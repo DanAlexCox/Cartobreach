@@ -1,5 +1,3 @@
-# Class for website
-
 # Class for map
 class Map:
     def __init__(self, width, height, x, y):
@@ -34,11 +32,19 @@ class Map:
         
 # Class for continents
 class Continent:
-    def __init__(self, name, alpha_code, name_map, val=1):
+    def __init__(self, name, alpha_code, name_map, val=1, most_inci='N/A', most_inci_count='N/A', crit_infra_count='N/A',
+                 edu_count='N/A', multi_count='N/A', recent_name='N/A', recent_date='N/A'):
         self._name = name # name of continent
         self._alpha_code = alpha_code # alpha code of continent
         self._name_map = name_map # name on world map
         self._val = val # active value of continent
+        self._most_inci = most_inci # active value of most popular incident type
+        self._most_inci_count = most_inci_count # active value of total most popular incident type
+        self._crit_infra_count = crit_infra_count # active value of total critical infrastructure receivers
+        self._edu_count = edu_count # active value of total education receivers
+        self._multi_count = multi_count # active value of total incidents affecting more than current continent
+        self._recent_name = recent_name # active name of recent incident
+        self._recent_date = recent_date # active date of recent incident
     
     def getName(self): # name getter
         return self._name 
@@ -63,42 +69,153 @@ class Continent:
     
     def setValue(self, value): # active value of continent setter
         self._val = value
+        
+    def getMostInci(self): # active value of continent incident type getter
+        return self._most_inci
+    
+    def setMostInci(self, value): # active value of continent incident type setter
+        self._most_inci = value
+        
+    def getMostInciCount(self): # active value of continent incident type count getter
+        return self._most_inci_count
+    
+    def setMostInciCount(self, value): # active value of continent incident type count setter
+        self._most_inci_count = value
+    
+    def getCritInfraCount(self): # active value of continent incidents affecting critical infrastructure getter
+        return self._crit_infra_count
+    
+    def setCritInfraCount(self, value): # active value of continent incidents affecting critical infrastructure setter
+        self._crit_infra_count = value
+    
+    def getEduCount(self): # active value of continent incidents affecting education getter
+        return self._edu_count
+    
+    def setEduCount(self, value): # active value of continent incidents affecting education setter
+        self._edu_count = value
+    
+    def getMultiCount(self): # active value of continent incidents affecting multiple countries getter
+        return self._multi_count
+    
+    def setMultiCount(self, value): # active value of continent incidents affecting multiple countries setter
+        self._multi_count = value
+    
+    def getRecentName(self): # active name of recent continent incident getter
+        return self._recent_name
+    
+    def setRecentName(self, value): # active name of recent continent incident setter
+        self._recent_name = value
+    
+    def getRecentDate(self): # active date of recent continent incident getter
+        return self._recent_date
+    
+    def setRecentDate(self, value): # active date of recent continent incident setter
+        self._recent_date = value
     
 # Class for countries
 class Country:
-    def __init__(self, name, alpha_code, cont_code, val=1):
+    def __init__(self, name, alpha_code_up, alpha_code_low, continent, val=1, most_inci='N/A', most_inci_count='N/A', crit_infra_count='N/A',
+                 edu_count='N/A', multi_count='N/A', recent_name='N/A', recent_date='N/A'):
         self._name = name # name of country
-        self._alpha_code = alpha_code # alpha 2 code of country
-        self._cont_code = cont_code # continent code where country is
+        self._alpha_code_up = alpha_code_up # alpha 2 code upper case of country
+        self._alpha_code_low = alpha_code_low # alpha 2 code lower case of country
+        self._continent = continent # assigned continent
         self._val = val # active value on map
-    
+        self._most_inci = most_inci # active value of most popular incident type
+        self._most_inci_count = most_inci_count # active value of total most popular incident type
+        self._crit_infra_count = crit_infra_count # active value of total critical infrastructure receivers
+        self._edu_count = edu_count # active value of total education receivers
+        self._multi_count = multi_count # active value of total incidents affecting more than current country
+        self._recent_name = recent_name # active name of recent incident
+        self._recent_date = recent_date # active date of recent incident
+        
     def getName(self):
         return self._name # name getter
     
     def setName(self, value):
         self._name = value # name setter
     
-    def getAlphaCode(self):
-        return self._alpha_code # country alpha code getter
+    def getAlphaCodeUp(self):
+        return self._alpha_code_up # country upper case alpha code getter
     
-    def setAlphaCode(self, value): # country setter
-        self._alpha_code = value
+    def setAlphaCodeUp(self, value): # country upper case setter
+        self._alpha_code_up = value
     
-    def getContCode(self):
-        return self._cont_code # continent code getter
+    def getAlphaCodeLow(self):
+        return self._alpha_code_low # country lower case alpha code getter
     
-    def setContCode(self, value): # country setter to continent code
-        self._cont_code = value
+    def setAlphaCodeLow(self, value): # country lower case setter
+        self._alpha_code_low = value
+        
+    def getContinent(self):
+        return self._continent # continent getter
     
+    def setContinent(self, value): # continent setter
+        self._continent = value
+        
     def getValue(self): # active value of country getter
         return self._val
     
     def setValue(self, value): # active value of country setter
         self._val = value
+        
+    def getMostInci(self): # active value of country incident type getter
+        return self._most_inci
     
+    def setMostInci(self, value): # active value of country incident type setter
+        self._most_inci = value
+        
+    def getMostInciCount(self): # active value of country incident type count getter
+        return self._most_inci_count
+    
+    def setMostInciCount(self, value): # active value of country incident type count setter
+        self._most_inci_count = value
+    
+    def getCritInfraCount(self): # active value of country incidents affecting critical infrastructure getter
+        return self._crit_infra_count
+    
+    def setCritInfraCount(self, value): # active value of country incidents affecting critical infrastructure setter
+        self._crit_infra_count = value
+    
+    def getEduCount(self): # active value of country incidents affecting education getter
+        return self._edu_count
+    
+    def setEduCount(self, value): # active value of country incidents affecting education setter
+        self._edu_count = value
+    
+    def getMultiCount(self): # active value of country incidents affecting multiple countries getter
+        return self._multi_count
+    
+    def setMultiCount(self, value): # active value of country incidents affecting multiple countries setter
+        self._multi_count = value
+    
+    def getRecentName(self): # active name of recent country incident getter
+        return self._recent_name
+    
+    def setRecentName(self, value): # active name of recent country incident setter
+        self._recent_name = value
+    
+    def getRecentDate(self): # active date of recent country incident getter
+        return self._recent_date
+    
+    def setRecentDate(self, value): # active date of recent country incident setter
+        self._recent_date = value
 
-# Class for scaling continents
-
-# Class for scaling countries
-
-# Class for filter
+# Class for categories with sub types
+class Category:
+    def __init__(self, cat_type, cat_subtypes):
+        self._cat_type = cat_type # category type option
+        self._cat_subtypes = cat_subtypes # category subtype options
+        
+    def getCatType(self): # category type getter
+        return self._cat_type
+    
+    def setCatType(self, value): # category type setter
+        self._cat_type = value
+        
+    def getCatSubType(self): # category subtype getter
+        return self._cat_subtypes
+    
+    def setSubCatType(self, value): # category subtype setter
+        self._cat_subtypes = value
+    

@@ -1,8 +1,10 @@
 from .classes.classes import Continent
-from pygal_maps_world.maps import SupranationalWorld #install pygal pygal_maps_world via pip
-from bs4 import BeautifulSoup # install beautifulsoup4 then install lxml
+from pygal_maps_world.maps import SupranationalWorld # install pygal pygal_maps_world via pip
+from urllib.parse import urlencode
+from textwrap import wrap
+from . import map
 
-#Constructing continent objects
+# constructing continent class objects
 AF = Continent("Africa", "AF", "africa")
 AN = Continent("Antartica", "AN", "antartica")
 AS = Continent("Asia", "AS", "asia")
@@ -14,28 +16,71 @@ SA = Continent("South America", "SA", "south_america")
 # make continent list for getting individual supranationalworld svgs
 continentList = [AF, AN, AS, EU, NA, OC, SA]
 
-# function that creates and renders continent map to file continents map
-def renderContinentMap():
-    worldmap = SupranationalWorld(title='Continents', show_legend=False) # Create world map
+# function that creates and renders continent map
+def renderContinentMap(total_value, getfullpath):
+    # style colour of map
+    worldmap = SupranationalWorld(title='Continents', legend_at_bottom=True, legend_box_size = 10,style=map.pygalStyle, print_labels=True) # Create world map
     # adding the continents
     for continents in continentList:
+        # only calculate total continent percentage value if total_value is an integer
+        if isinstance(total_value, int):
+            # only calculate continent percentage values if continents.getValue() is an integer
+            if isinstance(continents.getValue(), int):
+                totalPerc = continents.getValue()/total_value * 100 if total_value > 0 else 0
+                if isinstance(continents.getMostInciCount(), int):
+                    typePerc = continents.getMostInciCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    typePerc = 'N/A'
+                if isinstance(continents.getCritInfraCount(), int):
+                    critInfraPerc = continents.getCritInfraCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    critInfraPerc = 'N/A'
+                if isinstance(continents.getEduCount(), int):
+                    eduPerc = continents.getEduCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    eduPerc = 'N/A'
+                if isinstance(continents.getMultiCount(), int):
+                    multiPerc = continents.getMultiCount()/continents.getValue() * 100 if continents.getValue() > 0 else 0
+                else:
+                    multiPerc = 'N/A'
+            else:
+                print("cValue not an int")
+        else:
+            print("tValue not an int")
+        
+        # if recent name is longer that 100 character split
+        nameList = []
+        if len(continents.getRecentName()) > 100:
+            nameList = wrap(continents.getRecentName(),100) # help from: https://stackoverflow.com/a/48860937
+        else:
+            nameList.append(continents.getRecentName())
+        
+        nameString =''
+        # construct name split for tooltip
+        for namePart in nameList:
+            nameString += str(namePart) +'\n'
+            
+        # check if other get variable exist (i.e. check if getfullpath has ? in it)
+        xLinkString = ''
+        if '?' in getfullpath:
+            xLinkString = f"{getfullpath}&{urlencode({'continent':continents.getAlphaCode()})}"
+        else:
+            xLinkString = f"{getfullpath}?{urlencode({'continent':continents.getAlphaCode()})}"
+        
         worldmap.add(
-            continents.getName(), [(continents.getNameMap(),continents.getValue())]
-                # continents.getNameMap(): {
-                #     'value':continents.getValue(),
-                #     'label':f'{continents.getName()} incidents: {continents.getValue()}',
-                #     'xlink:href':f'/continent/{continents.getNameMap()}/'
-                #     }
-                # }
-    
-            )
+            continents.getName(), [{
+                'value' : (continents.getNameMap(),
+                          '\nTotal number of incidents - '+str(continents.getValue())+' ('+str(totalPerc)+'% of the filtered data)'
+                          +'\nIncident type occurring the most - '+str(continents.getMostInci())+' ('+str(typePerc)+'% of the filtered continent data)' # most occurences of an incident type
+                          +'\nNumber of incidents affecting critical infrastructure - '+str(continents.getCritInfraCount())+ ' ('+str(critInfraPerc)+'% of the filtered continent data)'    # count critical infrastructure
+                          +'\nNumber of incidents affecting education - '+str(continents.getEduCount())+ ' ('+str(eduPerc)+'% of the filtered continent data)'   # count education
+                          +'\nNumber of incidents affecting more than this continent - '+str(continents.getMultiCount())+ ' ('+str(multiPerc)+'% of the filtered continent data)'    # count only >1 continent in receiver continent
+                          +'\nLast known incident:\n'
+                          + '- '+nameString # most recent incident "name" 
+                          +'- Dated: '+str(continents.getRecentDate())  # most recent incident "start date" 
+                          ),
+                'xlink' : xLinkString # LINK WORKS solution: https://github.com/Kozea/pygal/issues/173
+            }]
+        )
     return worldmap.render().decode("utf-8")
-    
-    # mark_safe(svg.to_file('static/images/continents_map.svg', x_title="Hover over continent to see incident numbers.")) # render the map in a SVG file
-
-# render svg images of all continents separately using loop
-# for i in range(0, len(continentList)):
-#     singleContinent = pygal.maps.world.SupranationalWorld(show_legend=False)
-#     singleContinent.add(continentList[i].getName(), [continentList[i].getNameMap()])
-#     singleContinent.render_to_file('Cartobreach/static/images/continents_map_'+continentList[i].getNameMap()+'.svg')
 

@@ -5,6 +5,7 @@ import pycountry_convert as pcc # import pycountry-convert
 import pygal as py
 from datetime import datetime # import datetime function
 from .continents import AF,AN,AS,EU,NA,OC,SA # import continent objects
+from . import map
 
 pd.options.mode.chained_assignment = None
 
@@ -24,8 +25,12 @@ def cleanColumn(column):
 
 # function for counting how many instances are in an uncleaned column
 def countUncleanColumnValues(column, search):
-    # clean column and turn into list
-    cleanedColumn = cleanColumn(column)
+    # check if column already has been cleaned
+    if column.apply(lambda v: isinstance(v, list)).all():
+        cleanedColumn = column
+    else:
+        # clean column and turn into list
+        cleanedColumn = cleanColumn(column)
     return cleanedColumn.apply(lambda x: isinstance(x, list) and search in x).sum()
 
 # function that converts country alpha codes to continents
@@ -51,7 +56,7 @@ def filterDateTime(series):
     series = series.apply(convertDateTime)
     return series[series.apply(lambda x: isinstance(x, datetime))]
 
-# function that filters every row that doesnt have only value in each row
+# function that filters every row that does have only value in each row
 def filterSingleColumn(dataset, cellList):
     # clean column
     cellList = cleanColumn(cellList)
@@ -59,8 +64,9 @@ def filterSingleColumn(dataset, cellList):
 
 # function that filters every row that doesnt have only value in each row
 def filterMultipleColumns(dataset, column):
-    # clean column
-    column = cleanColumn(column)
+    # check first row if its a str not a list
+    if not isinstance(column.iloc[0], list):
+        column = cleanColumn(column)
     return dataset[column.apply(lambda x: isinstance(x, list) and len(x) > 1)]
 
 # function that filters a specific value from series
@@ -95,40 +101,43 @@ def specificIntensity(scorecolumn, regioncolumn, region):
     return filterSpecificColumn(regioncolumn, region)[scorecolumn].apply(lambda x: 2 if "2 points" in x else (1 if "1 point" in x else 0)).sum()
 
 # function that cuts data series into cut dates between minimum date and maximum
-def filterDateRange(dataset, dateColumnSeries, min, max):
-    filteredSeries = filterDateTime(dateColumnSeries) # filter date series
-    if isinstance(min, str) and isinstance(max, str): # if min and max dates are string
-        min = pd.Timestamp(datetime.strptime(min, '%d.%m.%Y')) #convert date string to datetime
-        max = pd.Timestamp(datetime.strptime(max, '%d.%m.%Y')) #convert date string to datetime
-    # union comparison of min and max ranges
-    return dataset[filteredSeries.apply(lambda x: x >= min) & filteredSeries.apply(lambda x: x < max)]
+def filterDateRange(dataset, dateColumnSeries, min_date, max_date):
+
+    # convert column to datetime
+    dates = pd.to_datetime(dateColumnSeries, format="%d.%m.%Y", errors='coerce')
+
+    # convert min/max if strings
+    if isinstance(min_date, str):
+        min_date = pd.to_datetime(min_date, format="%d.%m.%Y")
+
+    if isinstance(max_date, str):
+        max_date = pd.to_datetime(max_date, format="%d.%m.%Y")
+
+    # boolean mask
+    mask = (dates >= min_date) & (dates < max_date)
+
+    return dataset.loc[mask]    
 
 # function that adds rows in a date range
 def countInDateRange(dataset, dateColumnSeries, min, max):
-    return filterDateRange(dataset, dateColumnSeries, min, max).count()
+    dateFiltered = filterDateRange(dataset, dateColumnSeries, min, max)
+    return len(dateFiltered.index)
 
-# function that constructs line plot for yearly incident counts between dataset minimum and maximum date
-def yearlyIncidentLinePlot(dataset, dateColumnSeries, dataMin, dataMax):
+# function that constructs bar plot for yearly incident counts between dataset minimum and maximum date
+def yearlyIncidentBarPlot(dataset, startdate='01.01.2020', enddate='01.01.2025'):
     # yearly date range list
-    yearRange = pd.date_range(start=dataMin, end=dataMax, freq='YS').to_pydatetime()
+    yearRange = pd.date_range(start=startdate, end=enddate, freq='YS').to_pydatetime()
     # date range counts of each year (count up to end of year, end of year)
+    bar = py.Bar(title='Total incidents recorded every year', x_title='Timeline',
+                            y_title='Number of incidents', x_label_rotation=30)
     x_values = []
-    xtick_replace = []
-    xtick_values = []
     y_values = []
     for i in range(0, len(yearRange)-1):
-        x_values.append(str(yearRange[i]))
-        if yearRange[i].year % 2 == 0: # determine x axis scale i.e. xticks
-            xtick_replace.append(str(yearRange[i]))
-            xtick_values.append(str(yearRange[i].year))
-        y_values.append(countInDateRange(dataset, dateColumnSeries, yearRange[i], yearRange[i+1]))
-    # plot line plot (x: year, y: number of incidents)
-    ppl.figure()
-    ppl.plot(x_values, y_values)
-    ppl.xlabel("Year")
-    ppl.xticks(xtick_replace, xtick_values)
-    ppl.ylabel("No. of Incidents")
-    ppl.savefig("Cartobreach/static/images/incidents_per_year.png")
+        x_values.append(str(yearRange[i].year))
+        y_values.append(countInDateRange(dataset, dataset['start_date'], yearRange[i], yearRange[i+1]))
+    bar.x_labels = x_values
+    bar.add ('Total each year', y_values)
+    return bar.render().decode("utf-8")
 
 # function that cuts data into specified range with one condition
 def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
@@ -141,39 +150,51 @@ def filterDataRange(dateColumnSeries, dataColumn, value, min, max):
 
 # function that adds rows in data range
 def countInDataRange(dateColumnSeries, dataColumn, value, min, max):
-    return filterDataRange(dateColumnSeries, dataColumn, value, min, max).count()
+    dataFiltered = filterDataRange(dateColumnSeries, dataColumn, value, min, max)
+    return len(dataFiltered.index)
 
-# function that constructs a scatter plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
-def monthlyAllAreasIncidentLinePlot(dateColumnSeries, cleanedArea):
-    uniqueArea = cleanedArea.explode().unique() # get list of only unique values in dataColumn
+# function that orders based on date (ascending/descending)
+def orderByDate(dataset, dateColumn, order):
+    if not isinstance(dataset, pd.DataFrame):
+        return False
+    # check input 'order' is either ascending (True) or descending (False) source: https://www.geeksforgeeks.org/python/how-to-sort-a-pandas-dataframe-by-date/
+    if order in [True, False]:
+        dataset[dateColumn] = convertDateTime(dataset[dateColumn])
+        dataset = dataset.sort_values(by=dateColumn, ascending=order)
+        return dataset
+    else:
+        return "Invalid order"     
+
+# function that constructs a line plot with monthly incidents for all cleaned areas (continents/countries)(cleanColumn(...))
+def quarterAllAreasIncidentLinePlot(series, filterColumnSeries, legendList, startdate='01.01.2020', enddate='01.01.2025'):
+    if not isinstance(legendList, list):
+        print("legendlist not a list")
+        exit()
     # dataset lifetime monthly range list for all areas 
-    monthRange = pd.date_range(start='01.01.2000', end = '01.01.2025', freq='MS').to_pydatetime()
-    xtick_replace= [] # replace select months
-    xtick_values = [] # xtick new scale values
-    area_allocation = [] #allocates x,y values to area
-    ppl.figure() # get all area data
-    for area in range(0, len(uniqueArea)):
-        x_values = [] # new area needs new x values
-        y_values = [] # new area needs new y values
+    monthRange = pd.date_range(start=startdate, end = enddate, freq='3MS').to_pydatetime()
+                
+    line = py.DateTimeLine(title='Line Chart Quarterly Incidents', x_title='Timeline',show_minor_x_labels=False,
+                            y_title='Incidents every 4 months', show_dots=True, x_label_rotation=30,
+                            x_value_formatter=lambda dt: str(dt.year),legend_at_bottom = True,
+                            legend_at_bottom_columns=20) # Set graph and axis titles
+    # get year for start and end date
+    startYear = int(startdate.split('.')[-1])
+    endYear = int(enddate.split('.')[-1])
+    line.x_labels_major = [datetime(year, 1, 1) for year in range(startYear, endYear)]
+    for area in range(0, len(legendList)):
+        filteredSeries = filterSpecificColumn(series, filterColumnSeries, legendList[area]) # filter by column value eg. EU
+        coords_values = []
         for i in range(0, len(monthRange)-1): # find count for each area
-            x_values.append(str(monthRange[i]))
-            if (monthRange[i].month % 12 == 0) and (monthRange[i].year % 2 == 0): # scale for years
-                xtick_replace.append(str(monthRange[i]))
-                xtick_values.append(str(monthRange[i].year))
-            # count incidents for an area and within month range make function
-            y_values.append(countInDataRange(dateColumnSeries, cleanedArea, uniqueArea[area], monthRange[i], monthRange[i+1]))
-        area_allocation.append([uniqueArea[area],[x_values, y_values]])
+            coords_values.append((monthRange[i], countInDateRange(filteredSeries['start_date'], filteredSeries['start_date'],
+                                                                    monthRange[i], monthRange[i+1])))
         # plot line graph figures
-        ppl.plot(area_allocation[area][1][0], area_allocation[area][1][1])
-    ppl.xlabel("Timeline")
-    ppl.ylabel("Incidents per month")
-    ppl.xticks(xtick_replace, xtick_values)
-    ppl.savefig("Cartobreach/static/images/continent_incidents_per_month.png")
+        line.add(str(legendList[area]), coords_values)
+    return line.render().decode("utf-8")
 
 # function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values
-def pieChart(dataColumnSeries):
+def pieChart(dataColumnSeries, titleName='Pie Chart Template'):
     # initialize pie chart
-    pie = py.Pie(show_legend = False)
+    pie = py.Pie(title= titleName, legend_at_bottom=True, style=map.pygalSideStyle)
     pie.title = 'Pie chart'
     # get list of unique values eg. continents (all 7 continent alpha codes)
     uniqueList = []
@@ -192,9 +213,25 @@ def pieChart(dataColumnSeries):
         pie.add(iList, [{'value':iCount, 'label':str(iCountPercent)+"%"}])
     return pie.render().decode("utf-8")
 
+# function that constructs a pie chart from a dataSeries assume cleaned, a column of unique values chosen from a string list
+# TASK FIX PIE CHART
+def pieChartSpecific(dataColumnSeries, specificList, titleName='Pie Chart Template'):
+    # initialize pie chart
+    pie = py.Pie(title= titleName, legend_at_bottom=True, style=map.pygalSideStyle)
+    pie.title = 'Pie chart'
+    # combine whole series into macroList
+    macroList = []
+    for p in dataColumnSeries:
+        macroList.extend(p)
+    for iList in specificList: # count occurences of unique value in dataColumnSeries
+        iCount = macroList.count(iList)
+        iCountPercent = round(((float(iCount)/float(len(macroList))) * 100),2)
+        pie.add(iList, [{'value':iCount, 'label':str(iCountPercent)+"%"}])
+    return pie.render().decode("utf-8")
+
 # function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars
-def barChart(dataColumnSeries):
-    bar = py.Bar(show_legend = False)
+def barChart(dataColumnSeries, titleName):
+    bar = py.Bar(title=titleName,legend_at_bottom=True, style=map.pygalSideStyle)
     bar.title = "Bar chart"
     # find unique values
     uniqueList = []
@@ -209,6 +246,20 @@ def barChart(dataColumnSeries):
         macroList.extend(b)
     # count occurences of unique value in dataColumnSeries
     for iList in uniqueList: # count occurences of unique value in dataColumnSeries
+        iCount = macroList.count(iList)
+        bar.add(iList, [iCount])
+    return bar.render().decode("utf-8")
+
+# function that constructs a bar chart with dataSeries assume cleaned, a column of unique values for different bars chosen from a string list
+def barChartSpecific(dataColumnSeries, titleName, specificList):
+    bar = py.Bar(title=titleName,legend_at_bottom=True, style=map.pygalSideStyle)
+    bar.title = "Bar chart"
+    # combine whole series into list
+    macroList = []
+    for b in dataColumnSeries:
+        macroList.extend(b)
+    # count occurences of unique value in dataColumnSeries
+    for iList in specificList: # count occurences of specified values in dataColumnSeries
         iCount = macroList.count(iList)
         bar.add(iList, [iCount])
     return bar.render().decode("utf-8")

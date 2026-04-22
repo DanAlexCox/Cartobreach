@@ -23,26 +23,18 @@ Cartobreach:
 - static
 
 ## Known Issues
-- Main map unclickable
-- Charts unclear
-- No legends for charts
-- Monthly chart data cuts off at 2014
-- Site unreponsive when selecting Antarctica "ZeroDivisionError"
-- Continent data not considering data range filter
-- No home button
+- No chart titles
+- Stuck on specific region, need back/hide button
+- Link index filter to sources filter not vice versa
+- Problem with values and assigning to map?????
+- Finish region analysis for attackers and receivers
 
 ## Hosting Issues
 - Static files not present due to Render limited free services
 - Long loading due to Render limited free services
 
 ## Upcoming features
-- Country version
-- Link to GitHub Repository on site
 - Add scatter diagrams
-- More advanced filter
-- Referencing original sources
-- Review section
-- Intensity scale on map
 
 ## Author
 Mr Daniel Alexander Cox
