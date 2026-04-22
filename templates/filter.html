@@ -21,7 +21,7 @@
                         {% if key in selectedreceivercats %}
                             <div class="receiver-type-option">
                                 <input type="checkbox" name="receivertype" id="{{key}}" value="{{key}}" checked>
-                                <label for="{{key}}">-{{key}}</label>
+                                <label for="{{key}}">{{key}}</label>
                             </div>
                             <h4>Sub-types</h4>
                             <div class="receiver-type-subtype-options">
@@ -29,10 +29,10 @@
                                 <div class="receiver-subtype-option">
                                     {% if receiversubcat in selectedreceiversubcats %}
                                         <input type="checkbox" name="receiversubtype" id="{{receiversubcat}}" value="{{receiversubcat}}" checked>
-                                        <label for="{{receiversubcat}}">-{{receiversubcat}}</label>
+                                        <label for="{{receiversubcat}}">{{receiversubcat}}</label>
                                     {% else %}
                                         <input type="checkbox" name="receiversubtype" id="{{receiversubcat}}" value="{{receiversubcat}}">
-                                        <label for="{{receiversubcat}}">-{{receiversubcat}}</label>
+                                        <label for="{{receiversubcat}}">{{receiversubcat}}</label>
                                     {% endif %}
                                 </div>
                             {% endfor %}
@@ -40,7 +40,7 @@
                         {% else %}
                             <div class="receiver-type-option">
                                 <input type="checkbox" name="receivertype" id="{{key}}" value="{{key}}">
-                                <label for="{{key}}">-{{key}}</label>
+                                <label for="{{key}}">{{key}}</label>
                             </div>
                         {% endif %}
                     {% endfor %}
