@@ -266,7 +266,7 @@ input[type="date"]::-webkit-datetime-edit-ampm-field{
 }
 
 .analytics svg {
-    width: 60%;
+    overflow: visible;
 }
 /* map popup style */
 .mappopup{
