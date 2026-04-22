@@ -43,7 +43,7 @@ def index(request):
     selectedReceiverSubCat = request.GET.getlist("receiversubtype")
     mapanalytics = request.POST.get('mapanalytics')
     filterReset = request.POST.get('reset')
-    popUpClose = request.POST.get('popup')
+    popUpClose = request.POST.get('popup', None)
     mapload = None
     
     if filterReset == 'reset':
@@ -59,6 +59,8 @@ def index(request):
     
     # condition requests
     # find out if continent or country is selected on map
+    getContinent = None
+    getCountry = None
     if popUpClose != 'close': # check if close button is pressed to hide code
         if selectRegion == None:
             getCountry = None
@@ -71,6 +73,7 @@ def index(request):
     else:
         getContinent = request.GET.get('continent') # load GET continent (value should be .getAlphaCode())
         getCountry = None
+        selectDict['receivercontinent'] = getContinent
         selectRegion = None
     
     # find out if receiver or attacker is selected from switches
